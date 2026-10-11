@@ -114,8 +114,9 @@ the systems, never any brand's logo, mascot, illustrations, fonts, or copy.
 - **Restraint:** solid orange is reserved for actions, selected choice cards, and the landing's closing band.
   Decorative fields use the `.grid-field` utility (Firecrawl's faint grid).
 - **Contrast:** action buttons and internship badges keep the requested white-on-bright-orange treatment
-  (3.3:1). Yellow/gray badges and selected cards use dark text. Other small colored text uses the `-deep`
-  shades (at least 4.5:1 on white and on their tint).
+  (3.3:1). Full-time badges also use white labels on yellow by request, despite the low contrast.
+  Gray badges and selected cards use dark text. Other small colored text uses the `-deep` shades
+  (at least 4.5:1 on white and on their tint).
   `--subtle` is for icons, borders, and placeholders; text uses `--muted` or darker.
 - **Redaction is visible:** small cards use profile-drawn `RedactedResume` thumbnails with hatched identity
   bars. Expanded views show the actual redacted source pages, or the original PDF after purchase, inside

@@ -14,3 +14,7 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
+
+.tag[data-tone="yellow"] {
+  color: var(--surface);
+}

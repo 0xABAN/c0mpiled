@@ -13,7 +13,7 @@ page.setDefaultTimeout(15000);
 
 const badgeColors = {
   Internship: { background: "rgb(255, 77, 0)", color: "rgb(255, 255, 255)" },
-  "Full-time": { background: "rgb(246, 180, 0)", color: "rgb(75, 58, 0)" },
+  "Full-time": { background: "rgb(246, 180, 0)", color: "rgb(255, 255, 255)" },
   "Intern + Full-time": { background: "rgb(235, 235, 235)", color: "rgb(38, 38, 38)" },
 };
 
