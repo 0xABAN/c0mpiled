@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@aws-amplify/adapter-nextjs": "^1.8.0",
+    "@aws-amplify/ui-react": "^6.15.7",
+    "aws-amplify": "^6.22.1",
     "lucide-react": "^1.55.0",
     "next": "15.5.27",
     "react": "19.1.0",
