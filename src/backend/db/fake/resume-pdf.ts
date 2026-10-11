@@ -118,7 +118,7 @@ export async function renderFakeResumePdf(student: FakeResume): Promise<Uint8Arr
       y -= 5;
     }
 
-    section("TECHNICAL SKILLS");
+    section(student.profile.skills.includes("Volunteering") ? "SKILLS" : "TECHNICAL SKILLS");
     paragraph(student.profile.skills.join(", "));
     if (y < 55) throw new Error("Synthetic resume exceeds one page; shorten the fictional content.");
 

@@ -196,10 +196,28 @@ const FIELD_BY_MAJOR: Record<string, keyof typeof FIELDS> = {
   Marketing: "marketing",
 };
 
+/** Service-focused work replaces generic industry examples, not the student's degree coursework. */
+const VOLUNTEER_WORK: Omit<Field, "courses"> = {
+  bullets: [
+    "Organized {count} volunteer shifts for community programs, including onboarding and accessible event check-in.",
+    "Maintained a donor follow-up tracker with consent preferences, acknowledgment dates, and clear staff handoffs.",
+    "Reconciled {count} donation and attendance records before preparing a nonprofit program-impact summary.",
+    "Coordinated a fundraising campaign with volunteer outreach, event logistics, and donor thank-you messages.",
+    "Reviewed volunteer scheduling gaps and documented changes that reduced missed handoffs by {percent}% in a sample review.",
+    "Prepared grant-research notes and separated verified service outcomes from estimates in reports for nonprofit staff.",
+  ],
+  projects: [
+    { name: "Volunteer Shift Planner", bullets: ["Planned community-service shifts around volunteer availability, accessibility needs, and program capacity.", "Documented check-in and reminder procedures for {count} fictional volunteers using consent-based contact lists."] },
+    { name: "Community Fundraising Campaign", bullets: ["Developed a nonprofit campaign brief linking donor outreach, volunteer responsibilities, and event costs.", "Prepared donation acknowledgments and a campaign report using synthetic gift records, not real donor data."] },
+    { name: "Nonprofit Impact Dashboard", bullets: ["Summarized volunteer hours, service attendance, and donation trends from a fictional nonprofit dataset.", "Checked {count} sample records for duplicates and missing values, then documented limits of the impact measures."] },
+  ],
+};
+
 /** Stable variation: rerenders of one fictional person keep the same details and dates. */
 export function fakeResumeContent(student: FakeResume) {
-  const field = FIELDS[FIELD_BY_MAJOR[student.profile.majors[0]]];
-  if (!field) throw new Error(`No fictional resume content defined for ${student.profile.majors[0]}.`);
+  const education = FIELDS[FIELD_BY_MAJOR[student.profile.majors[0]]];
+  if (!education) throw new Error(`No fictional resume content defined for ${student.profile.majors[0]}.`);
+  const field = student.profile.skills.includes("Volunteering") ? VOLUNTEER_WORK : education;
 
   const seed = createHash("sha256").update(student.userId).digest().readUInt32BE(0);
   const fill = (text: string, index: number) => text
@@ -213,7 +231,7 @@ export function fakeResumeContent(student: FakeResume) {
   return {
     degree: `${degree} in ${student.profile.majors.join(" and ")}`,
     educationDates: `Aug ${student.profile.gradYear - duration} - May ${student.profile.gradYear}`,
-    courses: field.courses,
+    courses: education.courses,
     phone: `814-555-${String(100 + seed % 100).padStart(4, "0")}`,
     portfolio: `example.com/${student.name.toLowerCase().replaceAll(" ", "-")}`,
     experience: student.profile.experience.map((job, index) => ({
