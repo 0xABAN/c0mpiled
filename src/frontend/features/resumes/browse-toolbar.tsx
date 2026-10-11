@@ -3,6 +3,7 @@
 import { ChevronDown } from "lucide-react";
 import { useId } from "react";
 
+import { Button } from "@/frontend/components/ui/button";
 import { RemovableChip } from "@/frontend/components/ui/chip";
 import type { ResumeFacets, ResumeFilters, ResumeSort } from "@/frontend/lib/api/types";
 import { pluralize } from "@/frontend/lib/format";
@@ -14,6 +15,8 @@ type BrowseToolbarProps = {
   facets: ResumeFacets;
   total: number;
   unlockedCount: number;
+  canUnlock: boolean;
+  pending: boolean;
   onChange: (next: ResumeFilters) => void;
 };
 
@@ -23,31 +26,44 @@ const SORT_LABELS: Record<ResumeSort, string> = {
 };
 
 /** Result count, sort, the recruiter's All/Unlocked switch, and removable applied filters. */
-export function BrowseToolbar({ filters, facets, total, unlockedCount, onChange }: BrowseToolbarProps) {
+export function BrowseToolbar({ filters, facets, total, unlockedCount, canUnlock, pending, onChange }: BrowseToolbarProps) {
   const sortId = useId();
   const applied = appliedFilters(filters, facets, onChange);
 
-
   return (
     <div className={styles.toolbar}>
+      {canUnlock && (
+        <div className={styles.viewSwitch} role="group" aria-label="Resume view">
+          <Button
+            className={styles.viewButton}
+            variant={filters.unlockedOnly ? "outline" : "primary"}
+            aria-pressed={!filters.unlockedOnly}
+            onClick={() => onChange({ ...filters, unlockedOnly: false })}
+          >
+            All resumes
+          </Button>
+          <Button
+            className={styles.viewButton}
+            variant={filters.unlockedOnly ? "primary" : "outline"}
+            aria-pressed={filters.unlockedOnly}
+            onClick={() => onChange({ ...filters, unlockedOnly: true })}
+          >
+            Unlocked <span className={styles.viewCount}>{unlockedCount}</span>
+          </Button>
+        </div>
+      )}
+
       <div className={styles.row}>
         <p className={styles.count} aria-live="polite">
-          <strong className="tabular">{pluralize(total, "resume")}</strong>
-          {filters.q && <> for “{filters.q}”</>}
+          {pending ? "Updating resumes…" : (
+            <>
+              <strong className="tabular">{pluralize(total, "resume")}</strong>
+              {filters.q && <> for “{filters.q}”</>}
+            </>
+          )}
         </p>
 
         <div className={styles.controls}>
-          {unlockedCount > 0 && (
-            <div className={styles.segmented} role="group" aria-label="Show">
-              <button type="button" aria-pressed={!filters.unlockedOnly} onClick={() => onChange({ ...filters, unlockedOnly: false })}>
-                All
-              </button>
-              <button type="button" aria-pressed={filters.unlockedOnly} onClick={() => onChange({ ...filters, unlockedOnly: true })}>
-                Unlocked · {unlockedCount}
-              </button>
-            </div>
-          )}
-
           <label htmlFor={sortId} className={styles.sortLabel}>
             Sort by
           </label>

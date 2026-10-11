@@ -69,33 +69,32 @@
   pointer-events: none;
 }
 
-/* All / Unlocked switch. */
-.segmented {
-  display: inline-flex;
-  margin-right: 8px;
-  padding: 3px;
-  border: var(--border) solid var(--line);
-  border-radius: var(--radius-md);
+/* View navigation gets its own row instead of competing with the sort control. */
+.viewSwitch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: min(100%, 380px);
+}
+
+.viewSwitch .viewButton {
+  min-width: 0;
+  padding: 0 12px;
+  gap: 8px;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.viewCount {
+  padding: 4px 6px;
+  border-radius: 6px;
   background: var(--sunken);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
-.segmented button {
-  height: 32px;
-  padding: 0 14px;
-  border: 0;
-  border-radius: 9px;
-  background: transparent;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.segmented button[aria-pressed="true"] {
-  background: var(--surface);
-  box-shadow: inset 0 0 0 2px var(--line), inset 0 -3px 0 var(--line);
-  color: var(--accent-deep);
+.viewButton[aria-pressed="true"] .viewCount {
+  background: rgb(255 255 255 / 0.2);
 }
 
 .applied {

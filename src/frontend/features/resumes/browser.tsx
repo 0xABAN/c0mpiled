@@ -2,7 +2,7 @@
 
 import { LockKeyhole, SlidersHorizontal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, useTransition, type MouseEvent } from "react";
+import { useCallback, useEffect, useOptimistic, useRef, useState, useTransition, type MouseEvent } from "react";
 
 import { AnchorButton, Button, LinkButton } from "@/frontend/components/ui/button";
 import { loadMoreResumes } from "@/frontend/lib/api/actions";
@@ -24,7 +24,7 @@ type BrowserProps = {
   facets: ResumeFacets;
   /** First page, rendered on the server. Later pages load as the user scrolls. */
   initialPage: ResumePage;
-  /** How many resumes the recruiter has unlocked; shows the All / Unlocked switch when > 0. */
+  /** Total unlocked resumes, shown on the company-only view switch. */
   unlockedCount: number;
   /** Companies buy books; students browse with every resume locked and no unlock actions. */
   canUnlock: boolean;
@@ -36,6 +36,7 @@ export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isFiltering, startFiltering] = useTransition();
+  const [pendingFilters, setPendingFilters] = useOptimistic(filters);
 
   const [pages, setPages] = useState({ key: filtersKey(filters), items: initialPage.items, nextCursor: initialPage.nextCursor });
   const [loadError, setLoadError] = useState(false);
@@ -48,8 +49,12 @@ export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock
   }, [filters, initialPage]);
 
   const applyFilters = useCallback(
-    (next: ResumeFilters) => startFiltering(() => router.replace(browseHref(next), { scroll: false })),
-    [router],
+    (next: ResumeFilters) => startFiltering(() => {
+      // Acknowledge the selection immediately while the server fetches its results.
+      setPendingFilters(next);
+      router.replace(browseHref(next), { scroll: false });
+    }),
+    [router, setPendingFilters],
   );
 
   const loadMore = useCallback(async () => {
@@ -119,12 +124,12 @@ export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock
   }, [loadMore, pages.nextCursor]);
 
   const [sheetOpen, setSheetOpen] = useState(false);
-  const filterCount = activeFilterCount(filters);
+  const filterCount = activeFilterCount(pendingFilters);
 
   return (
     <div className={styles.layout}>
       <aside className={styles.rail} aria-label="Filters">
-        <FilterRail facets={facets} filters={filters} onChange={applyFilters} />
+        <FilterRail facets={facets} filters={pendingFilters} onChange={applyFilters} />
       </aside>
 
       <section className={styles.results} aria-label="Resumes" aria-busy={isFiltering}>
@@ -135,7 +140,7 @@ export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock
           </Button>
         </div>
 
-        <BrowseToolbar filters={filters} facets={facets} total={initialPage.total} unlockedCount={canUnlock ? unlockedCount : 0} onChange={applyFilters} />
+        <BrowseToolbar filters={pendingFilters} facets={facets} total={initialPage.total} unlockedCount={unlockedCount} canUnlock={canUnlock} pending={isFiltering} onChange={applyFilters} />
 
         <div className={isFiltering ? `${styles.grid} ${styles.pending}` : styles.grid}>
           {pages.items.length > 0 ? (
@@ -163,7 +168,7 @@ export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock
       </section>
 
       <FilterSheet open={sheetOpen} onClose={() => setSheetOpen(false)} total={initialPage.total} pending={isFiltering}>
-        <FilterRail facets={facets} filters={filters} onChange={applyFilters} />
+        <FilterRail facets={facets} filters={pendingFilters} onChange={applyFilters} />
       </FilterSheet>
 
       {selected && (
