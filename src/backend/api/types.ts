@@ -15,7 +15,8 @@ import type { School } from "@/backend/schools";
 export type { ParsedResume, ResumeProfile, Seeking } from "@/backend/parsing/types";
 
 export type Degree = ResumeProfile["degree"];
-export type Contact = ParsedResume["contact"];
+/** Private contact details, present only after the company unlocks a book. */
+export type Contact = ParsedResume["contact"] & { linkedinUrl: string | null };
 
 /* ------------------------------------------------------------------ */
 /* Mutations                                                           */
@@ -212,6 +213,8 @@ export type ResumeSubmission = {
   uploadId: string;
   /** Name as it should appear once unlocked. The email is the account's verified email. */
   name: string;
+  /** Optional personal LinkedIn URL. Blank removes it; omission preserves an existing link. */
+  linkedinUrl?: string;
   profile: ResumeProfile;
   /** The student ticked the consent checkbox. The backend stores `consented_at`. */
   consent: true;
@@ -256,7 +259,7 @@ export type UploadResult =
 /** A school account's resume and where it stands in each book it asked to join. */
 export type StudentHome = {
   /** `null` until the student submits a resume. */
-  resume: { id: string; name: string; profile: ResumeProfile; previewPageCount: number; updatedAt: string } | null;
+  resume: { id: string; name: string; linkedinUrl: string | null; profile: ResumeProfile; previewPageCount: number; updatedAt: string } | null;
   /** Every book the student asked to join, newest request first, including rejections. */
   memberships: { book: BookSummary; status: MembershipStatus; requestedAt: string }[];
 };

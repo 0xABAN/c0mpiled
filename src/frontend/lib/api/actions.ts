@@ -18,5 +18,6 @@ export {
   submitResume,
   unlockBook,
   updateBookPrice,
+  updateResumeLinkedIn,
   uploadResume,
 } from "@/backend/api/actions";

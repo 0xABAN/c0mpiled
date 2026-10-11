@@ -105,6 +105,11 @@ export async function submitResume(submission: ResumeSubmission): Promise<Action
   });
 }
 
+/** Saves or removes the signed-in student’s optional private LinkedIn contact. */
+export async function updateResumeLinkedIn(url: string): Promise<ActionResult<string | null>> {
+  return runAction(() => resumes.updateResumeLinkedIn(url));
+}
+
 /** Adds the student's existing resume to more books at their school. */
 export async function requestBooks(input: { bookIds: string[]; consent: true }): Promise<ActionResult> {
   return runAction(async () => {

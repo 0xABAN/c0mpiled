@@ -23,6 +23,8 @@ try {
   await page.getByRole("button", { name: "Join Demo Club", exact: true }).click();
   await page.getByLabel("Resume PDF").setInputFiles({ name: "preview-check.pdf", mimeType: "application/pdf", buffer: fakeResume() });
   await page.getByLabel("Your name", { exact: true }).fill("Casey Example", { timeout: 60_000 });
+  const linkedinUrl = "https://www.linkedin.com/in/roster-preview-check";
+  await page.getByRole("textbox", { name: /^LinkedIn/ }).fill(linkedinUrl);
 
   const trigger = page.getByRole("button", { name: "View full size", exact: true });
   await trigger.waitFor({ timeout: 60_000 });
@@ -60,6 +62,7 @@ try {
     assert.ok(await trigger.evaluate((element) => element === document.activeElement), "Escape must restore focus");
     assert.ok(Math.abs((await page.evaluate(() => window.scrollY)) - scroll) < 3, "Closing must preserve scroll position");
     assert.equal(await page.getByLabel("Your name", { exact: true }).inputValue(), "Casey Example");
+    assert.equal(await page.getByRole("textbox", { name: /^LinkedIn/ }).inputValue(), linkedinUrl);
     assert.ok(await page.getByRole("checkbox").isChecked(), "Consent must survive opening the preview");
 
     await trigger.click();
@@ -80,6 +83,8 @@ try {
   await page.route(`${baseUrl}/join/psu-demo-club`, async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     assert.ok(route.request().headers()["next-action"], "Expected a server action.");
+    const [submission] = JSON.parse(route.request().postData());
+    assert.equal(submission.linkedinUrl, linkedinUrl, "Review must include the optional contact link in submission.");
     await route.fulfill({
       status: 200,
       contentType: "text/x-component",

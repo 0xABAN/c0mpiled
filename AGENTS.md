@@ -136,8 +136,9 @@ the systems, never any brand's logo, mascot, illustrations, fonts, or copy.
 - **School account:** a verified email at a US school's domain. It can upload one resume and request to join
   books at its own school, and it can create a club. An officer is a school account that owns a club.
 - **Recruiter account:** any email, plus a company. Only recruiters buy books.
-- **Browse** is open to every signed-in account, students included. Names, emails, and original PDFs stay
-  hidden until a company buys a book the resume is in.
+- **Browse** is open to every signed-in account, students included. Names, emails, optional LinkedIn links,
+  and original PDFs stay hidden until a company buys a book the resume is in. Students can add LinkedIn
+  during resume review or edit/remove it on `/resume`; it is private contact data, never a search field.
 - Signup: choose school or recruiter → school accounts type their school and must use one of its email
   domains → Cognito sends a code → setup. The server rechecks the verified email against the school's
   domains before creating the account.
@@ -237,7 +238,7 @@ users         id (Cognito sub) PK, email unique, account_type 'school' | 'recrui
 clubs         id, slug unique ("psu-hkn"), school_domain, name, tagline null, hue, payout_email,
               owner_id → users, created_at
 books         id, club_id → clubs unique (one book per club), title, price_cents, created_at
-resumes       id, user_id → users unique (one per student), contact_name, pdf_key, preview_keys text[],
+resumes       id, user_id → users unique (one per student), contact_name, linkedin_url null, pdf_key, preview_keys text[],
               grad_year int, majors text[], seeking text[], skills text[], profile jsonb, search_text text,
               created_at, updated_at
 book_members  book_id → books, resume_id → resumes, status 'pending' | 'accepted' | 'rejected',

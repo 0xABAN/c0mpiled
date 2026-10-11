@@ -15,6 +15,7 @@ import { deleteFiles, getResumePdf, putPreviewPages, putResumePdf, resumePdfKey 
 import { parseInput } from "@/backend/validation";
 
 import { resumeColumns } from "./columns";
+import { linkedinUrlInput } from "./linkedin";
 import { requestMemberships, requireBooksAtSchool } from "./membership";
 
 /**
@@ -91,6 +92,7 @@ const submissionInput = z.object({
   bookIds: z.array(z.uuid()).min(1, "Pick at least one club.").max(20),
   uploadId: uploadIdInput,
   name: nameInput,
+  linkedinUrl: linkedinUrlInput.optional(),
   profile: profileInput,
   consent: z.literal(true, "Agree to share your resume with employers."),
 });
@@ -114,6 +116,7 @@ export async function submitResume(rawSubmission: unknown): Promise<void> {
 
   const columns = {
     contactName: submission.name,
+    linkedinUrl: submission.linkedinUrl,
     pdfKey,
     previewKeys,
     ...resumeColumns(submission.profile, schoolName(schoolDomain)),

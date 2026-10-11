@@ -17,6 +17,7 @@ import { pluralize, timeAgo } from "@/frontend/lib/format";
 
 import { ClubCard, type ClubAtAGlance } from "./club-card";
 import { ConfirmButton } from "./confirm-button";
+import { LinkedInContact } from "./linkedin-contact";
 import styles from "./student-home.module.css";
 
 const STATUS_LABELS: Record<MembershipStatus, string> = {
@@ -90,7 +91,7 @@ export function StudentHome({ home, club, school, books }: StudentHomeProps) {
     <div className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.title}>Your resume</h1>
-        <p className={styles.lead}>Companies see your profile, never your name or email, until they buy a book you&apos;re in.</p>
+        <p className={styles.lead}>Companies see your profile, never your contact details, until they buy a book you&apos;re in.</p>
       </header>
 
       <div className={styles.columns}>
@@ -130,6 +131,7 @@ export function StudentHome({ home, club, school, books }: StudentHomeProps) {
 
         <div className={styles.main}>
           {club && <ClubCard glance={club} />}
+          {resume && <LinkedInContact linkedinUrl={resume.linkedinUrl} />}
 
           <section aria-labelledby="books-heading">
             <h2 id="books-heading" className={styles.sectionTitle}>

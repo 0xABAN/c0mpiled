@@ -11,6 +11,7 @@ import { UserError } from "@/backend/errors";
 import { deleteFiles } from "@/backend/storage";
 import { parseInput } from "@/backend/validation";
 
+import { linkedinUrlInput } from "./linkedin";
 import { requestMemberships, requireBooksAtSchool } from "./membership";
 
 /** The viewer's resume and join requests, or `null` for anyone but a school account. */
@@ -35,6 +36,7 @@ export async function getStudentHome(): Promise<StudentHome | null> {
     resume: {
       id: resume.id,
       name: resume.contactName,
+      linkedinUrl: resume.linkedinUrl,
       profile: resume.profile,
       previewPageCount: resume.previewKeys.length,
       updatedAt: resume.updatedAt.toISOString(),
@@ -45,6 +47,21 @@ export async function getStudentHome(): Promise<StudentHome | null> {
       requestedAt: row.requestedAt.toISOString(),
     })),
   };
+}
+
+/** Changes only the signed-in student’s contact link, without re-uploading their PDF. */
+export async function updateResumeLinkedIn(rawUrl: unknown): Promise<string | null> {
+  const linkedinUrl = parseInput(linkedinUrlInput, rawUrl);
+  const account = await requireAccount("school");
+
+  const [saved] = await db
+    .update(resumes)
+    .set({ linkedinUrl, updatedAt: new Date() })
+    .where(eq(resumes.userId, account.id))
+    .returning({ linkedinUrl: resumes.linkedinUrl });
+
+  if (!saved) throw new UserError("Add your resume first.");
+  return saved.linkedinUrl;
 }
 
 const requestInput = z.object({

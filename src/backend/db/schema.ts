@@ -113,6 +113,8 @@ export const resumes = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     /** Name as it appears once a book is unlocked. */
     contactName: text("contact_name").notNull(),
+    /** Optional student-entered contact link, never part of the searchable teaser profile. */
+    linkedinUrl: text("linkedin_url"),
     pdfKey: text("pdf_key").notNull(),
     /**
      * The redacted pages recruiters see before they buy a book (Contract 3), in page order.

@@ -178,7 +178,7 @@ export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock
             !canUnlock ? (
               <LockedNote resume={selected} />
             ) : selected.contact ? (
-              <ContactCard resumeId={selected.id} email={selected.contact.email} />
+              <ContactCard resumeId={selected.id} email={selected.contact.email} linkedinUrl={selected.contact.linkedinUrl} />
             ) : (
               <LinkButton href={unlockHref(filters, selected.id)} variant="primary" block>
                 <LockKeyhole size={18} strokeWidth={3} aria-hidden />

@@ -1,0 +1,14 @@
+.form {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}

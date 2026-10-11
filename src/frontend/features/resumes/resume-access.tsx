@@ -26,7 +26,7 @@ export function LockedNote({ resume }: { resume: ResumeView }) {
 }
 
 /** Contact details and PDF downloads for an unlocked resume. */
-export function ContactCard({ resumeId, email }: { resumeId: string; email: string | null }) {
+export function ContactCard({ resumeId, email, linkedinUrl }: { resumeId: string; email: string | null; linkedinUrl: string | null }) {
   const toast = useToast();
 
   async function copyEmail() {
@@ -46,6 +46,12 @@ export function ContactCard({ resumeId, email }: { resumeId: string; email: stri
         </button>
       ) : (
         <p className={styles.unlockBody}>No email on this resume.</p>
+      )}
+
+      {linkedinUrl && (
+        <AnchorButton href={linkedinUrl} target="_blank" rel="noopener noreferrer" variant="outline" block>
+          LinkedIn <ExternalLink size={18} strokeWidth={2.75} aria-hidden />
+        </AnchorButton>
       )}
 
       <div className={styles.contactActions}>

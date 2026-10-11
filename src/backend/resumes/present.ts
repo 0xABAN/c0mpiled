@@ -19,6 +19,7 @@ export const resumeViewColumns = {
   id: resumes.id,
   profile: resumes.profile,
   contactName: resumes.contactName,
+  linkedinUrl: resumes.linkedinUrl,
   previewKeys: resumes.previewKeys,
   createdAt: resumes.createdAt,
   email: users.email,
@@ -29,6 +30,7 @@ type ResumeViewRow = {
   id: string;
   profile: ResumeView["profile"];
   contactName: string;
+  linkedinUrl: string | null;
   previewKeys: string[];
   createdAt: Date;
   email: string;
@@ -77,7 +79,7 @@ export async function presentResumes(rows: ResumeViewRow[], viewerId: string): P
       books: bookRefs,
       profile: row.profile,
       previewPageCount: row.previewKeys.length,
-      contact: unlocked ? { name: row.contactName, email: row.email } : null,
+      contact: unlocked ? { name: row.contactName, email: row.email, linkedinUrl: row.linkedinUrl } : null,
       createdAt: row.createdAt.toISOString(),
     };
   });

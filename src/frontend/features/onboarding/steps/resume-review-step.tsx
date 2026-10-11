@@ -26,7 +26,7 @@ const MAX_SKILLS = 12;
 const MAX_JOBS = 3;
 
 /** The editable resume. `gradYear` is 0 until chosen (a failed parse never guesses). */
-export type ResumeDraft = { name: string; profile: ResumeProfile };
+export type ResumeDraft = { name: string; linkedinUrl: string; profile: ResumeProfile };
 
 export const EMPTY_PROFILE: ResumeProfile = { gradYear: 0, majors: [], degree: "BS", seeking: [], skills: [], experience: [] };
 
@@ -91,6 +91,18 @@ export function ResumeReviewStep(props: ResumeReviewStepProps) {
             hint="Hidden from companies until they unlock your club's book."
             value={draft.name}
             onChange={(event) => onChange({ ...draft, name: event.target.value })}
+          />
+          <TextField
+            label="LinkedIn"
+            optional
+            inputMode="url"
+            autoCapitalize="none"
+            spellCheck={false}
+            maxLength={500}
+            placeholder="https://www.linkedin.com/in/your-name"
+            hint="Optional way for companies to reach you after they unlock the book."
+            value={draft.linkedinUrl}
+            onChange={(event) => onChange({ ...draft, linkedinUrl: event.target.value })}
           />
 
           <div>
@@ -185,7 +197,7 @@ export function ResumeReviewStep(props: ResumeReviewStepProps) {
           <div inert>
             <ResumeCard resume={preview} href="#" />
           </div>
-          <p className={styles.privacy}>Your name, email, and PDF stay hidden until a company buys the book.</p>
+          <p className={styles.privacy}>Your name, email, LinkedIn, and PDF stay hidden until a company buys the book.</p>
         </div>
       </div>
     </OnboardingShell>
