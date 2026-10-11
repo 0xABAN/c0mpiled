@@ -98,7 +98,10 @@ export function SignupFlow({ initialType, initialSchool, joinSlug }: SignupFlowP
             name="accountType"
             layout="tile"
             checked={accountType === "recruiter"}
-            onChange={() => setAccountType("recruiter")}
+            onChange={() => {
+              setAccountType("recruiter");
+              setSchool(null);
+            }}
             art={
               <Monogram name="Recruiter" tone="ink" size={80}>
                 <Briefcase size={38} strokeWidth={2.5} />

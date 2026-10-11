@@ -82,6 +82,26 @@ try {
   assert.equal(await price.getByRole("textbox", { name: "Price in dollars" }).inputValue(), savedPrice);
   await price.getByRole("button", { name: "Cancel", exact: true }).click();
   console.log("PASS price editor: Cancel discards the draft without changing the saved price.");
+
+  const signup = await browser.newPage();
+  await signup.goto(`${base}/signup`);
+  await signup.locator("label").filter({ has: signup.getByRole("radio", { name: /I'm a student/ }) }).click();
+  await signup.getByRole("button", { name: "Continue", exact: true }).click();
+  await signup.getByRole("textbox", { name: "School name" }).fill("Pennsylvania State");
+  await signup.getByText("Pennsylvania State University", { exact: true }).click();
+  await signup.getByRole("button", { name: "Continue", exact: true }).click();
+  await signup.getByRole("heading", { name: "Create your account" }).waitFor();
+  await signup.getByRole("button", { name: "Back", exact: true }).click();
+  await signup.getByRole("button", { name: "Back", exact: true }).click();
+  await signup.locator("label").filter({ has: signup.getByRole("radio", { name: /I'm hiring/ }) }).click();
+  await signup.getByRole("button", { name: "Continue", exact: true }).click();
+  await signup.getByRole("heading", { name: "Create your account" }).waitFor();
+  assert.equal(await signup.getByPlaceholder("you@company.com").count(), 1);
+  assert.equal(await signup.getByText(/Signing up at Pennsylvania State/).count(), 0);
+  console.log("PASS signup: switching from student to company removes the school email restriction.");
+} catch (error) {
+  console.error(`Failed at ${page.url()}: ${(await page.locator("body").innerText()).slice(0,1500)}`);
+  throw error;
 } finally {
   await browser.close();
 }
