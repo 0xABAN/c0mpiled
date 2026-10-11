@@ -29,6 +29,7 @@ import { inArray, like, or } from "drizzle-orm";
 import { createDatabase, type Database } from "@/backend/db/client";
 import { makeTextPdf } from "@/backend/db/fake/pdf";
 import { fakePeople } from "@/backend/db/fake/people";
+import { storeFakeResumeFiles } from "@/backend/db/fake/resume-files";
 import { bookMembers, books, clubs, resumes, unlocks, users } from "@/backend/db/schema";
 import { redactResume } from "@/backend/redaction";
 import { resumeColumns } from "@/backend/resumes/columns";
@@ -114,7 +115,7 @@ async function ensureCognitoUser(cognito: CognitoIdentityProviderClient, userPoo
   return sub;
 }
 
-/** Deletes every demo row and the demo student's S3 files. */
+/** Deletes every demo row and all demo resume files, including invented members' files. */
 async function removeDemoData(db: Database, loginIds: string[]) {
   const isDemoUser = or(like(users.id, `${DEMO_PREFIX}%`), inArray(users.id, loginIds))!;
   const demoClubIds = db.select({ id: clubs.id }).from(clubs).where(or(like(clubs.ownerId, `${DEMO_PREFIX}%`), inArray(clubs.ownerId, loginIds)));
@@ -123,7 +124,7 @@ async function removeDemoData(db: Database, loginIds: string[]) {
   const files = await db
     .select({ pdfKey: resumes.pdfKey, previewKeys: resumes.previewKeys })
     .from(resumes)
-    .where(inArray(resumes.userId, loginIds));
+    .where(or(like(resumes.userId, `${DEMO_PREFIX}%`), inArray(resumes.userId, loginIds)));
 
   // Purchases block deleting their book, so they go first. Clubs cascade to books and
   // memberships; users cascade to resumes.
@@ -167,21 +168,30 @@ async function insertDemoData(db: Database, logins: Record<DemoRole, string>) {
   const resumeRows: (typeof resumes.$inferInsert)[] = [];
   const memberRows: (typeof bookMembers.$inferInsert)[] = [];
 
-  /** Invented members (no PDF, so no previews), like the seed's students. */
-  function addInventedStudent(n: number, bookId: string, majors: string[], status: "accepted" | "pending", requestedAt: Date) {
+  /** Invented members get real synthetic PDFs and redacted source pages, like the seed. */
+  async function addInventedStudent(n: number, bookId: string, majors: string[], status: "accepted" | "pending", requestedAt: Date) {
     const userId = `${DEMO_PREFIX}student-${n}`;
     const resumeId = randomUUID();
     const name = people.name();
+    const email = `${name.toLowerCase().replace(" ", ".")}.demo${n}@psu.edu`;
+    const profile = people.profile(majors);
+    const files = await storeFakeResumeFiles({ userId, name, email, school: SCHOOL_NAME, profile });
 
-    userRows.push({ id: userId, email: `${name.toLowerCase().replace(" ", ".")}.demo${n}@psu.edu`, accountType: "school", schoolDomain: SCHOOL_DOMAIN, onboardedAt: requestedAt });
-    resumeRows.push({ id: resumeId, userId, contactName: name, pdfKey: `demo/${resumeId}.pdf`, createdAt: requestedAt, updatedAt: requestedAt, ...resumeColumns(people.profile(majors), SCHOOL_NAME) });
+    userRows.push({ id: userId, email, accountType: "school", schoolDomain: SCHOOL_DOMAIN, onboardedAt: requestedAt });
+    resumeRows.push({ id: resumeId, userId, contactName: name, ...files, createdAt: requestedAt, updatedAt: requestedAt, ...resumeColumns(profile, SCHOOL_NAME) });
     memberRows.push({ bookId, resumeId, status, consentedAt: requestedAt, requestedAt, decidedAt: status === "accepted" ? new Date(requestedAt.getTime() + 3_600_000) : null });
   }
 
   let n = 0;
-  for (let i = 0; i < 6; i++) addInventedStudent(++n, demoClub.bookId, DEMO_CLUB_MAJORS, "accepted", hoursAgo(30 - i * 4));
-  for (let i = 0; i < 3; i++) addInventedStudent(++n, demoClub.bookId, DEMO_CLUB_MAJORS, "pending", hoursAgo(2 - i * 0.5));
-  for (let i = 0; i < 5; i++) addInventedStudent(++n, robotics.bookId, ROBOTICS_MAJORS, "accepted", hoursAgo(26 - i * 3));
+  try {
+    for (let i = 0; i < 6; i++) await addInventedStudent(++n, demoClub.bookId, DEMO_CLUB_MAJORS, "accepted", hoursAgo(30 - i * 4));
+    for (let i = 0; i < 3; i++) await addInventedStudent(++n, demoClub.bookId, DEMO_CLUB_MAJORS, "pending", hoursAgo(2 - i * 0.5));
+    for (let i = 0; i < 5; i++) await addInventedStudent(++n, robotics.bookId, ROBOTICS_MAJORS, "accepted", hoursAgo(26 - i * 3));
+  } catch (error) {
+    // No rows have been inserted yet, so failed generation can safely discard its files.
+    await deleteFiles(resumeRows.flatMap((resume) => [resume.pdfKey, ...(resume.previewKeys ?? [])]));
+    throw error;
+  }
 
   // The demo student has a real PDF, so their previews and downloads work like a real member's.
   const pdf = makeTextPdf(STUDENT.lines);

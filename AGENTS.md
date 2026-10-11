@@ -293,7 +293,13 @@ overwrite what exists):
 - `infra/cognito.sh [stage]`: the user pool and web client.
 - `infra/s3.sh [stage]`: the private, encrypted resume bucket.
 - `npm run db:seed`: invented clubs, students, and purchases (every seed account id starts with `seed:`).
-  `npm run db:seed -- --remove` deletes them; do that before real launch.
+  Invented seed/demo students get labeled synthetic source PDFs and redacted PNGs, not fake expanded
+  documents drawn from teaser profiles. `npm run db:seed -- --remove` deletes seed rows and their files;
+  do that before real launch.
+- `npm run db:backfill-fake-files`: dry-run count of legacy `seed:`/`demo:` resumes with exact placeholder
+  PDF keys and no previews. Add `-- --apply` to attach synthetic source PDFs/previews without a reset.
+  It changes only file references, preserves IDs/profiles/timestamps/memberships/purchases, and excludes
+  real Cognito users (including the shared demo logins), existing uploads, and existing previews.
 - `npm run demo:reset`: the shared demo logins `demo.officer@psu.edu` (runs Demo Club, with members, requests,
   and sales) and `demo.student@psu.edu` (a resume with redacted previews in two books), with
   `NEXT_PUBLIC_DEMO_PASSWORD`. Run it again to undo whatever visitors did; `-- --remove` deletes the data.

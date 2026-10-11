@@ -10,6 +10,7 @@
     "db:generate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs generate",
     "db:migrate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs migrate",
     "db:seed": "tsx --conditions=react-server --env-file=.env.local src/backend/db/seed.ts",
+    "db:backfill-fake-files": "tsx --conditions=react-server --env-file=.env.local src/backend/db/backfill-fake-resume-files.ts",
     "redact": "tsx --conditions=react-server scripts/redact.ts",
     "demo:reset": "node --conditions=react-server --env-file=.env.local --import tsx src/backend/demo/reset.ts"
   },

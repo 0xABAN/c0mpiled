@@ -16,9 +16,11 @@ import { inArray, like, or } from "drizzle-orm";
 import type { Hue } from "@/backend/api/types";
 import { resumeColumns } from "@/backend/resumes/columns";
 import { findSchool } from "@/backend/schools";
+import { deleteFiles } from "@/backend/storage";
 
 import { createDatabase } from "./client";
 import { fakePeople } from "./fake/people";
+import { storeFakeResumeFiles } from "./fake/resume-files";
 import { bookMembers, books, clubs, resumes, unlocks, users } from "./schema";
 
 const SEED_PREFIX = "seed:";
@@ -64,11 +66,17 @@ async function removeSeedData(db: ReturnType<typeof createDatabase>["db"]) {
   const seedClubIds = db.select({ id: clubs.id }).from(clubs).where(like(clubs.ownerId, `${SEED_PREFIX}%`));
   const seedBookIds = db.select({ id: books.id }).from(books).where(inArray(books.clubId, seedClubIds));
 
+  const files = await db
+    .select({ pdfKey: resumes.pdfKey, previewKeys: resumes.previewKeys })
+    .from(resumes)
+    .where(like(resumes.userId, `${SEED_PREFIX}%`));
+
   // Purchases block deleting their book, so they go first. Clubs cascade to books and
   // memberships; users cascade to resumes.
   await db.delete(unlocks).where(or(inArray(unlocks.bookId, seedBookIds), like(unlocks.recruiterId, `${SEED_PREFIX}%`)));
   await db.delete(clubs).where(like(clubs.ownerId, `${SEED_PREFIX}%`));
   await db.delete(users).where(seedUsers);
+  await deleteFiles(files.flatMap((file) => [file.pdfKey, ...file.previewKeys]));
 }
 
 async function insertSeedData(db: ReturnType<typeof createDatabase>["db"]) {
@@ -96,13 +104,17 @@ async function insertSeedData(db: ReturnType<typeof createDatabase>["db"]) {
     bookIdByClub.set(club.key, bookId);
   }
 
-  function addStudent(club: ClubSeed, status: "accepted" | "pending", requestedAt: Date) {
+  async function addStudent(club: ClubSeed, status: "accepted" | "pending", requestedAt: Date) {
     const userId = nextUserId();
     const resumeId = randomUUID();
     const name = people.name();
+    const email = `${name.toLowerCase().replace(" ", ".")}${userNumber}@${club.schoolDomain}`;
+    const profile = people.profile(club.majors);
+    const school = findSchool(club.schoolDomain)!.name;
+    const files = await storeFakeResumeFiles({ userId, name, email, school, profile });
 
-    userRows.push({ id: userId, email: `${name.toLowerCase().replace(" ", ".")}${userNumber}@${club.schoolDomain}`, accountType: "school", schoolDomain: club.schoolDomain, onboardedAt: requestedAt });
-    resumeRows.push({ id: resumeId, userId, contactName: name, pdfKey: `seed/${resumeId}.pdf`, createdAt: requestedAt, updatedAt: requestedAt, ...resumeColumns(people.profile(club.majors), findSchool(club.schoolDomain)!.name) });
+    userRows.push({ id: userId, email, accountType: "school", schoolDomain: club.schoolDomain, onboardedAt: requestedAt });
+    resumeRows.push({ id: resumeId, userId, contactName: name, ...files, createdAt: requestedAt, updatedAt: requestedAt, ...resumeColumns(profile, school) });
 
     const decidedAt = status === "accepted" ? new Date(requestedAt.getTime() + 3_600_000) : null;
     memberRows.push({ bookId: bookIdByClub.get(club.key)!, resumeId, status, consentedAt: requestedAt, requestedAt, decidedAt });
@@ -115,9 +127,15 @@ async function insertSeedData(db: ReturnType<typeof createDatabase>["db"]) {
   }
 
   let hours = 2;
-  for (const club of CLUBS) {
-    for (let i = 0; i < club.members; i++) addStudent(club, "accepted", hoursAgo((hours += between(1, 4))));
-    for (let i = 0; i < PENDING_PER_CLUB; i++) addStudent(club, "pending", hoursAgo(i * 0.4 + 0.2));
+  try {
+    for (const club of CLUBS) {
+      for (let i = 0; i < club.members; i++) await addStudent(club, "accepted", hoursAgo((hours += between(1, 4))));
+      for (let i = 0; i < PENDING_PER_CLUB; i++) await addStudent(club, "pending", hoursAgo(i * 0.4 + 0.2));
+    }
+  } catch (error) {
+    // No rows have been inserted yet, so failed generation can safely discard its files.
+    await deleteFiles(resumeRows.flatMap((resume) => [resume.pdfKey, ...(resume.previewKeys ?? [])]));
+    throw error;
   }
 
   for (const purchase of PURCHASES) {
