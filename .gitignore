@@ -1,0 +1,23 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+/build
+next-env.d.ts
+*.tsbuildinfo
+
+# secrets: .npmrc holds the App Monetization beta token, and this repo is public
+.npmrc
+.env*
+
+# never commit real resumes
+*.pdf
+resumes/
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+.vercel
