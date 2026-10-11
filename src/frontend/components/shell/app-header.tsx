@@ -12,10 +12,18 @@ import { UserMenu } from "./user-menu";
 
 /** Top bar for app pages: logo, navigation, global search, and the account area. */
 export function AppHeader({ viewer }: { viewer: Viewer | null }) {
+  const isRecruiter = viewer?.accountType === "recruiter";
+
+  // Browsing and search are for recruiters; everyone else gets their own entry points.
   const links = [
-    { href: "/browse", label: "Browse" },
+    ...(isRecruiter ? [{ href: "/browse", label: "Browse" }] : []),
     ...(viewer?.ownedClub ? [{ href: "/dashboard", label: "My club" }] : []),
-    ...(viewer ? [] : [{ href: "/signup?as=school", label: "For clubs" }]),
+    ...(viewer
+      ? []
+      : [
+          { href: "/signup?as=school", label: "For clubs" },
+          { href: "/signup?as=recruiter", label: "For companies" },
+        ]),
   ];
 
   return (
@@ -25,9 +33,9 @@ export function AppHeader({ viewer }: { viewer: Viewer | null }) {
         <NavLinks links={links} />
 
         <div className={styles.right}>
-          <HeaderSearch />
+          {isRecruiter && <HeaderSearch />}
 
-          {viewer?.accountType === "recruiter" && (
+          {isRecruiter && (
             <Link href="/browse?unlocked=1" className={styles.stat} title="Resumes you've unlocked">
               <KeyRound size={20} strokeWidth={2.75} aria-hidden />
               <span className="tabular">{viewer.unlockedCount}</span>

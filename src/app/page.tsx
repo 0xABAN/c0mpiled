@@ -1,3 +1,26 @@
-export default function Home() {
-  return <main>Roster</main>;
+import { redirect } from "next/navigation";
+
+import { AppHeader } from "@/frontend/components/shell/app-header";
+import { Landing } from "@/frontend/features/marketing/landing";
+import { getViewer } from "@/frontend/lib/api";
+
+/** The landing page, and the one place that sends each signed-in account to its home. */
+export default async function Home() {
+  const viewer = await getViewer();
+
+  if (viewer) {
+    if (!viewer.accountType) redirect("/signup");
+    if (!viewer.onboarded) redirect("/setup");
+    if (viewer.accountType === "recruiter") redirect("/browse");
+    if (viewer.ownedClub) redirect("/dashboard");
+  }
+
+  return (
+    <>
+      <AppHeader viewer={viewer} />
+      <main>
+        <Landing />
+      </main>
+    </>
+  );
 }
