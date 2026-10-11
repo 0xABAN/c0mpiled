@@ -1,7 +1,7 @@
 # Roster: club resume books for recruiters
 
-Working name; rename freely. Built for c0mpiled (Penn State EDI, Sun Oct 11 2026), Track 2 "Build AND Sell".
-Building runs 12:00–8:00 PM, and judging starts at 8:00.
+Working name; rename freely. Built for [c0mpiled](https://luma.com/compiled-jjvw) (Penn State EDI, Sun Oct 11
+2026), Track 2 "Build AND Sell". Building runs 12:00–8:00 PM, and judging starts at 8:00.
 
 ## The pitch
 
