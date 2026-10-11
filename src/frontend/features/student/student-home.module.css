@@ -1,5 +1,6 @@
 .page {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 28px;
   width: min(100%, 1080px);
   margin: 0 auto;
@@ -181,11 +182,21 @@
 
 @media (max-width: 860px) {
   .columns {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .side {
     position: static;
-    max-width: 320px;
+    max-width: min(100%, 320px);
+  }
+}
+
+@media (max-width: 560px) {
+  .row {
+    flex-wrap: wrap;
+  }
+
+  .rowText {
+    flex-basis: calc(100% - 60px);
   }
 }

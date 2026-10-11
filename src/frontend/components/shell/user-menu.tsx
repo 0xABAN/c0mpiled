@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "aws-amplify/auth";
-import { FileUser, KeyRound, LayoutDashboard, LogOut } from "lucide-react";
+import { FileUser, KeyRound, LayoutDashboard, LogOut, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -66,6 +66,13 @@ export function UserMenu({ viewer }: { viewer: Viewer }) {
             <p className={styles.email}>{viewer.email}</p>
             <p className={styles.badge}>{subtitle}</p>
           </div>
+
+          {viewer.accountType && (
+            <Link href="/browse" className={styles.item} role="menuitem" onClick={() => setOpen(false)}>
+              <Search size={18} strokeWidth={2.5} aria-hidden />
+              Browse
+            </Link>
+          )}
 
           {viewer.accountType === "recruiter" && (
             <Link href="/browse?unlocked=1" className={styles.item} role="menuitem" onClick={() => setOpen(false)}>

@@ -1,5 +1,6 @@
 .page {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 28px;
   width: min(100%, 1160px);
   margin: 0 auto;
@@ -22,6 +23,8 @@
 
 .heroText {
   display: grid;
+  min-width: 0;
+  overflow-wrap: anywhere;
   flex: 1 1 260px;
   gap: 4px;
 }
@@ -39,6 +42,8 @@
 
 .share {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
   flex: 1 1 360px;
   gap: 8px;
 }
@@ -105,6 +110,8 @@
 
 .statText {
   display: flex;
+  min-width: 0;
+  overflow-wrap: anywhere;
   flex-direction: column-reverse;
 }
 
@@ -193,7 +200,7 @@
 
 @media (max-width: 1000px) {
   .columns {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .side {
@@ -202,5 +209,13 @@
 
   .stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .stat {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 }

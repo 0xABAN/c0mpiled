@@ -63,8 +63,28 @@
 }
 
 @media (max-width: 720px) {
+  .header {
+    height: auto;
+  }
+
   .inner {
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: 72px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .inner > :first-child {
+    margin-right: auto;
+  }
+
+  .right {
+    display: contents;
+  }
+
+  .demoFull {
+    display: none;
   }
 
   .signup {

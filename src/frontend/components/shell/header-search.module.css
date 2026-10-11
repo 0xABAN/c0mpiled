@@ -62,8 +62,9 @@
 
 @media (max-width: 720px) {
   .search {
-    width: auto;
-    flex: 1;
+    order: 1;
+    width: 100%;
+    min-width: 0;
   }
 
   .kbd {

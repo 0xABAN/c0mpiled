@@ -43,7 +43,7 @@ export function AppHeader({ viewer }: { viewer: Viewer | null }) {
 
           {viewer && isDemoAccount(viewer.email) && (
             <span className={styles.demoBadge} title="Shared demo login. Anyone can change this data, and it resets.">
-              Demo account
+              Demo<span className={styles.demoFull}> account</span>
             </span>
           )}
 

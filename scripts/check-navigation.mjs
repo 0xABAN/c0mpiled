@@ -46,6 +46,12 @@ try {
   await page.waitForURL(`${base}/browse?year=2028`);
   console.log("PASS checkout return: candidate and filters survive; close returns to filtered results.");
 
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.waitForFunction(() => document.documentElement.scrollWidth <= innerWidth);
+    assert.ok(await page.getByRole("searchbox", { name: "Search resumes" }).isVisible());
+  }
+
   await page.getByRole("link", { name: "Roster home", exact: true }).click();
   await expectHome();
   await page.getByRole("button", { name: "Student", exact: true }).click();
@@ -53,6 +59,18 @@ try {
   await page.getByRole("link", { name: "Roster home", exact: true }).click();
   await expectHome();
   console.log("PASS student demo: account switch and logo return work.");
+
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const path of ["/resume", "/dashboard", "/browse"]) {
+      await page.goto(`${base}${path}`, { waitUntil: "networkidle" });
+      await page.waitForFunction(() => document.documentElement.scrollWidth <= innerWidth);
+    }
+  }
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Browse", exact: true }).click();
+  await page.waitForURL(`${base}/browse`);
+  console.log("PASS mobile: student pages and company header fit 320/390px; account menu exposes Browse.");
 } finally {
   await browser.close();
 }
