@@ -65,6 +65,13 @@
   animation: stamp 500ms var(--ease-spring) 650ms both;
 }
 
+/* zoom (unlike transform) shrinks the layout box too, so the stack fits narrow screens. */
+@media (max-width: 600px) {
+  .stack {
+    zoom: 0.55;
+  }
+}
+
 @keyframes stamp {
   from {
     opacity: 0;

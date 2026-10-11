@@ -2,127 +2,107 @@
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: center;
-  gap: 48px;
-  width: min(100%, var(--container));
+  justify-items: center;
+  gap: 36px;
+  width: min(100%, 1040px);
   margin: 0 auto;
-  padding: 64px var(--page-x) 72px;
-}
-
-.heroCopy {
-  display: grid;
-  gap: 20px;
-}
-
-.eyebrow {
-  color: var(--accent-deep);
-  font-size: 14px;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  padding: 88px var(--page-x) 56px;
+  text-align: center;
 }
 
 .title {
-  font-size: clamp(36px, 4.4vw, 56px);
+  font-size: clamp(40px, 6vw, 72px);
   font-weight: 900;
-  letter-spacing: -0.025em;
-  line-height: 1.05;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
 }
 
 /* One key phrase in the accent, Firecrawl's headline move. */
-.title em,
-.closingTitle em {
+.title em {
   color: var(--accent);
   font-style: normal;
 }
 
-.lead {
-  max-width: 540px;
-  color: var(--muted);
-  font-size: 19px;
-  font-weight: 600;
+/* ---------- Doors ---------- */
+
+.doors {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  width: min(100%, 820px);
 }
 
-.ctas {
+.door {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 8px;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 22px 22px 24px;
+  border: var(--border) solid var(--line);
+  border-bottom-width: 6px;
+  border-radius: 20px;
+  background: var(--surface);
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color var(--dur) ease,
+    transform var(--dur) var(--ease-out);
 }
 
-/* The card stack sits in a gridded panel with a lip, like the login art. */
-.heroArt {
+.door:hover {
+  border-color: var(--accent-soft);
+  transform: translateY(-3px);
+}
+
+/* Press: the face drops onto its lip, like every other pressable thing. */
+.door:active {
+  border-bottom-width: 2px;
+  margin-bottom: 4px;
+  transform: translateY(4px);
+  transition-duration: var(--dur-fast);
+}
+
+.doorText {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.doorWho {
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.doorAction {
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.doorArrow {
+  color: var(--accent);
+  transition: transform var(--dur) var(--ease-spring);
+}
+
+.door:hover .doorArrow {
+  transform: translateX(4px);
+}
+
+/* ---------- Showcase ---------- */
+
+.showcase {
   display: grid;
   place-items: center;
-  padding: 48px 24px;
+  width: min(100% - 2 * var(--page-x), 960px);
+  margin: 0 auto;
+  padding: 48px 24px 40px;
+  overflow: hidden;
   border: var(--border) solid var(--line);
   border-bottom-width: 8px;
   border-radius: 32px;
-}
-
-/* ---------- Steps ---------- */
-
-.steps {
-  width: min(100%, var(--container));
-  margin: 0 auto;
-  padding: 32px var(--page-x) 80px;
-}
-
-.sectionTitle {
-  margin-bottom: 36px;
-  font-size: 34px;
-  font-weight: 900;
-  text-align: center;
-}
-
-.stepList {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-}
-
-.step {
-  display: grid;
-  justify-items: center;
-  gap: 10px;
-  padding: 32px 24px;
-  border: var(--border) solid var(--line);
-  border-bottom-width: 5px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  text-align: center;
-}
-
-.stepArt {
-  position: relative;
-  margin-bottom: 8px;
-}
-
-.stepNumber {
-  position: absolute;
-  top: -10px;
-  right: -12px;
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  padding-bottom: 2px;
-  border: 3px solid var(--surface);
-  border-radius: 50%;
-  background: var(--ink);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 900;
-}
-
-.stepTitle {
-  font-size: 21px;
-}
-
-.stepBody {
-  color: var(--muted);
-  font-weight: 600;
 }
 
 /* ---------- Closing ---------- */
@@ -130,32 +110,26 @@
 .closing {
   width: min(100%, var(--container));
   margin: 0 auto;
-  padding: 0 var(--page-x) 64px;
+  padding: 64px var(--page-x);
 }
 
 .closingBand {
-  display: grid;
-  justify-items: center;
-  gap: 12px;
-  padding: 56px 24px;
-  border-radius: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 32px;
+  padding: 36px 44px 40px;
+  border-radius: 28px;
   background: var(--accent);
-  box-shadow: inset 0 -10px 0 var(--accent-lip);
-  text-align: center;
+  box-shadow: inset 0 -8px 0 var(--accent-lip);
 }
 
 .closingTitle {
   color: #fff;
-  font-size: clamp(28px, 3.4vw, 40px);
+  font-size: clamp(28px, 3.6vw, 42px);
   font-weight: 900;
   letter-spacing: -0.02em;
-}
-
-.closingLead {
-  margin-bottom: 12px;
-  color: rgb(255 255 255 / 0.9);
-  font-size: 18px;
-  font-weight: 700;
 }
 
 .closingBand .closingButton {
@@ -173,17 +147,23 @@
   text-transform: uppercase;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 720px) {
   .hero {
-    grid-template-columns: 1fr;
-    padding-top: 40px;
+    gap: 28px;
+    padding-top: 56px;
   }
 
-  .heroArt {
-    overflow: hidden;
+  .doors {
+    grid-template-columns: 1fr;
   }
 
-  .stepList {
-    grid-template-columns: 1fr;
+  .doorAction {
+    font-size: 20px;
+  }
+
+  .closingBand {
+    justify-content: center;
+    padding: 32px 24px 36px;
+    text-align: center;
   }
 }
