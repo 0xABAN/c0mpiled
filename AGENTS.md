@@ -324,8 +324,11 @@ purpose: anyone may use the demo logins), `MONETIZATION_APP_ID` (sandbox ARN), `
 Billing builds also need private `MONETIZATION_NPM_REGISTRY` and `MONETIZATION_NPM_TOKEN` values. The build
 writes an ignored, mode-0600 `.npmrc`; these build credentials must never enter `.env.production` or client
 assets. Keep their values outside this public repo. `infra/billing.sh <env-file> [compute-role-name]` adds
-only the four required billing permissions, scoped to the dedicated app; it does not deploy. An existing
-hosting environment needs those permissions and the billing build/runtime variables before release.
+only the four required billing permissions; it does not deploy. The beta requires `Resource: "*"` because
+it does not yet authorize app ARNs, so these IAM actions cover live and test monetization resources.
+Roster still rejects live configuration. Narrow IAM resources when the provider supports it; never add
+admin or publish permissions. An existing hosting environment needs those permissions and the billing
+build/runtime variables before release.
 
 Setting up an environment (each script prints env lines to append to `.env.local`, and refuses to
 overwrite what exists):
