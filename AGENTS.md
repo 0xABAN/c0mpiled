@@ -37,7 +37,8 @@ resumes. Payments, uploads, parsing, and S3 come after.
 The teaser card the plan originally gave the teammate already exists as
 `src/frontend/features/resumes/resume-card.tsx`.
 
-The two contracts below are the seams between us. Agree on them at 12:00 and change them only together.
+Contracts 1 and 2 below are the seams between us. Agree on them at 12:00 and change them only together.
+Contract 3 (redaction) is internal to Adam's side, between resume storage and the browse pages.
 
 ## Stack
 
@@ -53,6 +54,8 @@ The two contracts below are the seams between us. Agree on them at 12:00 and cha
   that expire after 5 minutes.
 - **Bedrock** Converse API with Claude Haiku 4.5 (`us.anthropic.claude-haiku-4-5-20251001-v1:0`; confirm
   in the console). Send the PDF as a `document` block, and force a single tool call to get JSON back.
+- **mupdf** (WebAssembly) redacts resumes: it finds identifying text, removes it, and renders each page to
+  PNG. It's AGPL-3.0, which this public repo satisfies.
 - **Billing:** AWS App Monetization private beta, run with `/monetize`. Setup steps and terms are in the
   welcome letter PDF. Don't copy them into this repo: the letter is confidential, and this repo is public.
   Payments are mocks/test cards.
@@ -74,6 +77,7 @@ src/backend/    server-only feature modules, each with an index.ts as its public
   clubs/        clubs, books, join requests
   resumes/      resumes, search, filter options
   parsing/      parseResume (teammate)
+  redaction/    redactResume (Contract 3)
   billing/      Contract 2 (teammate)
   api/          the view models and functions the UI calls
 ```
@@ -130,6 +134,37 @@ merges.
 The club earns what the recruiter paid; any platform fee is undecided. Open for the teammate: how a
 club-set, per-book price maps onto App Monetization. Confirm with the AWS team before running `/monetize`.
 
+## Contract 3: redaction
+
+Before buying a book, recruiters read each student's real resume with everything that identifies the
+student blacked out. `src/backend/redaction` produces it, the backend stores it, and the frontend shows it.
+The module is pure (bytes in, bytes out) and never touches S3, the database, or auth.
+
+```ts
+/**
+ * One PNG per page with the student's identity blacked out. Throws UserError when the student
+ * must fix the PDF (scanned, locked, over 3 pages, or `name` not on it as typed), and Error if
+ * identifying text survives redaction.
+ */
+redactResume(pdf: Uint8Array, student: { name: string }): Promise<Uint8Array[]>
+```
+
+It blacks out each part of the name (whole words, ignoring case and accents), emails, phone numbers, web
+addresses, street addresses, state + ZIP, every link, and every image (headshots). Patterns run over whole
+paragraphs, so a wrapped address still matches, and they lean toward hiding too much. No model is involved.
+Pages are images, so no text layer, metadata, or link target survives. After redacting, it reads each page
+back and throws if anything still matches.
+
+- **Review step:** `previewRedaction(uploadId, name)` returns the pages as data URLs and saves nothing, so
+  the student sees exactly what recruiters will see before ticking consent.
+- **Submit:** `submitResume` redacts again with the submitted name (fast and deterministic), puts
+  `previews/{userId}/{uuid}/{n}.png` next to the original PDF, and saves `resumes.preview_keys`.
+- **Browse:** `GET /api/resumes/[id]/preview/[page]` checks access, then redirects to a presigned S3 URL that
+  expires after 5 minutes, like the PDF route. Before unlock, the detail view shows these pages and cards
+  keep the profile-drawn `RedactedResume`. After unlock, the original PDF replaces them.
+
+`npm run redact -- fake.pdf "Full Name" [out-dir]` redacts one PDF from the command line.
+
 ## Data model
 
 The source of truth is `src/backend/db/schema.ts`. After changing it, run `npm run db:generate`, commit the
@@ -141,7 +176,7 @@ users         id (Cognito sub) PK, email unique, account_type 'school' | 'recrui
 clubs         id, slug unique ("psu-hkn"), school_domain, name, tagline null, hue, payout_email,
               owner_id → users, created_at
 books         id, club_id → clubs unique (one book per club), title, price_cents, created_at
-resumes       id, user_id → users unique (one per student), contact_name, pdf_key,
+resumes       id, user_id → users unique (one per student), contact_name, pdf_key, preview_keys text[],
               grad_year int, majors text[], seeking text[], skills text[], profile jsonb, search_text text,
               created_at, updated_at
 book_members  book_id → books, resume_id → resumes, status 'pending' | 'accepted' | 'rejected',
@@ -169,9 +204,9 @@ primary email domain ("psu.edu").
 ## Flows
 
 **Join** (server actions): the student uploads a PDF ≤ 5 MB → put `resumes/{userId}/{uuid}.pdf` →
-`await parseResume()` (~5–10 s) → the student reviews the profile, ticks consent, and picks books at their
-school → save the resume and add `pending` memberships. The officer accepts or rejects on `/dashboard`.
-Re-uploading replaces the one resume in every book.
+`await parseResume()` (~5–10 s) → the student reviews the profile and the redacted preview, ticks consent,
+and picks books at their school → redact, save the resume, and add `pending` memberships. The officer
+accepts or rejects on `/dashboard`. Re-uploading replaces the one resume in every book.
 
 **Search:** recruiters only, accepted memberships only. Any-of within school, grad year, seeking, major,
 and club; skills must all match (`skills @> $1`). Free text: every word must appear in `search_text`
@@ -179,8 +214,8 @@ and club; skills must all match (`skills @> $1`). Free text: every word must app
 
 **Unlock:** `canUnlock` → insert `unlocks` row → `recordUnlock` → page reveals contact info and downloads.
 
-**Withdraw:** leaving a book deletes the membership; deleting the resume deletes the S3 object, the row,
-and every membership.
+**Withdraw:** leaving a book deletes the membership; deleting the resume deletes the S3 objects (the PDF
+and its preview pages), the row, and every membership.
 
 ## Gotchas
 
@@ -193,6 +228,8 @@ and every membership.
   `.env.production` before `npm run build`.
 - Raise the server action body limit to `'5mb'` (`serverActions.bodySizeLimit` in `next.config.ts`) for
   PDF uploads; the default is 1 MB.
+- mupdf is ESM with top-level await. Load it with `await import("mupdf")`, never a static import (tsx runs
+  this repo's `.ts` as CommonJS), and keep it in `serverExternalPackages` so the build traces its `.wasm`.
 - Attach an IAM compute role to the Amplify app with read/write on the bucket and `bedrock:InvokeModel`.
 - Never commit `.npmrc` (it holds the beta token) or real resumes. Use fake resumes when running `/monetize`.
 
