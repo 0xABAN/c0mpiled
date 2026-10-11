@@ -54,12 +54,13 @@ export async function getResumeFacets(): Promise<ResumeFacets> {
       .where(isVisibleResume)
       .groupBy(resumes.gradYear)
       .orderBy(resumes.gradYear),
+    // The alias must differ from the `seeking` column, or Postgres reports it as ambiguous.
     db
-      .select({ value: sql<string>`seeking`, count: count() })
-      .from(sql`${resumes}, unnest(${resumes.seeking}) as seeking`)
+      .select({ value: sql<string>`seeking_value`, count: count() })
+      .from(sql`${resumes}, unnest(${resumes.seeking}) as seeking_value`)
       .where(isVisibleResume)
-      .groupBy(sql`seeking`)
-      .orderBy(sql`seeking`),
+      .groupBy(sql`seeking_value`)
+      .orderBy(sql`seeking_value`),
     termFacet("majors"),
     termFacet("skills"),
     db
