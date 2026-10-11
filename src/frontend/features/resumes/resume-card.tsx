@@ -5,8 +5,7 @@ import type { MouseEvent } from "react";
 import { Monogram } from "@/frontend/components/ui/monogram";
 import { Tag } from "@/frontend/components/ui/tag";
 import type { ResumeView } from "@/frontend/lib/api/types";
-import { formatDegree } from "@/frontend/lib/format";
-import { seekingHue, seekingLabel } from "@/frontend/lib/hue";
+import { formatDegree, seekingLabel } from "@/frontend/lib/format";
 
 import { RedactedResume } from "./redacted-resume";
 import styles from "./resume-card.module.css";
@@ -27,13 +26,12 @@ export function ResumeCard({ resume, href, onOpen }: ResumeCardProps) {
   const { profile, books, contact } = resume;
   // Empty only in a student's own preview, before any club accepts them.
   const [firstBook, ...otherBooks] = books as [ResumeView["books"][number] | undefined, ...ResumeView["books"]];
-  const hue = seekingHue(profile.seeking);
 
   return (
     <div className={styles.wrap}>
-      <Link href={href} scroll={false} className={styles.card} data-hue={hue} onClick={onOpen}>
+      <Link href={href} scroll={false} className={styles.card} onClick={onOpen}>
         <div className={styles.preview}>
-          <Tag hue={hue} className={styles.tag}>
+          <Tag className={styles.tag}>
             {seekingLabel(profile.seeking)}
           </Tag>
           <div className={styles.paper}>
@@ -53,7 +51,7 @@ export function ResumeCard({ resume, href, onOpen }: ResumeCardProps) {
         <span className={styles.club}>
           {firstBook ? (
             <>
-              <Monogram name={firstBook.club.name} hue={firstBook.club.hue} size={22} />
+              <Monogram name={firstBook.club.name} size={22} />
               <span className={styles.clubName}>{firstBook.club.name}</span>
             </>
           ) : (

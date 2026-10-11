@@ -1,13 +1,14 @@
 import type { CSSProperties, ReactNode } from "react";
 
-import { hueFor, initials, type Tone } from "@/frontend/lib/hue";
+import { initials } from "@/frontend/lib/format";
+import type { Tone } from "@/frontend/lib/tone";
 
 import styles from "./monogram.module.css";
 
 type MonogramProps = {
-  /** The name to abbreviate. Also picks the hue unless `hue` is given. */
+  /** The name to abbreviate. */
   name: string;
-  hue?: Tone;
+  tone?: Tone;
   size?: number;
   shape?: "square" | "circle";
   ringed?: boolean;
@@ -15,11 +16,11 @@ type MonogramProps = {
   children?: ReactNode;
 };
 
-export function Monogram({ name, hue, size = 40, shape = "square", ringed, children }: MonogramProps) {
+export function Monogram({ name, tone = "neutral", size = 40, shape = "square", ringed, children }: MonogramProps) {
   return (
     <span
       className={[styles.monogram, shape === "circle" && styles.circle, ringed && styles.ringed].filter(Boolean).join(" ")}
-      data-hue={hue ?? hueFor(name)}
+      data-tone={tone}
       style={{ "--size": `${size}px` } as CSSProperties}
       aria-hidden
     >

@@ -38,7 +38,7 @@ export function ClubDoneStep({ frame, created, next }: ClubDoneStepProps) {
     >
       <div className={styles.done}>
         <span className={styles.doneBadge}>
-          <Monogram name={created.club.name} hue={created.club.hue} size={96}>
+          <Monogram name={created.club.name} tone="accent" size={96}>
             <BookOpenCheck size={46} strokeWidth={2.5} />
           </Monogram>
         </span>

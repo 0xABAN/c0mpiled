@@ -5,17 +5,18 @@
  *   resumes.fyi — layout (catalog, filter rail, card grid, detail panel)
  *   Duolingo    — surfaces and shape: 2px outlines, 16px radii, a solid darker "lip" under
  *                 anything pressable instead of drop shadows, bold uppercase labels
- *   Firecrawl   — color: off-white page, near-black ink, hairline grays, one hot orange
- *                 accent, and a few muted hues for status and categories
+ *   Firecrawl   — color: white and grays, a red-orange accent, a yellow highlight, and
+ *                 pure black on rare occasions
  *
- * Components use the role tokens (--accent, --success, --warning, --danger, --secondary)
- * and `data-hue` scopes, never a hue name directly, so a palette change happens here.
+ * Components use the role tokens (--accent, --secondary, --success, --warning, --danger)
+ * and `data-tone` scopes, never a raw color, so a palette change happens here.
  */
 
 :root {
   --font-ui: var(--font-nunito), ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
 
   /* Neutrals (Firecrawl). Muted is its ink at 72%: ≥ 5:1 on every surface, including tints. */
+  --black: #000000; /* rare: lips under ink, nothing larger */
   --ink: #262626;
   --ink-body: #262626;
   --muted: #636363;
@@ -28,107 +29,68 @@
   --scrim: rgb(0 0 0 / 0.5);
 
   /*
-   * Hues. Faces are Firecrawl's display-p3 accents as they render in sRGB (its orange
-   * "heat" samples as #ff4d00); teal and pink have no Firecrawl equivalent and are matched
-   * to the same saturation. Derived per hue:
+   * The accent: Firecrawl's "heat", its display-p3 red-orange as it renders in sRGB.
    *   lip  = face × 0.78, the solid band under pressable things
-   *   deep = darkened until ≥ 4.6:1 on white and on the tint, for small text and tags
-   *   tint = 14% on white (selected fills), wash = 4.5% (large surfaces), soft = 38% (borders on tint)
-   * White labels sit on bright faces only on large buttons and art.
+   *   deep = ≥ 4.6:1 on white and on the tint, for small text and tags
+   *   tint = selected fills, wash = large quiet surfaces, soft = borders on tint
+   * White labels on the face are for large buttons and art only (3.3:1).
    */
-  --orange: #ff4d00;
-  --orange-lip: #c73c00;
-  --orange-deep: #bf3a00;
-  --orange-tint: #ffe6db;
-  --orange-wash: #fff7f4;
-  --orange-soft: #ffbb9e;
+  --accent: #ff4d00;
+  --accent-lip: #c73c00;
+  --accent-deep: #bf3a00;
+  --accent-tint: #ffe6db;
+  --accent-wash: #fff7f4;
+  --accent-soft: #ffbb9e;
 
-  --blue: #006fff;
-  --blue-lip: #0057c7;
-  --blue-deep: #0061de;
-  --blue-tint: #dbebff;
-  --blue-wash: #f4f9ff;
-  --blue-soft: #9ec8ff;
-
-  --green: #00c65a;
-  --green-lip: #009a46;
-  --green-deep: #007d39;
-  --green-tint: #dbf7e8;
-  --green-wash: #f4fcf8;
-  --green-soft: #9ee9c0;
-
+  /* Highlight: Firecrawl's "honey", for things worth noticing that aren't actions. */
   --yellow: #f6b400;
   --yellow-lip: #c08c00;
-  --yellow-deep: #8f6800;
+  --yellow-deep: #8f6800; /* ≥ 4.6:1 on white and on the tint */
   --yellow-tint: #fef4db;
   --yellow-wash: #fffcf4;
   --yellow-soft: #fce29e;
+  --on-yellow: #4b3a00; /* labels on the yellow face; white is too faint there */
 
-  --purple: #985eff;
-  --purple-lip: #7749c7;
-  --purple-deep: #7b4ccf;
-  --purple-tint: #f1e8ff;
-  --purple-wash: #faf8ff;
-  --purple-soft: #d8c2ff;
-
-  --red: #ff0301;
-  --red-lip: #c70201;
-  --red-deep: #cc0201;
-  --red-tint: #ffdcdb;
-  --red-wash: #fff4f4;
-  --red-soft: #ff9f9e;
-
-  --teal: #00b39f;
-  --teal-lip: #008c7c;
-  --teal-deep: #00786b;
-  --teal-tint: #dbf4f2;
-  --teal-wash: #f4fcfb;
-  --teal-soft: #9ee2db;
-
-  --pink: #ff3d8f;
-  --pink-lip: #c73070;
-  --pink-deep: #bf2e6b;
-  --pink-tint: #ffe4ef;
-  --pink-wash: #fff6fa;
-  --pink-soft: #ffb5d4;
+  /* Gray family with the same anatomy, for tiles, tags, and quiet surfaces. */
+  --gray: #ebebeb;
+  --gray-lip: #d4d4d4;
+  --gray-deep: #5c5c5c; /* ≥ 5.6:1 on its tint; white on it is 6.7:1 */
+  --gray-tint: #ececec;
+  --gray-wash: #f4f4f4;
+  --gray-soft: #dcdcdc;
 
   /*
-   * Roles.
-   *   accent    — the one action color: primary buttons (including unlock), selection,
-   *               focus, active navigation, links, and a key phrase in big headlines
-   *   secondary — ink buttons for the second action in a region
-   *   success / warning / danger — status: earned and accepted, pending, errors
+   * Roles. One color does all the talking:
+   *   accent    — primary actions (including unlock), selection, focus, active nav, links,
+   *               one key phrase in big headlines, and money (earnings, payouts)
+   *   secondary — ink buttons on a black lip, for the second action in a region
+   *   success   — accent: good news reads in the same voice as the action that caused it
+   *   danger    — accent: errors use their message and icon, not a second red
+   *   warning   — yellow: pending, waiting, and badges like BEST VALUE
    */
-  --accent: var(--orange);
-  --accent-lip: var(--orange-lip);
-  --accent-deep: var(--orange-deep);
-  --accent-tint: var(--orange-tint);
-  --accent-wash: var(--orange-wash);
-  --accent-soft: var(--orange-soft);
-
   --secondary: var(--ink);
-  --secondary-lip: #000000;
+  --secondary-lip: var(--black);
 
-  --success: var(--green);
-  --success-lip: var(--green-lip);
-  --success-deep: var(--green-deep);
-  --success-tint: var(--green-tint);
-  --success-wash: var(--green-wash);
-  --success-soft: var(--green-soft);
+  --success: var(--accent);
+  --success-lip: var(--accent-lip);
+  --success-deep: var(--accent-deep);
+  --success-tint: var(--accent-tint);
+  --success-wash: var(--accent-wash);
+  --success-soft: var(--accent-soft);
+
+  --danger: var(--accent);
+  --danger-lip: var(--accent-lip);
+  --danger-deep: var(--accent-deep);
+  --danger-tint: var(--accent-tint);
+  --danger-wash: var(--accent-wash);
+  --danger-soft: var(--accent-soft);
 
   --warning: var(--yellow);
   --warning-lip: var(--yellow-lip);
   --warning-deep: var(--yellow-deep);
   --warning-tint: var(--yellow-tint);
   --warning-soft: var(--yellow-soft);
-  --on-warning: #4b3a00;
-
-  --danger: var(--red);
-  --danger-lip: var(--red-lip);
-  --danger-deep: var(--red-deep);
-  --danger-tint: var(--red-tint);
-  --danger-wash: var(--red-wash);
-  --danger-soft: var(--red-soft);
+  --on-warning: var(--on-yellow);
 
   /* Shape */
   --radius: 16px;
@@ -152,19 +114,18 @@
 }
 
 /*
- * Hue scopes. Components set `data-hue` and read the generic --face / --lip / --deep /
- * --tint / --wash / --soft variables, so one stylesheet serves every color. The eight
- * category hues match the backend's `Hue`; "accent" lets art follow the theme's accent.
+ * Tone scopes. Components set `data-tone` and read --face / --lip / --deep / --tint /
+ * --wash / --soft / --on-face, so tiles, tags, and cards share one stylesheet.
+ *   neutral — the default: entities (clubs, companies, schools) and quiet art
+ *   accent  — art that celebrates or invites (sent, unlocked, club created)
+ *   yellow  — highlights: waiting counts, coins, badges
+ *   ink     — near-black on a black lip, for the rare piece that should feel heavy
  */
-[data-hue="accent"] { --face: var(--accent); --lip: var(--accent-lip); --deep: var(--accent-deep); --tint: var(--accent-tint); --wash: var(--accent-wash); --soft: var(--accent-soft); --on-face: #fff; }
-[data-hue="orange"] { --face: var(--orange); --lip: var(--orange-lip); --deep: var(--orange-deep); --tint: var(--orange-tint); --wash: var(--orange-wash); --soft: var(--orange-soft); --on-face: #fff; }
-[data-hue="blue"] { --face: var(--blue); --lip: var(--blue-lip); --deep: var(--blue-deep); --tint: var(--blue-tint); --wash: var(--blue-wash); --soft: var(--blue-soft); --on-face: #fff; }
-[data-hue="green"] { --face: var(--green); --lip: var(--green-lip); --deep: var(--green-deep); --tint: var(--green-tint); --wash: var(--green-wash); --soft: var(--green-soft); --on-face: #fff; }
-[data-hue="yellow"] { --face: var(--yellow); --lip: var(--yellow-lip); --deep: var(--yellow-deep); --tint: var(--yellow-tint); --wash: var(--yellow-wash); --soft: var(--yellow-soft); --on-face: var(--on-warning); }
-[data-hue="purple"] { --face: var(--purple); --lip: var(--purple-lip); --deep: var(--purple-deep); --tint: var(--purple-tint); --wash: var(--purple-wash); --soft: var(--purple-soft); --on-face: #fff; }
-[data-hue="red"] { --face: var(--red); --lip: var(--red-lip); --deep: var(--red-deep); --tint: var(--red-tint); --wash: var(--red-wash); --soft: var(--red-soft); --on-face: #fff; }
-[data-hue="teal"] { --face: var(--teal); --lip: var(--teal-lip); --deep: var(--teal-deep); --tint: var(--teal-tint); --wash: var(--teal-wash); --soft: var(--teal-soft); --on-face: #fff; }
-[data-hue="pink"] { --face: var(--pink); --lip: var(--pink-lip); --deep: var(--pink-deep); --tint: var(--pink-tint); --wash: var(--pink-wash); --soft: var(--pink-soft); --on-face: #fff; }
+:root,
+[data-tone="neutral"] { --face: var(--gray); --lip: var(--gray-lip); --deep: var(--gray-deep); --tint: var(--gray-tint); --wash: var(--gray-wash); --soft: var(--gray-soft); --on-face: var(--ink); }
+[data-tone="accent"] { --face: var(--accent); --lip: var(--accent-lip); --deep: var(--accent-deep); --tint: var(--accent-tint); --wash: var(--accent-wash); --soft: var(--accent-soft); --on-face: #fff; }
+[data-tone="yellow"] { --face: var(--yellow); --lip: var(--yellow-lip); --deep: var(--yellow-deep); --tint: var(--yellow-tint); --wash: var(--yellow-wash); --soft: var(--yellow-soft); --on-face: var(--on-yellow); }
+[data-tone="ink"] { --face: var(--ink); --lip: var(--black); --deep: var(--ink); --tint: var(--line); --wash: var(--sunken); --soft: var(--line-strong); --on-face: #fff; }
 
 /* Reset */
 *,

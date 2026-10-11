@@ -77,7 +77,7 @@ export function SchoolPicker({ selected, onSelect }: SchoolPickerProps) {
             value={school.domains[0]}
             checked={selected?.domains[0] === school.domains[0]}
             onChange={() => onSelect(school)}
-            art={<Monogram name={school.name} hue="blue" size={44} />}
+            art={<Monogram name={school.name} size={44} />}
             title={school.name}
             description={`@${school.domains[0]}`}
           />

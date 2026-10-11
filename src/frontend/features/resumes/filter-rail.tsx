@@ -81,7 +81,7 @@ export function FilterRail({ facets, filters, onChange }: FilterRailProps) {
           searchLabel="Search clubs"
           renderLabel={(option) => (
             <span className={styles.clubOption}>
-              <Monogram name={option.label} hue={option.hue} size={22} />
+              <Monogram name={option.label} size={22} />
               {option.label}
             </span>
           )}

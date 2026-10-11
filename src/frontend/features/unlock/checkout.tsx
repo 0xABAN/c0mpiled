@@ -13,8 +13,7 @@ import { browseHref, EMPTY_FILTERS } from "@/frontend/features/resumes/filters";
 import { RedactedResume } from "@/frontend/features/resumes/redacted-resume";
 import { unlockBook } from "@/frontend/lib/api/actions";
 import type { UnlockOffer, UnlockQuote, UnlockResult } from "@/frontend/lib/api/types";
-import { formatMoney, pluralize } from "@/frontend/lib/format";
-import { seekingHue, seekingLabel } from "@/frontend/lib/hue";
+import { formatMoney, pluralize, seekingLabel } from "@/frontend/lib/format";
 
 import styles from "./checkout.module.css";
 import { UnlockSuccess } from "./unlock-success";
@@ -30,7 +29,6 @@ export function Checkout({ quote }: { quote: UnlockQuote }) {
   const [isUnlocking, startUnlocking] = useTransition();
 
   const selected = offers.find((offer) => offer.book.id === selectedId) ?? offers[0];
-  const hue = seekingHue(resume.profile.seeking);
 
   // "Best value" means the lowest price per resume, whichever book is preselected.
   const bestValueId = [...offers].sort((a, b) => perResumeCents(a) - perResumeCents(b))[0]?.book.id;
@@ -73,12 +71,12 @@ export function Checkout({ quote }: { quote: UnlockQuote }) {
             </p>
           </header>
 
-          <section className={styles.preview} data-hue={hue} aria-label="The resume you started from">
+          <section className={styles.preview} aria-label="The resume you started from">
             <div className={styles.previewPaper}>
               <RedactedResume resume={resume} size="card" />
             </div>
             <div className={styles.previewText}>
-              <Tag hue={hue}>{seekingLabel(resume.profile.seeking)}</Tag>
+              <Tag>{seekingLabel(resume.profile.seeking)}</Tag>
               <h2 className={styles.previewTitle}>{resume.profile.majors.join(" & ")}</h2>
               <p className={styles.previewMeta}>
                 {resume.school.name} · Class of {resume.profile.gradYear}
@@ -114,7 +112,7 @@ export function Checkout({ quote }: { quote: UnlockQuote }) {
                     checked={offer.book.id === selected.book.id}
                     onChange={() => setSelectedId(offer.book.id)}
                     badge={offer.book.id === bestValueId ? "Best value" : undefined}
-                    art={<Monogram name={offer.book.club.name} hue={offer.book.club.hue} size={48} />}
+                    art={<Monogram name={offer.book.club.name} size={48} />}
                     title={offer.book.club.name}
                     description={describeBook(offer)}
                     trailing={<span className={`${styles.price} tabular`}>{formatMoney(offer.priceCents)}</span>}
@@ -183,7 +181,7 @@ function BookOffer({ offer }: { offer: UnlockOffer }) {
 
   return (
     <>
-      <Monogram name={club.name} hue={club.hue} size={56} />
+      <Monogram name={club.name} size={56} />
       <div className={styles.bookText}>
         <p className={styles.bookName}>{club.name}</p>
         {club.tagline && <p className={styles.bookTagline}>{club.tagline}</p>}

@@ -6,8 +6,7 @@ import { Monogram } from "@/frontend/components/ui/monogram";
 import { Tag } from "@/frontend/components/ui/tag";
 import { resumePdfUrl } from "@/frontend/lib/api/routes";
 import type { Membership } from "@/frontend/lib/api/types";
-import { formatDegree, timeAgo } from "@/frontend/lib/format";
-import { seekingHue, seekingLabel } from "@/frontend/lib/hue";
+import { formatDegree, seekingLabel, timeAgo } from "@/frontend/lib/format";
 
 import styles from "./membership-rows.module.css";
 
@@ -60,7 +59,7 @@ export function RequestRow({ membership, busy, onAccept, onReject }: { membershi
         <Identity membership={membership} />
 
         <div className={styles.details}>
-          <Tag hue={seekingHue(profile.seeking)}>{seekingLabel(profile.seeking)}</Tag>
+          <Tag>{seekingLabel(profile.seeking)}</Tag>
           {profile.skills.slice(0, 3).map((skill) => (
             <Chip key={skill} small>
               {skill}

@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 import { LinkButton } from "@/frontend/components/ui/button";
 import { Monogram } from "@/frontend/components/ui/monogram";
 import { DemoLogin } from "@/frontend/features/auth/demo-login";
-import type { Hue } from "@/frontend/lib/api/types";
 
 import { CardStack } from "./card-stack";
 import styles from "./landing.module.css";
@@ -22,8 +21,8 @@ export function Landing() {
         </h1>
 
         <nav className={styles.doors} aria-label="Get started">
-          <Door href="/signup?as=school" hue="green" icon={<BookOpenCheck size={30} strokeWidth={2.5} />} who="I run a club" action="Sell our book" />
-          <Door href="/signup?as=recruiter" hue="purple" icon={<Briefcase size={30} strokeWidth={2.5} />} who="I'm hiring" action="Search them all" />
+          <Door href="/signup?as=school" icon={<BookOpenCheck size={30} strokeWidth={2.5} />} who="I run a club" action="Sell our book" />
+          <Door href="/signup?as=recruiter" icon={<Briefcase size={30} strokeWidth={2.5} />} who="I'm hiring" action="Search them all" />
         </nav>
 
         <DemoLogin label="Peek inside first" stacked />
@@ -47,13 +46,13 @@ export function Landing() {
   );
 }
 
-type DoorProps = { href: string; hue: Hue; icon: ReactNode; who: string; action: string };
+type DoorProps = { href: string; icon: ReactNode; who: string; action: string };
 
 /** A big pressable card that starts signup as one kind of account. */
-function Door({ href, hue, icon, who, action }: DoorProps) {
+function Door({ href, icon, who, action }: DoorProps) {
   return (
     <Link href={href} className={styles.door}>
-      <Monogram name={who} hue={hue} size={60}>
+      <Monogram name={who} tone="ink" size={60}>
         {icon}
       </Monogram>
       <span className={styles.doorText}>

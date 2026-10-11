@@ -8,7 +8,7 @@ import { browseHref, EMPTY_FILTERS } from "@/frontend/features/resumes/filters";
 import { REVEAL_PARAM } from "@/frontend/features/resumes/browser";
 import type { ResumeView, UnlockResult } from "@/frontend/lib/api/types";
 import { formatMoney, pluralize } from "@/frontend/lib/format";
-import { HUES, seekingHue } from "@/frontend/lib/hue";
+import type { Tone } from "@/frontend/lib/tone";
 
 import styles from "./unlock-success.module.css";
 
@@ -18,6 +18,9 @@ type UnlockSuccessProps = {
 };
 
 const CONFETTI_PIECES = 28;
+
+/** Mostly the accent, with yellow, a little ink, and gray, like the rest of the palette. */
+const CONFETTI_TONES: Tone[] = ["accent", "yellow", "accent", "ink", "neutral"];
 
 /** Celebration after a purchase: who you unlocked, and what the club earned. */
 export function UnlockSuccess({ resume, result }: UnlockSuccessProps) {
@@ -39,7 +42,7 @@ export function UnlockSuccess({ resume, result }: UnlockSuccessProps) {
         yours, {pluralize(offer.book.resumeCount, "resume")} in all.
       </p>
 
-      <div className={styles.person} data-hue={seekingHue(resume.profile.seeking)}>
+      <div className={styles.person}>
         <span className={styles.avatar}>{contact.name[0]}</span>
         <div className={styles.personText}>
           <p className={styles.name}>
@@ -82,7 +85,7 @@ function Confetti() {
         return (
           <span
             key={index}
-            data-hue={HUES[index % HUES.length]}
+            data-tone={CONFETTI_TONES[index % CONFETTI_TONES.length]}
             style={
               {
                 "--x": `${Math.cos(angle) * distance}px`,

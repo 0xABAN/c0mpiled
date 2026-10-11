@@ -32,7 +32,7 @@ export function GoalsStep({ frame, goals, onChange, onNext }: { frame: StepFrame
           checked={goals.resume}
           onChange={(resume) => onChange({ ...goals, resume })}
           art={
-            <Monogram name="Resume" hue="blue" size={80}>
+            <Monogram name="Resume" tone="ink" size={80}>
               <FileUser size={40} strokeWidth={2.5} />
             </Monogram>
           }
@@ -45,7 +45,7 @@ export function GoalsStep({ frame, goals, onChange, onNext }: { frame: StepFrame
           checked={goals.club}
           onChange={(club) => onChange({ ...goals, club })}
           art={
-            <Monogram name="Club" hue="green" size={80}>
+            <Monogram name="Club" tone="ink" size={80}>
               <BookOpenCheck size={40} strokeWidth={2.5} />
             </Monogram>
           }

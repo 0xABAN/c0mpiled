@@ -31,7 +31,7 @@ export function ResumeDoneStep({ frame, books, onFinish, finishing }: ResumeDone
     >
       <div className={clubStyles.done}>
         <span className={clubStyles.doneBadge}>
-          <Monogram name="Sent" hue="blue" size={96}>
+          <Monogram name="Sent" tone="accent" size={96}>
             <Send size={44} strokeWidth={2.5} />
           </Monogram>
         </span>
@@ -41,7 +41,7 @@ export function ResumeDoneStep({ frame, books, onFinish, finishing }: ResumeDone
         <ul className={styles.requests}>
           {books.map((book) => (
             <li key={book.id} className={styles.request}>
-              <Monogram name={book.club.name} hue={book.club.hue} size={40} />
+              <Monogram name={book.club.name} size={40} />
               <span className={styles.requestName}>{book.club.name}</span>
               <span className={styles.pending}>Pending</span>
             </li>

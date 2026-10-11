@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, Link2, LockKeyhole, X } from "lucide-react";
-import { useEffect, useRef, useState, type ComponentProps, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { Button } from "@/frontend/components/ui/button";
 import { Chip } from "@/frontend/components/ui/chip";
@@ -10,8 +10,7 @@ import { Tag } from "@/frontend/components/ui/tag";
 import { useToast } from "@/frontend/components/ui/toast";
 import { resumePdfUrl, resumePreviewUrl } from "@/frontend/lib/api/routes";
 import type { ResumeView } from "@/frontend/lib/api/types";
-import { formatDegree } from "@/frontend/lib/format";
-import { seekingHue, seekingLabel } from "@/frontend/lib/hue";
+import { formatDegree, seekingLabel } from "@/frontend/lib/format";
 
 import { RedactedPages } from "./redacted-pages";
 import { RedactedResume } from "./redacted-resume";
@@ -39,7 +38,6 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
   const [view, setView] = useState<"summary" | "pdf">("summary");
 
   const { profile, contact, books } = resume;
-  const hue = seekingHue(profile.seeking);
 
   // Focus the dialog itself rather than its first button, so no control looks pre-selected.
   useEffect(() => {
@@ -104,7 +102,7 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
       </header>
 
       <div className={styles.body}>
-        <div className={styles.canvas} data-hue={hue}>
+        <div className={styles.canvas}>
           {contact && (
             <div className={styles.viewTabs} role="tablist" aria-label="Resume view">
               <button type="button" role="tab" aria-selected={view === "summary"} className={styles.viewTab} onClick={() => setView("summary")}>
@@ -136,13 +134,13 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
 
         <aside className={styles.panel}>
           <div className={styles.identity}>
-            <span className={styles.avatar} data-hue={hue}>
+            <span className={styles.avatar}>
               {contact ? contact.name[0] : <LockKeyhole size={26} strokeWidth={2.75} aria-hidden />}
             </span>
             <div className={styles.identityText}>
               <div className={styles.nameRow}>
                 <h2 className={styles.name}>{contact?.name ?? "Name hidden"}</h2>
-                <Tag hue={hue}>{seekingLabel(profile.seeking)}</Tag>
+                <Tag>{seekingLabel(profile.seeking)}</Tag>
               </div>
               <p className={styles.headline}>
                 {profile.majors.join(" & ")} · Class of {profile.gradYear}
@@ -153,14 +151,14 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
           <PanelSection title={books.length > 1 ? "In these books" : "In this book"}>
             <div className={styles.rows}>
               {books.map((book) => (
-                <OrgRow key={book.id} name={book.club.name} hue={book.club.hue} detail={book.club.tagline ?? book.club.school} />
+                <OrgRow key={book.id} name={book.club.name} detail={book.club.tagline ?? book.club.school} />
               ))}
             </div>
           </PanelSection>
 
           <PanelSection title="Education">
             <div className={styles.rows}>
-              <OrgRow name={resume.school.name} hue="blue" detail={`${formatDegree(profile.degree)}, ${profile.majors.join(" & ")} · ${profile.gradYear}`} />
+              <OrgRow name={resume.school.name} detail={`${formatDegree(profile.degree)}, ${profile.majors.join(" & ")} · ${profile.gradYear}`} />
             </div>
           </PanelSection>
 
@@ -198,10 +196,10 @@ function PanelSection({ title, children }: { title: string; children: ReactNode 
   );
 }
 
-function OrgRow({ name, detail, hue }: { name: string; detail: string; hue?: ComponentProps<typeof Monogram>["hue"] }) {
+function OrgRow({ name, detail }: { name: string; detail: string }) {
   return (
     <div className={styles.orgRow}>
-      <Monogram name={name} hue={hue} size={36} />
+      <Monogram name={name} size={36} />
       <div className={styles.orgText}>
         <p className={styles.orgName}>{name}</p>
         <p className={styles.orgDetail}>{detail}</p>

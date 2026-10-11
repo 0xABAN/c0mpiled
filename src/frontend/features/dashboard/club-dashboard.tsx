@@ -10,6 +10,7 @@ import { useToast } from "@/frontend/components/ui/toast";
 import { decideJoinRequest } from "@/frontend/lib/api/actions";
 import type { ClubDashboard as Dashboard, Membership } from "@/frontend/lib/api/types";
 import { formatMoney, pluralize } from "@/frontend/lib/format";
+import type { Tone } from "@/frontend/lib/tone";
 
 import styles from "./club-dashboard.module.css";
 import { EarningsCard } from "./earnings-card";
@@ -58,8 +59,8 @@ export function ClubDashboard({ dashboard }: { dashboard: Dashboard }) {
 
   return (
     <div className={styles.page}>
-      <header className={styles.hero} data-hue={club.hue}>
-        <Monogram name={club.name} hue={club.hue} size={76} />
+      <header className={styles.hero}>
+        <Monogram name={club.name} tone="ink" size={76} />
         <div className={styles.heroText}>
           <h1 className={styles.clubName}>{club.name}</h1>
           <p className={styles.clubMeta}>{[club.tagline, club.school].filter(Boolean).join(" · ")}</p>
@@ -78,10 +79,10 @@ export function ClubDashboard({ dashboard }: { dashboard: Dashboard }) {
       </header>
 
       <dl className={styles.stats}>
-        <Stat icon={<Users size={22} strokeWidth={2.75} />} hue="blue" label="Members" value={String(members.length)} />
-        <Stat icon={<Clock size={22} strokeWidth={2.75} />} hue="yellow" label="Waiting for you" value={String(pending.length)} />
-        <Stat icon={<DollarSign size={22} strokeWidth={2.75} />} hue="purple" label="Book price" value={formatMoney(book.priceCents)} />
-        <Stat icon={<Check size={22} strokeWidth={3} />} hue="green" label="Earned" value={formatMoney(earnedCents)} />
+        <Stat icon={<Users size={22} strokeWidth={2.75} />} label="Members" value={String(members.length)} />
+        <Stat icon={<Clock size={22} strokeWidth={2.75} />} tone="yellow" label="Waiting for you" value={String(pending.length)} />
+        <Stat icon={<DollarSign size={22} strokeWidth={2.75} />} label="Book price" value={formatMoney(book.priceCents)} />
+        <Stat icon={<Check size={22} strokeWidth={3} />} tone="accent" label="Earned" value={formatMoney(earnedCents)} />
       </dl>
 
       <div className={styles.columns}>
@@ -135,10 +136,10 @@ export function ClubDashboard({ dashboard }: { dashboard: Dashboard }) {
   );
 }
 
-function Stat({ icon, hue, label, value }: { icon: ReactNode; hue: "blue" | "yellow" | "purple" | "green"; label: string; value: string }) {
+function Stat({ icon, tone = "neutral", label, value }: { icon: ReactNode; tone?: Tone; label: string; value: string }) {
   return (
     <div className={styles.stat}>
-      <span className={styles.statIcon} data-hue={hue} aria-hidden>
+      <span className={styles.statIcon} data-tone={tone} aria-hidden>
         {icon}
       </span>
       {/* Label first for screen readers; CSS shows the value on top. */}

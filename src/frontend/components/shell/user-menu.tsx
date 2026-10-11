@@ -8,7 +8,6 @@ import { useEffect, useRef, useState } from "react";
 
 import { ConfigureAmplify } from "@/frontend/features/auth/configure-amplify";
 import type { Viewer } from "@/frontend/lib/api/types";
-import { hueFor } from "@/frontend/lib/hue";
 
 import styles from "./user-menu.module.css";
 
@@ -51,7 +50,7 @@ export function UserMenu({ viewer }: { viewer: Viewer }) {
       <button
         type="button"
         className={styles.avatar}
-        data-hue={hueFor(viewer.email)}
+        data-tone="ink"
         aria-label="Account menu"
         aria-expanded={open}
         aria-haspopup="menu"

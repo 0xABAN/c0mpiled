@@ -97,8 +97,8 @@ export function JoinFlow({ club, blocker, school, finishesSetup }: JoinFlowProps
   return (
     <OnboardingShell progress={0} exitHref="/">
       <div className={styles.intro}>
-        <div className={styles.card} data-hue={club.hue}>
-          <Monogram name={club.name} hue={club.hue} size={96} />
+        <div className={styles.card} data-tone="accent">
+          <Monogram name={club.name} tone="accent" size={96} />
           <p className={styles.invited}>You&apos;re invited to join</p>
           <h1 className={styles.name}>{club.name}</h1>
           <p className={styles.meta}>{[club.tagline, club.school].filter(Boolean).join(" · ")}</p>

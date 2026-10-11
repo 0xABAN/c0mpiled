@@ -103,7 +103,7 @@ export function StudentHome({ home, school, books }: StudentHomeProps) {
             </>
           ) : (
             <div className={styles.noResume}>
-              <Monogram name="Resume" hue="blue" size={64}>
+              <Monogram name="Resume" size={64}>
                 <FileUser size={32} strokeWidth={2.5} />
               </Monogram>
               <p className={styles.noResumeTitle}>No resume yet</p>
@@ -122,7 +122,7 @@ export function StudentHome({ home, school, books }: StudentHomeProps) {
               <ul className={styles.rows}>
                 {memberships.map(({ book, status, requestedAt }) => (
                   <li key={book.id} className={styles.row}>
-                    <Monogram name={book.club.name} hue={book.club.hue} size={44} />
+                    <Monogram name={book.club.name} size={44} />
                     <div className={styles.rowText}>
                       <p className={styles.rowName}>{book.club.name}</p>
                       <p className={styles.rowMeta}>Requested {timeAgo(requestedAt)}</p>
@@ -161,7 +161,7 @@ export function StudentHome({ home, school, books }: StudentHomeProps) {
                         type="checkbox"
                         checked={chosen.includes(book.id)}
                         onChange={(checked) => setChosen(checked ? [...chosen, book.id] : chosen.filter((id) => id !== book.id))}
-                        art={<Monogram name={book.club.name} hue={book.club.hue} size={44} />}
+                        art={<Monogram name={book.club.name} size={44} />}
                         title={book.club.name}
                         description={[book.club.tagline, pluralize(book.resumeCount, "member")].filter(Boolean).join(" · ")}
                       />
@@ -183,7 +183,7 @@ export function StudentHome({ home, school, books }: StudentHomeProps) {
                 <ul className={styles.rows}>
                   {joinable.map((book) => (
                     <li key={book.id} className={styles.row}>
-                      <Monogram name={book.club.name} hue={book.club.hue} size={44} />
+                      <Monogram name={book.club.name} size={44} />
                       <div className={styles.rowText}>
                         <p className={styles.rowName}>{book.club.name}</p>
                         <p className={styles.rowMeta}>{book.club.tagline ?? pluralize(book.resumeCount, "member")}</p>

@@ -86,7 +86,7 @@ export function SignupFlow({ initialType, initialSchool, joinSlug }: SignupFlowP
             checked={accountType === "school"}
             onChange={() => setAccountType("school")}
             art={
-              <Monogram name="Student" hue="blue" size={80}>
+              <Monogram name="Student" tone="ink" size={80}>
                 <GraduationCap size={40} strokeWidth={2.5} />
               </Monogram>
             }
@@ -100,7 +100,7 @@ export function SignupFlow({ initialType, initialSchool, joinSlug }: SignupFlowP
             checked={accountType === "recruiter"}
             onChange={() => setAccountType("recruiter")}
             art={
-              <Monogram name="Recruiter" hue="purple" size={80}>
+              <Monogram name="Recruiter" tone="ink" size={80}>
                 <Briefcase size={38} strokeWidth={2.5} />
               </Monogram>
             }
@@ -137,7 +137,7 @@ export function SignupFlow({ initialType, initialSchool, joinSlug }: SignupFlowP
 
       {school && (
         <p className={styles.schoolNote}>
-          <Monogram name={school.name} hue="blue" size={28} />
+          <Monogram name={school.name} size={28} />
           Signing up at {school.name} with your <strong>@{school.domains[0]}</strong> email
         </p>
       )}

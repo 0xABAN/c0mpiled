@@ -45,7 +45,7 @@ export function ResumeBooksStep({ frame, school, books, selectedIds, onChange, o
               type="checkbox"
               checked={selectedIds.includes(book.id)}
               onChange={(checked) => toggle(book.id, checked)}
-              art={<Monogram name={book.club.name} hue={book.club.hue} size={48} />}
+              art={<Monogram name={book.club.name} size={48} />}
               title={book.club.name}
               description={[book.club.tagline, pluralize(book.resumeCount, "member")].filter(Boolean).join(" · ")}
             />

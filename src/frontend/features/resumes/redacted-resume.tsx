@@ -59,7 +59,7 @@ export function RedactedResume({ resume, size, revealing }: RedactedResumeProps)
       {size === "full" && (
         <Section title="Education">
           <div className={styles.entry}>
-            <Monogram name={school.name} hue="blue" size={24} />
+            <Monogram name={school.name} size={24} />
             <div className={styles.entryText}>
               <p className={styles.entryTitle}>{school.name}</p>
               <p className={styles.entryMeta}>
