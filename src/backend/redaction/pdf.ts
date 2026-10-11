@@ -25,9 +25,9 @@ const BAR_ABOVE_BASELINE = 0.75;
 const BAR_BELOW_BASELINE = 0.15;
 
 /**
- * One block of text (roughly a paragraph) with its lines joined by spaces, so a pattern can
- * match an address that wraps. `glyphs[i]` says where `text[i]` (a UTF-16 unit) is drawn,
- * or is `null` for the spaces added between lines.
+ * One block of text (roughly a paragraph), preserving line breaks so a city label can't
+ * consume an employer on the line above. Address patterns can still span lines with `\s`.
+ * `glyphs[i]` says where `text[i]` (a UTF-16 unit) is drawn, or is `null` for added newlines.
  */
 type Block = { text: string; glyphs: (Glyph | null)[] };
 
@@ -156,7 +156,7 @@ function readPage(page: PDFPage): { blocks: Block[]; images: Rect[] } {
       line += 1;
 
       if (block.text.length > 0) {
-        block.text += " ";
+        block.text += "\n";
         block.glyphs.push(null);
       }
     },

@@ -196,9 +196,13 @@ redactResume(pdf: Uint8Array, student: { name: string }): Promise<Uint8Array[]>
 ```
 
 It blacks out each part of the name (whole words, ignoring case and accents), emails, phone numbers, web
-addresses, street addresses, state + ZIP, and all linked text. Images (headshots) are deleted without a box,
-so a background image doesn't take the page's text with it. Patterns run over whole paragraphs, so a wrapped
-address still matches, and they lean toward hiding too much. No model is involved.
+addresses, street addresses, state + ZIP, capitalized US city/state labels (such as `Seattle, WA` and
+`New York, NY`), and all linked text. City labels use valid postal abbreviations for the 50 states and DC,
+start at line/column boundaries or separators, and match everywhere, including education and contact
+sections. Bare cities, international formats, and unseparated employer/city text are not reliably detected.
+Images (headshots) are deleted without a box, so a background image doesn't take the page's text with it.
+Patterns run over whole paragraphs with line breaks preserved: wrapped addresses still match, but city
+labels can't swallow the employer on the preceding line. No model is involved.
 Pages are images, so no text layer, metadata, or link target survives. After redacting, it reads each page
 back and throws if anything still matches.
 
@@ -211,6 +215,11 @@ back and throws if anything still matches.
   keep the profile-drawn `RedactedResume`. After unlock, the original PDF replaces them.
 
 `npm run redact -- fake.pdf "Full Name" [out-dir]` redacts one PDF from the command line.
+Run the detector and rendered-page checks with
+`node --conditions=react-server --import tsx --test src/backend/redaction/redaction.test.ts`.
+
+Rules apply when generating a preview, not when serving a stored PNG. Existing previews need regeneration
+or resume resubmission to pick up new rules; resubmission replaces their S3 pages after saving succeeds.
 
 ## Data model
 
