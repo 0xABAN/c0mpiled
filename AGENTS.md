@@ -24,8 +24,9 @@ at the club's price (mock payments), recruiter downloads PDFs, student withdraws
 **Out:** ranking, officer bulk upload, Stripe Connect payouts (clubs are paid by hand after the event),
 messaging, ATS export, resume feedback, email notifications, zip downloads.
 
-**v1 (building now):** auth, signup and setup, the Postgres schema, and search with filters over seeded fake
-resumes. Payments, uploads, parsing, and S3 come after.
+**v1 (built, local only):** auth, signup and setup, clubs and join requests, PDF upload to S3 with redacted
+previews (the student types the profile), the student home, and search with filters. Parsing, payments,
+and the Amplify deploy come next.
 
 ## Team split
 
@@ -78,6 +79,7 @@ src/backend/    server-only feature modules, each with an index.ts as its public
   resumes/      resumes, search, filter options
   parsing/      parseResume (teammate)
   redaction/    redactResume (Contract 3)
+  storage/      resume PDFs and preview pages in S3, presigned links
   billing/      Contract 2 (teammate)
   api/          the view models and functions the UI calls
 ```
@@ -235,6 +237,19 @@ and its preview pages), the row, and every membership.
 
 Env vars: `DATABASE_URL`, `APP_REGION`, `RESUME_BUCKET`, `BEDROCK_MODEL_ID`,
 `NEXT_PUBLIC_COGNITO_USER_POOL_ID`, `NEXT_PUBLIC_COGNITO_CLIENT_ID`.
+
+Setting up an environment (each script prints env lines to append to `.env.local`, and refuses to
+overwrite what exists):
+
+- `ADMIN_DATABASE_URL=... npx tsx infra/create-database.ts`: Roster's own role and database on an RDS
+  instance, then `npm run db:migrate`.
+- `infra/cognito.sh [stage]`: the user pool and web client.
+- `infra/s3.sh [stage]`: the private, encrypted resume bucket.
+- `npm run db:seed`: invented clubs, students, and purchases (every seed account id starts with `seed:`).
+  `npm run db:seed -- --remove` deletes them; do that before real launch.
+
+Test accounts: create them with `aws cognito-idp admin-create-user --message-action SUPPRESS` and
+`admin-set-user-password --permanent`, so they don't spend the 50-emails-a-day Cognito quota.
 
 ## Timeline
 
