@@ -81,7 +81,7 @@ export async function updateBookPrice(priceCents: number): Promise<ActionResult>
 }
 
 /**
- * Stores one resume PDF (form field `file`, at most 5 MB) for a school account. `parsed` is
+ * Stores one resume PDF (form field `file`, at most 4 MB) for a school account. `parsed` is
  * `null` until the parser exists, so the student fills in the profile by hand.
  */
 export async function uploadResume(formData: FormData): Promise<UploadResult> {

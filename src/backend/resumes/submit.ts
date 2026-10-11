@@ -17,7 +17,11 @@ import { parseInput } from "@/backend/validation";
 import { resumeColumns } from "./columns";
 import { requestMemberships, requireBooksAtSchool } from "./membership";
 
-const MAX_PDF_BYTES = 5 * 1024 * 1024;
+/**
+ * Amplify Hosting rejects request bodies over about 4.4 MB (413) before our code runs, so the
+ * limit sits safely below that. Resumes are rarely over 1 MB.
+ */
+const MAX_PDF_BYTES = 4 * 1024 * 1024;
 
 /** Every PDF starts with these bytes; the browser-reported MIME type alone can't be trusted. */
 const PDF_SIGNATURE = new TextEncoder().encode("%PDF-");
@@ -27,7 +31,7 @@ function looksLikePdf(bytes: Uint8Array): boolean {
 }
 
 /**
- * Stores a school account's resume PDF (form field `file`, at most 5 MB) and returns its
+ * Stores a school account's resume PDF (form field `file`, at most 4 MB) and returns its
  * upload id. Nothing is attached to any book until `submitResume`.
  *
  * `parsed` is always `null` for now, so the student types their profile. Once the teammate's
@@ -38,7 +42,7 @@ export async function uploadResume(formData: FormData): Promise<{ uploadId: stri
 
   const file = formData.get("file");
   if (!(file instanceof File)) throw new UserError("Choose a PDF to upload.");
-  if (file.size > MAX_PDF_BYTES) throw new UserError("PDFs must be 5 MB or smaller.");
+  if (file.size > MAX_PDF_BYTES) throw new UserError("PDFs must be 4 MB or smaller.");
 
   const pdf = new Uint8Array(await file.arrayBuffer());
   if (!looksLikePdf(pdf)) throw new UserError("That file isn't a PDF.");
