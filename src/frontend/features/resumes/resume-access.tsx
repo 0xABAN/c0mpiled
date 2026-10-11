@@ -1,35 +1,13 @@
 "use client";
 
-import { Download, ExternalLink, LockKeyhole, Mail } from "lucide-react";
+import { Download, ExternalLink, Mail } from "lucide-react";
 
-import { AnchorButton, LinkButton } from "@/frontend/components/ui/button";
+import { AnchorButton } from "@/frontend/components/ui/button";
 import { useToast } from "@/frontend/components/ui/toast";
 import { resumePdfUrl } from "@/frontend/lib/api/routes";
 import type { ResumeView } from "@/frontend/lib/api/types";
 
 import styles from "./resume-access.module.css";
-
-/** Recruiter call to action for a locked resume. */
-export function UnlockCard({ resume, href }: { resume: ResumeView; href: string }) {
-  const { books } = resume;
-
-  return (
-    <div className={styles.unlockCard}>
-      <p className="eyebrow">Locked</p>
-      <h3 className={styles.unlockTitle}>See who this is</h3>
-      <p className={styles.unlockBody}>
-        {books.length === 1
-          ? `Unlock ${books[0].club.name}'s book to see their name, email, and original PDF. The club gets paid.`
-          : `They're in ${books.length} books. Unlock any one to see their name, email, and original PDF. That club gets paid.`}
-      </p>
-
-      <LinkButton href={href} variant="primary" block>
-        <LockKeyhole size={18} strokeWidth={3} aria-hidden />
-        Unlock resume
-      </LinkButton>
-    </div>
-  );
-}
 
 /** What a student sees instead of the unlock card: who can reveal this resume, and how. */
 export function LockedNote({ resume }: { resume: ResumeView }) {

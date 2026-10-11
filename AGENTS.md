@@ -105,21 +105,23 @@ the systems, never any brand's logo, mascot, illustrations, fonts, or copy.
   - Red-orange `--accent` is every primary action (Continue, Accept, Unlock), selection, focus, the active nav
     item, links, money (earnings), one key phrase in big headlines, and also `--success` and `--danger`.
   - Yellow `--warning` marks things worth noticing that aren't actions: pending, waiting, BEST VALUE, coins.
-  - Everything else is gray: clubs, companies, schools, resume cards, and tags. The seeking type is read from
-    the tag's label, not a color. Clubs still store a `hue`, but nothing renders it.
+  - Clubs, companies, schools, and resume paper stay gray and white. Seeking badges are red-orange with
+    white labels; every seeking type uses the same color. Clubs still store a `hue`, but nothing renders it.
   - Ink (near-black on a black lip) is for `--secondary` buttons and rare heavy art: choice screens, the
     officer's own club tile, the account avatar.
 - **Restraint:** orange never floods a large surface. Decorative fields use the `.grid-field` utility (Firecrawl's
   faint grid); the landing's closing band is the one solid accent block.
-- **Contrast:** white labels sit on the bright accent only on large buttons and art (3.3:1). Small colored text
-  and tags use the `-deep` shades (at least 4.5:1 on white and on their tint). `--subtle` is for icons, borders, and
-  placeholders; text uses `--muted` or darker.
-- **Redaction is visible:** hidden text is a dark hatched bar (`RedactedResume`, drawn from the profile). Cards
-  always use it; the detail view shows Contract 3's redacted pages when a resume has them.
+- **Contrast:** action buttons and seeking badges use the requested white-on-bright-orange treatment
+  (3.3:1). Other small colored text uses the `-deep` shades (at least 4.5:1 on white and on their tint).
+  `--subtle` is for icons, borders, and placeholders; text uses `--muted` or darker.
+- **Redaction is visible:** small cards use profile-drawn `RedactedResume` thumbnails with hatched identity
+  bars. Expanded views show the actual redacted source pages, or the original PDF after purchase, inside
+  rounded frames. Never substitute a profile drawing for a missing source document.
 - **Page patterns:**
-  - Recruiter pages (browse, detail, unlock) follow resumes.fyi: a filter rail beside a masonry grid of
-    gray cards, a meta row outside each card, and a full-screen detail with the document on the left and
-    an info panel on the right.
+  - Browse uses a filter rail beside an equal-height CSS grid of resume cards, with a meta row outside
+    each card. Shorter thumbnails leave whitespace at the bottom rather than staggering or cropping.
+    Full-screen detail shows the source document on the left; the right panel has book memberships,
+    education, and a purchase action that opens checkout. Do not repeat experience and skills there.
   - Onboarding (signup, setup, join) follows Duolingo: one question per screen, a progress bar on top, our mark
     asking the question in a speech bubble, and the main action in a bottom bar (`OnboardingShell`, `Prompt`).
   - Student pages (`/resume`, and `/dashboard` for a student who runs a club): stat tiles and list rows on white.

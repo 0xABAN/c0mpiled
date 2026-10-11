@@ -1,6 +1,6 @@
 "use client";
 
-import { SlidersHorizontal } from "lucide-react";
+import { LockKeyhole, SlidersHorizontal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition, type MouseEvent } from "react";
 
@@ -15,7 +15,7 @@ import styles from "./browser.module.css";
 import { FilterRail } from "./filter-rail";
 import { FilterSheet } from "./filter-sheet";
 import { activeFilterCount, browseHref, EMPTY_FILTERS, filtersKey, SELECTED_PARAM, unlockHref } from "./filters";
-import { ContactCard, LockedNote, UnlockCard } from "./resume-access";
+import { ContactCard, LockedNote } from "./resume-access";
 import { ResumeCard } from "./resume-card";
 import { ResumeDetail } from "./resume-detail";
 
@@ -175,7 +175,10 @@ export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock
             ) : selected.contact ? (
               <ContactCard resumeId={selected.id} email={selected.contact.email} />
             ) : (
-              <UnlockCard resume={selected} href={unlockHref(filters, selected.id)} />
+              <LinkButton href={unlockHref(filters, selected.id)} variant="primary" block>
+                <LockKeyhole size={18} strokeWidth={3} aria-hidden />
+                Buy resume book
+              </LinkButton>
             )
           }
           mobileAction={
@@ -185,7 +188,7 @@ export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock
               </AnchorButton>
             ) : (
               <LinkButton href={unlockHref(filters, selected.id)} variant="primary" block>
-                Unlock resume
+                Buy resume book
               </LinkButton>
             )
           }

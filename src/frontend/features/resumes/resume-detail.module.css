@@ -149,27 +149,21 @@
   font-weight: 900;
 }
 
-.identityText {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-
 .nameRow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
+  min-width: 0;
+}
+
+.nameRow .seeking {
+  background: var(--face);
+  color: #fff;
 }
 
 .name {
   font-size: 24px;
-}
-
-.headline {
-  color: var(--muted);
-  font-size: 16px;
-  font-weight: 700;
 }
 
 .section {
@@ -216,12 +210,6 @@
   color: var(--muted);
   font-size: 14px;
   font-weight: 600;
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
 }
 
 /* ---------- Calls to action ---------- */

@@ -4,7 +4,6 @@ import { ArrowLeft, ArrowRight, Link2, LockKeyhole, X } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 
 import { Button } from "@/frontend/components/ui/button";
-import { Chip } from "@/frontend/components/ui/chip";
 import { Monogram } from "@/frontend/components/ui/monogram";
 import { Tag } from "@/frontend/components/ui/tag";
 import { useToast } from "@/frontend/components/ui/toast";
@@ -127,14 +126,9 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
             <span className={styles.avatar}>
               {contact ? contact.name[0] : <LockKeyhole size={26} strokeWidth={2.75} aria-hidden />}
             </span>
-            <div className={styles.identityText}>
-              <div className={styles.nameRow}>
-                <h2 className={styles.name}>{contact?.name ?? "Name hidden"}</h2>
-                <Tag>{seekingLabel(profile.seeking)}</Tag>
-              </div>
-              <p className={styles.headline}>
-                {profile.majors.join(" & ")} · Class of {profile.gradYear}
-              </p>
+            <div className={styles.nameRow}>
+              <h2 className={styles.name}>{contact?.name ?? "Name hidden"}</h2>
+              <Tag tone="accent" className={styles.seeking}>{seekingLabel(profile.seeking)}</Tag>
             </div>
           </div>
 
@@ -149,22 +143,6 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
           <PanelSection title="Education">
             <div className={styles.rows}>
               <OrgRow name={resume.school.name} detail={`${formatDegree(profile.degree)}, ${profile.majors.join(" & ")} · ${profile.gradYear}`} />
-            </div>
-          </PanelSection>
-
-          <PanelSection title="Experience">
-            <div className={styles.rows}>
-              {profile.experience.map((job, index) => (
-                <OrgRow key={`${job.org}-${index}`} name={job.org} detail={job.title} />
-              ))}
-            </div>
-          </PanelSection>
-
-          <PanelSection title="Skills">
-            <div className={styles.chips}>
-              {profile.skills.map((skill) => (
-                <Chip key={skill}>{skill}</Chip>
-              ))}
             </div>
           </PanelSection>
 
