@@ -5,15 +5,13 @@ import { Prompt } from "@/frontend/components/onboarding/prompt";
 import { Button } from "@/frontend/components/ui/button";
 import { TextField } from "@/frontend/components/ui/field";
 import { Monogram } from "@/frontend/components/ui/monogram";
-import type { Hue } from "@/frontend/lib/api/types";
 
-import { HuePicker } from "../hue-picker";
 import type { StepFrame } from "../step";
 import styles from "./club-steps.module.css";
 
-export type ClubDetails = { name: string; tagline: string; hue: Hue };
+export type ClubDetails = { name: string; tagline: string };
 
-/** Name, one-line description, and color, with a live preview of the club's tile. */
+/** Name and one-line description, with a live preview of how the club appears. */
 export function ClubDetailsStep({ frame, school, value, onChange, onNext }: { frame: StepFrame; school: string; value: ClubDetails; onChange: (next: ClubDetails) => void; onNext: () => void }) {
   const name = value.name.trim();
 
@@ -28,8 +26,8 @@ export function ClubDetailsStep({ frame, school, value, onChange, onNext }: { fr
     >
       <Prompt title="Tell us about your club" lead="This is how companies will see it." />
 
-      <div className={styles.preview} data-hue={value.hue} aria-hidden>
-        <Monogram name={name || "Your club"} hue={value.hue} size={64} />
+      <div className={styles.preview} aria-hidden>
+        <Monogram name={name || "Your club"} size={64} />
         <div>
           <p className={styles.previewName}>{name || "Your club"}</p>
           <p className={styles.previewMeta}>{value.tagline.trim() || school}</p>
@@ -46,10 +44,6 @@ export function ClubDetailsStep({ frame, school, value, onChange, onNext }: { fr
           onChange={(event) => onChange({ ...value, tagline: event.target.value })}
           maxLength={80}
         />
-        <div>
-          <p className={styles.label}>Club color</p>
-          <HuePicker value={value.hue} onChange={(hue) => onChange({ ...value, hue })} />
-        </div>
       </div>
     </OnboardingShell>
   );

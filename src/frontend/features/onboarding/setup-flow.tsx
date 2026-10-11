@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useToast } from "@/frontend/components/ui/toast";
 import { browseHref, EMPTY_FILTERS } from "@/frontend/features/resumes/filters";
 import { completeRecruiterSetup, createClub, finishSetup } from "@/frontend/lib/api/actions";
-import type { BookSummary, ClubCreated, School } from "@/frontend/lib/api/types";
+import type { BookSummary, ClubCreated, Hue, School } from "@/frontend/lib/api/types";
 
 import type { StepFrame } from "./step";
 import { ClubDetailsStep, type ClubDetails } from "./steps/club-details-step";
@@ -20,6 +20,9 @@ import { ResumeDoneStep } from "./steps/resume-done-step";
 import { ResumeReviewStep } from "./steps/resume-review-step";
 import { ResumeUploadStep } from "./steps/resume-upload-step";
 import { useResumeDraft } from "./use-resume-draft";
+
+/** Stored on every new club; nothing renders it today. */
+const CLUB_HUE = "orange" satisfies Hue;
 
 type Step =
   | "goals"
@@ -39,7 +42,11 @@ type SetupFlowProps =
       email: string;
       school: School;
       /** Officers who already run a club (e.g. left setup halfway) only get the resume path. */
-      ownsClub: boolean;
+      /**
+       * Run only one path, skipping the goals question: "resume" for officers who already
+       * run a club, "club" for students who decide to sell their club's book later.
+       */
+      only?: "club" | "resume";
       /** Books at the viewer's school. */
       books: BookSummary[];
     }
@@ -57,13 +64,13 @@ export function SetupFlow(props: SetupFlowProps) {
   return props.accountType === "school" ? <SchoolSetup {...props} /> : <RecruiterSetup {...props} />;
 }
 
-function SchoolSetup({ email, school, books, ownsClub }: Extract<SetupFlowProps, { accountType: "school" }>) {
+function SchoolSetup({ email, school, books, only }: Extract<SetupFlowProps, { accountType: "school" }>) {
   const router = useRouter();
   const toast = useToast();
-  const [goals, setGoals] = useState<Goals>({ resume: ownsClub, club: false });
-  const [step, setStep] = useState<Step>(ownsClub ? "resume-books" : "goals");
+  const [goals, setGoals] = useState<Goals>({ resume: only === "resume", club: only === "club" });
+  const [step, setStep] = useState<Step>(only === "club" ? "club-details" : only === "resume" ? "resume-books" : "goals");
 
-  const [club, setClub] = useState<ClubDetails>({ name: "", tagline: "", hue: "purple" });
+  const [club, setClub] = useState<ClubDetails>({ name: "", tagline: "" });
   const [pricing, setPricing] = useState<ClubPricing>({ dollars: "300", payoutEmail: email });
   const [created, setCreated] = useState<ClubCreated | null>(null);
   const [creating, setCreating] = useState(false);
@@ -73,7 +80,7 @@ function SchoolSetup({ email, school, books, ownsClub }: Extract<SetupFlowProps,
   const resume = useResumeDraft([]);
 
   const steps: Step[] = [
-    ...(ownsClub ? [] : (["goals"] as const)),
+    ...(only ? [] : (["goals"] as const)),
     ...(goals.club ? (["club-details", "club-price", "club-done"] as const) : []),
     ...(goals.resume ? (["resume-books", "resume-upload", "resume-review", "resume-done"] as const) : []),
   ];
@@ -93,7 +100,8 @@ function SchoolSetup({ email, school, books, ownsClub }: Extract<SetupFlowProps,
     const result = await createClub({
       name: club.name.trim(),
       tagline: club.tagline.trim() || null,
-      hue: club.hue,
+      // Clubs still store a hue (the backend `Hue`), but the theme draws every club in gray.
+      hue: CLUB_HUE,
       priceCents: Number(pricing.dollars) * 100,
       payoutEmail: pricing.payoutEmail.trim(),
     });
