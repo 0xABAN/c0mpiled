@@ -1,6 +1,28 @@
+import type { Viewer } from "./types";
+
 /**
  * HTTP endpoints the UI links to directly (as opposed to calling server actions).
  */
+
+/** Account destination after authentication, separate from the public homepage. */
+export function accountHomeHref(viewer: Pick<Viewer, "accountType" | "onboarded">): string {
+  if (!viewer.accountType) return "/signup";
+  if (!viewer.onboarded) return "/setup";
+  return viewer.accountType === "recruiter" ? "/browse" : "/resume";
+}
+
+/** Only local paths may be used as post-login destinations. */
+export function safeNextPath(path: unknown): string | null {
+  if (typeof path !== "string" || !path.startsWith("/")) return null;
+
+  const origin = "https://roster.invalid";
+  try {
+    const url = new URL(path, origin);
+    return url.origin === origin ? `${url.pathname}${url.search}${url.hash}` : null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * The original PDF of an unlocked resume. The route checks access, then redirects to a

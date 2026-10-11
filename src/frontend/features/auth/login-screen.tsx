@@ -16,9 +16,9 @@ import { ThemedAuthenticator } from "./themed-authenticator";
 export function LoginScreen({ next }: { next: string | null }) {
   const router = useRouter();
 
-  // "/" routes each kind of account to its home.
+  // Refresh /login after Cognito sets cookies; its server page resolves the account destination.
   const onAuthenticated = useCallback(() => {
-    router.replace(next ?? "/");
+    router.replace(next ?? "/login");
     router.refresh();
   }, [next, router]);
 

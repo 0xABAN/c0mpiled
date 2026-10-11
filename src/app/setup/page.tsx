@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { SetupFlow } from "@/frontend/features/onboarding/setup-flow";
 import { getResumeFacets, getViewer, listOpenBooks } from "@/frontend/lib/api";
+import { accountHomeHref } from "@/frontend/lib/api/routes";
 
 export const metadata: Metadata = { title: "Set up · Roster" };
 
@@ -13,7 +14,7 @@ export default async function SetupPage({ searchParams }: { searchParams: Promis
 
   // `?club=1` lets a student who skipped it during onboarding start selling their club's book.
   const startingClub = (await searchParams).club === "1" && viewer.accountType === "school" && !viewer.ownedClub;
-  if (viewer.onboarded && !startingClub) redirect("/");
+  if (viewer.onboarded && !startingClub) redirect(accountHomeHref(viewer));
 
   if (viewer.accountType === "school") {
     const only = startingClub ? "club" : viewer.ownedClub ? "resume" : undefined;

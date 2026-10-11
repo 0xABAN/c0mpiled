@@ -19,7 +19,7 @@ const ROLES: { role: DemoRole; label: string; Icon: LucideIcon }[] = [
 
 /**
  * One-click sign-in to the shared demo accounts, so visitors can see the student and company
- * sides without signing up. Home routing then sends each to their page.
+ * sides without signing up. Each demo opens its own account page.
  */
 export function DemoLogin({ label = "Or try a demo:", stacked }: { label?: string; /** Label above centered buttons, for narrow columns. */ stacked?: boolean }) {
   const router = useRouter();
@@ -36,7 +36,7 @@ export function DemoLogin({ label = "Or try a demo:", stacked }: { label?: strin
       const result = await signIn({ username: DEMO_ACCOUNTS[role], password: demoPassword() });
       if (!result.isSignedIn) throw new Error("The demo account needs attention. Try again in a minute.");
 
-      router.replace("/");
+      router.push(role === "company" ? "/browse" : "/resume");
       router.refresh();
     } catch (cause) {
       setBusy(null);
