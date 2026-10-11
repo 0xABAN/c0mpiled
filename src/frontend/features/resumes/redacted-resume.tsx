@@ -70,22 +70,26 @@ export function RedactedResume({ resume, size, revealing }: RedactedResumeProps)
         </Section>
       )}
 
-      <Section title="Experience">
-        {profile.experience.map((job, index) => (
-          <div key={`${job.org}-${index}`} className={styles.entry}>
-            <Monogram name={job.org} size={size === "card" ? 16 : 24} />
-            <div className={styles.entryText}>
-              <p className={styles.entryTitle}>{job.org}</p>
-              <p className={styles.entryMeta}>{job.title}</p>
-              <Placeholder seed={`${resume.id}:${index}`} lines={bulletsPerJob} />
+      {profile.experience.length > 0 && (
+        <Section title="Experience">
+          {profile.experience.map((job, index) => (
+            <div key={`${job.org}-${index}`} className={styles.entry}>
+              <Monogram name={job.org} size={size === "card" ? 16 : 24} />
+              <div className={styles.entryText}>
+                <p className={styles.entryTitle}>{job.org}</p>
+                <p className={styles.entryMeta}>{job.title}</p>
+                <Placeholder seed={`${resume.id}:${index}`} lines={bulletsPerJob} />
+              </div>
             </div>
-          </div>
-        ))}
-      </Section>
+          ))}
+        </Section>
+      )}
 
-      <Section title="Skills">
-        <p className={styles.skills}>{profile.skills.join(" · ")}</p>
-      </Section>
+      {profile.skills.length > 0 && (
+        <Section title="Skills">
+          <p className={styles.skills}>{profile.skills.join(" · ")}</p>
+        </Section>
+      )}
     </article>
   );
 }
