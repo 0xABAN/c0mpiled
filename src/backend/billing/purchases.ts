@@ -1,7 +1,7 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
-import { and, eq, gt, inArray, isNull, or, sql } from "drizzle-orm";
+import { and, eq, gt, inArray, isNull, isNotNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { requireAccount } from "@/backend/accounts";
@@ -9,9 +9,10 @@ import { billingProducts, bookCheckouts, bookMembers, books, clubs, db, unlocks 
 import { UserError } from "@/backend/errors";
 import { parseInput } from "@/backend/validation";
 
-import { browseReturnPath } from "./contracts";
+import { browseReturnPath, isDemoBuyer, sameBillingApp } from "./contracts";
 import { splitBookPrice } from "./fees";
-import { billingConfig, createProduct, paidForProduct, startProviderCheckout } from "./provider";
+import { createProduct, paidForProduct, startProviderCheckout } from "./provider";
+import { activeUnlocks, billingConfig } from "./scope";
 
 const pending = and(isNull(bookCheckouts.paidAt), isNull(bookCheckouts.expiredAt));
 type Checkout = typeof bookCheckouts.$inferSelect;
@@ -20,6 +21,7 @@ type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export type CheckoutInput = { bookId: string; resumeId: string; priceCents: number; returnPath: string };
 export type CheckoutView = {
   id: string;
+  billingMode: "sandbox" | "live";
   bookName: string;
   priceCents: number;
   returnPath: string;
@@ -37,6 +39,7 @@ export async function pendingBookSplits(recruiterId: string, bookIds: string[]) 
     clubPayoutCents: sql<number>`${bookCheckouts.priceCents} - ${bookCheckouts.platformFeeCents}`,
   }).from(bookCheckouts).where(and(
     eq(bookCheckouts.recruiterId, recruiterId), inArray(bookCheckouts.bookId, bookIds), pending,
+    eq(bookCheckouts.appArn, billingConfig().appArn),
     or(isNull(bookCheckouts.expiresAt), gt(bookCheckouts.expiresAt, new Date())),
   ));
 }
@@ -53,7 +56,7 @@ async function lockPurchase(tx: Transaction, buyerId: string, bookId: string) {
 }
 
 async function recordedUnlock(tx: Transaction, buyerId: string, bookId: string) {
-  const [row] = await tx.select().from(unlocks).where(and(eq(unlocks.recruiterId, buyerId), eq(unlocks.bookId, bookId)));
+  const [row] = await tx.select().from(unlocks).where(and(eq(unlocks.recruiterId, buyerId), eq(unlocks.bookId, bookId), activeUnlocks()));
   return row;
 }
 
@@ -63,6 +66,7 @@ async function readyProduct(productId: string) {
     const [product] = await tx.select().from(billingProducts).where(eq(billingProducts.id, productId)).for("update");
     if (!product) throw new Error("Catalog reservation is missing.");
     if (product.metricId) return product;
+    if (billingConfig().mode === "live") throw new UserError("Live checkout has not been enabled for this book at this price.");
 
     const metricId = await createProduct(product);
     const [ready] = await tx.update(billingProducts).set({ metricId }).where(eq(billingProducts.id, product.id)).returning();
@@ -77,7 +81,7 @@ async function hasPayment(tx: Transaction, checkout: Checkout): Promise<boolean>
   if (!checkout.productId || !checkout.providerSessionId || !checkout.providerPurchaseId) return false;
 
   const [product] = await tx.select().from(billingProducts).where(eq(billingProducts.id, checkout.productId));
-  if (!product?.metricId || product.bookId !== checkout.bookId || product.priceCents !== checkout.priceCents || product.appArn !== checkout.appArn) {
+  if (!product?.metricId || product.bookId !== checkout.bookId || product.priceCents !== checkout.priceCents || !sameBillingApp(product.appArn, checkout.appArn)) {
     throw new Error("Checkout and provider product do not match.");
   }
   return paidForProduct(checkout.recruiterId, product.id, product.metricId);
@@ -89,9 +93,10 @@ async function saveUnlock(tx: Transaction, checkout: Checkout) {
     bookId: checkout.bookId,
     recruiterId: checkout.recruiterId,
     checkoutId: checkout.id,
+    billingMode: billingConfig().mode,
     priceCents: checkout.priceCents,
     platformFeeCents: checkout.platformFeeCents,
-  }).onConflictDoNothing({ target: [unlocks.bookId, unlocks.recruiterId] });
+  }).onConflictDoNothing({ target: [unlocks.bookId, unlocks.recruiterId, unlocks.billingMode] });
   await tx.update(bookCheckouts).set({ paidAt: new Date() }).where(eq(bookCheckouts.id, checkout.id));
 }
 
@@ -111,7 +116,10 @@ export async function beginCheckout(raw: unknown, origin: string): Promise<{ url
   } catch {
     throw new UserError("Return to the resume and try checkout again.");
   }
-  const { appArn } = billingConfig();
+  const { appArn, mode, liveProductId } = billingConfig();
+  if (mode === "live" && isDemoBuyer(buyer)) {
+    throw new UserError("Create your own company account to make a real purchase. Shared demo accounts cannot pay.");
+  }
 
   const [book] = await db.select({ id: books.id, name: clubs.name, priceCents: books.priceCents })
     .from(books).innerJoin(clubs, eq(clubs.id, books.clubId)).innerJoin(bookMembers, eq(bookMembers.bookId, books.id))
@@ -124,7 +132,7 @@ export async function beginCheckout(raw: unknown, origin: string): Promise<{ url
     if (await recordedUnlock(tx, buyer.id, book.id)) return null;
 
     const [previous] = await tx.select().from(bookCheckouts).where(and(
-      eq(bookCheckouts.bookId, book.id), eq(bookCheckouts.recruiterId, buyer.id), pending,
+      eq(bookCheckouts.bookId, book.id), eq(bookCheckouts.recruiterId, buyer.id), eq(bookCheckouts.appArn, appArn), pending,
     ));
     if (previous) {
       if (await hasPayment(tx, previous)) {
@@ -142,7 +150,15 @@ export async function beginCheckout(raw: unknown, origin: string): Promise<{ url
     const id = randomUUID();
     // Catalog reservation and intent are committed together; only positive-price books need a product.
     let productId: string | null = null;
-    if (book.priceCents > 0) {
+    if (mode === "live") {
+      // Catalogs are shared across provider environments. Only this approved product may go live.
+      const [product] = await tx.select().from(billingProducts).where(and(
+        eq(billingProducts.bookId, book.id), eq(billingProducts.priceCents, book.priceCents),
+        eq(billingProducts.id, liveProductId!), isNotNull(billingProducts.metricId),
+      ));
+      if (!product || !sameBillingApp(product.appArn, appArn)) throw new UserError("Live checkout has not been enabled for this book at this price.");
+      productId = product.id;
+    } else if (book.priceCents > 0) {
       const [product] = await tx.insert(billingProducts).values({ bookId: book.id, name: `Test: ${book.name}`, priceCents: book.priceCents, appArn })
         .onConflictDoUpdate({ target: [billingProducts.bookId, billingProducts.priceCents, billingProducts.appArn], set: { bookId: book.id } }).returning();
       productId = product.id;
@@ -185,10 +201,10 @@ export async function getCheckout(rawId: unknown): Promise<CheckoutView | null> 
   const [row] = await db.select({ checkout: bookCheckouts, bookName: clubs.name })
     .from(bookCheckouts).innerJoin(books, eq(books.id, bookCheckouts.bookId)).innerJoin(clubs, eq(clubs.id, books.clubId))
     .where(and(eq(bookCheckouts.id, id.data), eq(bookCheckouts.recruiterId, buyer.id)));
-  if (!row) return null;
+  if (!row || row.checkout.appArn !== billingConfig().appArn) return null;
   const { checkout } = row;
   return {
-    id: checkout.id, bookName: row.bookName, priceCents: checkout.priceCents,
+    id: checkout.id, bookName: row.bookName, billingMode: billingConfig().mode, priceCents: checkout.priceCents,
     returnPath: checkout.returnPath, checkoutUrl: checkout.checkoutUrl,
     expired: Boolean(checkout.expiresAt && checkout.expiresAt <= new Date()),
   };
@@ -199,7 +215,7 @@ export async function confirmCheckout(rawId: unknown): Promise<{ unlocked: boole
   const buyer = await requireBuyer();
   const id = parseInput(z.uuid(), rawId);
   const [checkout] = await db.select().from(bookCheckouts).where(and(eq(bookCheckouts.id, id), eq(bookCheckouts.recruiterId, buyer.id)));
-  if (!checkout) throw new UserError("Checkout not found.");
+  if (!checkout || checkout.appArn !== billingConfig().appArn) throw new UserError("Checkout not found in this billing environment.");
 
   return db.transaction(async (tx) => {
     await lockPurchase(tx, buyer.id, checkout.bookId);

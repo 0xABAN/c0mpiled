@@ -1,9 +1,15 @@
 import { z } from "zod";
+import { DEMO_ACCOUNTS } from "@/backend/demo/accounts";
 
-/** This integration is evaluation-only. A live ARN is a configuration error, never a fallback. */
-export function sandboxConfig(appArn: string | undefined, endpoint: string | undefined) {
-  const match = /^arn:aws:appmonetization:([a-z0-9-]+):\d{12}:apps\/([a-zA-Z0-9_-]+)\/sandbox$/.exec(appArn ?? "");
-  if (!match || !endpoint) throw new Error("Sandbox billing requires MONETIZATION_APP_ID and MONETIZATION_ENDPOINT.");
+/** Shared or invented identities must never start real payments. */
+export function isDemoBuyer(account: { id: string; email: string }): boolean {
+  return /^(seed|demo):/.test(account.id) || Object.values(DEMO_ACCOUNTS).some((email) => email === account.email.toLowerCase());
+}
+
+/** The explicit ARN selects the environment; never infer or fall back between test and live. */
+export function providerConfig(appArn: string | undefined, endpoint: string | undefined) {
+  const match = /^arn:aws:appmonetization:([a-z0-9-]+):\d{12}:apps\/([a-zA-Z0-9_-]+)(\/sandbox)?$/.exec(appArn ?? "");
+  if (!match || !endpoint) throw new Error("Billing requires MONETIZATION_APP_ID and MONETIZATION_ENDPOINT.");
 
   const url = new URL(endpoint);
   if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash || url.pathname !== "/") {
@@ -11,9 +17,14 @@ export function sandboxConfig(appArn: string | undefined, endpoint: string | und
   }
 
   if (url.hostname !== `${match[1]}.alpha.monetization.aws.dev` || url.port || match[2].endsWith("-shadow")) {
-    throw new Error("The sandbox ARN and supported provider endpoint must identify the same region.");
+    throw new Error("The app ARN and supported provider endpoint must identify the same region.");
   }
-  return { appArn: appArn!, appId: match[2], region: match[1], endpoint: url.origin };
+  return { appArn: appArn!, appId: match[2], region: match[1], endpoint: url.origin, mode: match[3] ? "sandbox" as const : "live" as const };
+}
+
+/** The provider shares its catalog across live/sandbox, but not buyer entitlements. */
+export function sameBillingApp(left: string, right: string): boolean {
+  return left.replace(/\/sandbox$/, "") === right.replace(/\/sandbox$/, "");
 }
 
 /**
@@ -42,11 +53,12 @@ export function browseReturnPath(raw: string): string {
   return `${url.pathname}${url.search}`;
 }
 
-/** Accept only the provider's test checkout host, never a live or caller-supplied payment URL. */
-export function sandboxCheckoutUrl(raw: string): string {
+/** A checkout URL must belong to the exact configured payment environment. */
+export function providerCheckoutUrl(raw: string, mode: "sandbox" | "live"): string {
   const url = new URL(raw);
-  if (url.protocol !== "https:" || url.hostname !== "us-east-1.sandbox.payments.monetization.aws.dev" || url.port || url.username || url.password) {
-    throw new Error("The provider returned a non-sandbox checkout URL.");
+  const host = mode === "sandbox" ? "us-east-1.sandbox.payments.monetization.aws.dev" : "us-east-1.payments.monetization.aws.dev";
+  if (url.protocol !== "https:" || url.hostname !== host || url.port || url.username || url.password) {
+    throw new Error("The provider returned a checkout URL for the wrong environment.");
   }
   return raw;
 }

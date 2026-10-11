@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 const file = process.argv[2];
 if (!file) throw new Error("Usage: node infra/lib/app-env.mjs <env-file>");
 
-const APP_VARS = /^(DATABASE_URL|APP_REGION|RESUME_BUCKET|BEDROCK_MODEL_ID|MONETIZATION_APP_ID|MONETIZATION_ENDPOINT|MONETIZATION_NPM_REGISTRY|MONETIZATION_NPM_TOKEN|NEXT_PUBLIC_[A-Z_]+)=(.*)$/;
+const APP_VARS = /^(DATABASE_URL|APP_REGION|RESUME_BUCKET|BEDROCK_MODEL_ID|MONETIZATION_APP_ID|MONETIZATION_ENDPOINT|MONETIZATION_LIVE_PRODUCT_ID|MONETIZATION_NPM_REGISTRY|MONETIZATION_NPM_TOKEN|NEXT_PUBLIC_[A-Z_]+)=(.*)$/;
 const REQUIRED = [
   "DATABASE_URL",
   "APP_REGION",
@@ -31,6 +31,10 @@ const env = Object.fromEntries(
 
 for (const name of REQUIRED) {
   if (!env[name]) throw new Error(`${name} is missing from ${file}`);
+}
+
+if (!env.MONETIZATION_APP_ID.endsWith("/sandbox") && !env.MONETIZATION_LIVE_PRODUCT_ID) {
+  throw new Error("MONETIZATION_LIVE_PRODUCT_ID is required for live billing.");
 }
 
 console.log(JSON.stringify(env));

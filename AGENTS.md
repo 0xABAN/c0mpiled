@@ -59,7 +59,7 @@ Contract 3 (redaction) is internal to Adam's side, between resume storage and th
   PNG. It's AGPL-3.0, which this public repo satisfies.
 - **Billing:** AWS App Monetization private beta, run with `/monetize`. Setup steps and terms are in the
   welcome letter PDF. Don't copy them into this repo: the letter is confidential, and this repo is public.
-  Payments are mocks/test cards.
+  Sandbox purchases are tests. Adam has authorized a live pilot for Co Club’s $20 book; club payouts remain manual.
 
 Next.js is pinned to 15: Amplify Hosting SSR supports Next 12–15 only.
 
@@ -81,7 +81,7 @@ src/backend/    server-only feature modules, each with an index.ts as its public
   redaction/    redactResume (Contract 3)
   storage/      resume PDFs and preview pages in S3, presigned links
   demo/         shared demo logins and `npm run demo:reset`
-  billing/      sandbox checkout, paid-product verification, fee accounting (Contract 2)
+  billing/      environment-isolated checkout, paid-product verification, fee accounting (Contract 2)
   api/          the view models and functions the UI calls
 ```
 
@@ -170,25 +170,36 @@ saved after the student has reviewed the profile. The types live in `src/backend
 
 ## Contract 2: billing boundary
 
-Every page calls billing through `src/backend/billing`, via the frontend API bridge. This is an
-**evaluation-only integration for all books**, including real clubs. Test cards may unlock real accepted
-resumes, but no real charge or club payout occurs. The configuration rejects non-sandbox app ARNs.
+Every page calls billing through `src/backend/billing`, via the frontend API bridge. The explicit app ARN
+selects sandbox (`/sandbox`) or live (no suffix). Adam confirmed AWS permission for real payments and
+approved publishing the audited app catalog. The live pilot is Co Club at $20. Only operator-prepared
+`billing_products` selected by `MONETIZATION_LIVE_PRODUCT_ID`, with a metric and matching price, are purchasable; other books and new prices fail closed. Shared
+demo accounts cannot make real purchases. No automatic club payouts are implemented.
 
 - `beginCheckout(input, origin)` checks the company, accepted membership, and quoted price, then persists
   an immutable checkout before opening hosted payment. Its UUID is the provider idempotency token.
 - `confirmCheckout(id)` checks ownership and server-side entitlement: `ALLOW`,
   `COVERED_BY_PURCHASED_UNITS`, and exactly the expected book/price metric with an available unit. Only then
-  does it insert the unique buyer/book unlock with the saved gross and fee. A deliberately free book needs
+  does it insert the unique buyer/book/environment unlock with the saved gross and fee. A deliberately free book needs
   no card. Neither a callback URL nor session creation proves payment.
 - `getCheckout(id)` returns buyer-only confirmation-page data. Confirmation can lag the redirect; the page
   offers an explicit recheck. Expired unpaid sessions can be replaced; paid callbacks remain idempotent.
 - `billing_products` maps each book/price to an immutable draft usage pack. Repricing never reuses a cheaper
-  entitlement. No subscription or publish call is made. Purchased capacity represents the book license;
+  entitlement. No subscription or runtime publish call is made. Live products must be prepared and
+  published by an authorized operator; publishing is app-wide, so inspect the entire draft first.
+  Catalogs are shared across provider scopes (the beta allows only four metrics), while buyer
+  entitlements remain isolated. Adam approved removing the original standalone fictional proof
+  product/metric to make room for a separately named Co Club $20 live offering.
+  Purchased capacity represents the book license;
   opening resumes does not consume it. The provider records the payment; Roster records the unlock.
 
 The pinned beta SDK lacks a catalog-creation wrapper, so `provider.ts` isolates its bundled generated
 command. Do not copy vendor code, publish drafts, or switch to live mode to work around provider errors.
-Refund/reversal handling and production charges remain out of scope.
+Automatic refund/reversal handling is not implemented; the initial live pilot requires operator
+reconciliation. Test and live pending intents are separate. All original purchases are marked sandbox;
+`activeUnlocks()` isolates contacts, files, search counts, and earnings by environment. Never delete old
+test records to enable real purchases. Migration 0006 retains the old purchase uniqueness constraint
+for rolling compatibility; apply 0007 only after the mode-aware app has deployed.
 
 **Pricing (decided by Adam):** a recruiter buys a club's entire book, once, at a price the club sets
 (`books.price_cents`; clubs charge $250–$650 today). There are no single-resume purchases and no plan tiers.
@@ -197,7 +208,7 @@ is not surcharged. A $250 book records $12.50 for Roster and $237.50 for the clu
 `splitBookPrice` in `src/backend/billing` calculates the quote. Purchases snapshot gross and fee;
 Postgres stores the club share as gross minus fee. Historical purchases retain a zero fee, and club
 earnings sum their recorded club shares, never today's rate or book price. This accounting is not a payout
-transfer; test payment authorization and actual payout integration remain separate.
+transfer; sandbox earnings never count as real proceeds. Real club transfers are handled manually.
 
 ## Contract 3: redaction
 
@@ -294,7 +305,7 @@ accepts or rejects on `/dashboard`. Re-uploading replaces the one resume in ever
 and club; skills must all match (`skills @> $1`). Free text: every word must appear in `search_text`
 (trigram-indexed) or an accepted club's name. Order by grad year then newest, or newest. No ranking.
 
-**Unlock:** persist quoted price/fee → hosted sandbox checkout → `/checkout/[id]` → server verifies the
+**Unlock:** persist quoted price/fee and environment → matching hosted checkout → `/checkout/[id]` → server verifies the
 exact paid product → idempotent `unlocks` insert → contact info and downloads. Historical purchases remain
 valid; a pending checkout does not grant access.
 
@@ -320,13 +331,14 @@ and its preview pages), the row, and every membership.
 
 Env vars: `DATABASE_URL`, `APP_REGION`, `RESUME_BUCKET`, `BEDROCK_MODEL_ID`,
 `NEXT_PUBLIC_COGNITO_USER_POOL_ID`, `NEXT_PUBLIC_COGNITO_CLIENT_ID`, `NEXT_PUBLIC_DEMO_PASSWORD` (public on
-purpose: anyone may use the demo logins), `MONETIZATION_APP_ID` (sandbox ARN), `MONETIZATION_ENDPOINT`.
+purpose: anyone may use the demo logins), `MONETIZATION_APP_ID` (explicit live or sandbox ARN), `MONETIZATION_ENDPOINT`,
+`MONETIZATION_LIVE_PRODUCT_ID` (the approved catalog product UUID; required in live mode).
 Billing builds also need private `MONETIZATION_NPM_REGISTRY` and `MONETIZATION_NPM_TOKEN` values. The build
 writes an ignored, mode-0600 `.npmrc`; these build credentials must never enter `.env.production` or client
 assets. Keep their values outside this public repo. `infra/billing.sh <env-file> [compute-role-name]` adds
 only the four required billing permissions; it does not deploy. The beta requires `Resource: "*"` because
 it does not yet authorize app ARNs, so these IAM actions cover live and test monetization resources.
-Roster still rejects live configuration. Narrow IAM resources when the provider supports it; never add
+Roster permits only prepared live products and blocks real demo purchases. Narrow IAM resources when the provider supports it; never add
 admin or publish permissions. An existing hosting environment needs those permissions and the billing
 build/runtime variables before release.
 

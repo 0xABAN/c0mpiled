@@ -6,11 +6,8 @@ import { z } from "zod";
 
 import { UserError } from "@/backend/errors";
 
-import { dollarAmount, hasPaidBookUnit, sandboxCheckoutUrl, sandboxConfig } from "./contracts";
-
-export function billingConfig() {
-  return sandboxConfig(process.env.MONETIZATION_APP_ID, process.env.MONETIZATION_ENDPOINT);
-}
+import { dollarAmount, hasPaidBookUnit, providerCheckoutUrl } from "./contracts";
+import { billingConfig } from "./scope";
 
 function client() {
   const config = billingConfig();
@@ -22,8 +19,8 @@ async function callProvider<T>(operation: string, call: () => Promise<T>): Promi
   try {
     return await call();
   } catch (error) {
-    console.error("Sandbox billing failed", { operation, error: error instanceof Error ? error.name : "UnknownError" });
-    throw new UserError("Test checkout could not reach or verify the payment provider. Please try again.", { cause: error });
+    console.error("Billing provider failed", { operation, error: error instanceof Error ? error.name : "UnknownError" });
+    throw new UserError("Checkout could not reach or verify the payment provider. Please try again.", { cause: error });
   }
 }
 
@@ -31,7 +28,7 @@ export type CatalogProduct = { id: string; name: string; priceCents: number };
 export const productCode = (id: string) => `book_${id.replaceAll("-", "")}`;
 
 /**
- * Author one immutable draft product per book/price. The sandbox reads drafts; never publish them.
+ * Author one immutable draft product per book/price. Live products must be prepared and published by the operator.
  * Stable database product IDs make retrying either provider write idempotent.
  */
 export async function createProduct(product: CatalogProduct): Promise<string> {
@@ -95,7 +92,7 @@ export async function startProviderCheckout(buyerId: string, productId: string, 
     ], { returnUrl, clientToken: checkoutId });
 
     const parsed = z.object({
-      checkoutUrl: z.string().transform(sandboxCheckoutUrl),
+      checkoutUrl: z.string().transform((url) => providerCheckoutUrl(url, billingConfig().mode)),
       checkoutSessionId: z.string().min(1),
       purchaseIds: z.array(z.string().min(1)).length(1),
       expiresAt: z.iso.datetime().transform((value) => new Date(value)),

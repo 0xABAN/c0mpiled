@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { getCurrentAccount, type Account } from "@/backend/accounts";
 import { bookMembers, books, clubs, db, resumes, unlocks } from "@/backend/db";
+import { activeUnlocks } from "@/backend/billing";
 import { presignedFileUrl } from "@/backend/storage";
 
 /**
@@ -73,7 +74,7 @@ async function canSeePdf(account: Account, resume: ResumeFiles): Promise<boolean
     .from(unlocks)
     .innerJoin(bookMembers, eq(bookMembers.bookId, unlocks.bookId))
     .where(
-      and(eq(unlocks.recruiterId, account.id), eq(bookMembers.resumeId, resume.id), eq(bookMembers.status, "accepted")),
+      and(activeUnlocks(), eq(unlocks.recruiterId, account.id), eq(bookMembers.resumeId, resume.id), eq(bookMembers.status, "accepted")),
     )
     .limit(1);
 

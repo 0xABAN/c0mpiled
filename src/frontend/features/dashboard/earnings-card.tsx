@@ -5,7 +5,7 @@ import { formatMoney, pluralize, timeAgo } from "@/frontend/lib/format";
 import styles from "./side-cards.module.css";
 
 /** Recorded club proceeds after Roster fees, not gross sales or completed payouts. */
-export function EarningsCard({ unlocks, earnedCents }: { unlocks: BookUnlock[]; earnedCents: number }) {
+export function EarningsCard({ unlocks, earnedCents, billingMode }: { unlocks: BookUnlock[]; earnedCents: number; billingMode: "sandbox" | "live" }) {
   return (
     <section className={`${styles.card} ${styles.earnings}`} aria-labelledby="earnings-heading">
       <p id="earnings-heading" className="eyebrow">
@@ -14,7 +14,7 @@ export function EarningsCard({ unlocks, earnedCents }: { unlocks: BookUnlock[]; 
       <p className={`${styles.total} tabular`}>{formatMoney(earnedCents)}</p>
       <p className={styles.caption}>{unlocks.length > 0 ? `From ${pluralize(unlocks.length, "company", "companies")} · after Roster fees` : "No sales yet. Your first company is coming."}</p>
 
-      <p className={styles.caption}>Test activity only. No money has been collected or paid out.</p>
+      <p className={styles.caption}>{billingMode === "sandbox" ? "Test activity only. No money has been collected or paid out." : "Recorded club proceeds, not completed payouts. Clubs are paid manually."}</p>
 
       {unlocks.length > 0 && (
         <ul className={styles.unlocks}>

@@ -135,7 +135,7 @@ export async function deleteResume(): Promise<ActionResult> {
   });
 }
 
-/** Starts a test checkout; neither the redirect nor session creation grants access. */
+/** Starts a checkout in the configured billing environment; neither the redirect nor session creation grants access. */
 export async function unlockBook(input: billing.CheckoutInput): Promise<UnlockResult> {
   const result = await runAction(async () => billing.beginCheckout(input, await getOrigin()));
   return result.status === "ok" ? { status: "checkout", url: result.data.url } : result;

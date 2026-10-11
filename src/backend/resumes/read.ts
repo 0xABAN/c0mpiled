@@ -1,13 +1,13 @@
 import "server-only";
 
-import { and, countDistinct, eq, ne } from "drizzle-orm";
+import { and, countDistinct, eq, isNotNull, ne } from "drizzle-orm";
 import { z } from "zod";
 
 import type { ResumeView, UnlockQuote } from "@/backend/api/types";
 import { requireAccount } from "@/backend/accounts";
-import { pendingBookSplits, splitBookPrice } from "@/backend/billing";
+import { activeUnlocks, billingConfig, isDemoBuyer, sameBillingApp, pendingBookSplits, splitBookPrice } from "@/backend/billing";
 import { toBookSummaries } from "@/backend/clubs";
-import { bookMembers, books, clubs, db, resumes, unlocks, users } from "@/backend/db";
+import { billingProducts, bookMembers, books, clubs, db, resumes, unlocks, users } from "@/backend/db";
 
 import { isVisibleResume, presentResumes, resumeViewColumns } from "./present";
 
@@ -17,7 +17,7 @@ export async function countUnlockedResumes(recruiterId: string): Promise<number>
     .select({ unlocked: countDistinct(bookMembers.resumeId) })
     .from(unlocks)
     .innerJoin(bookMembers, eq(bookMembers.bookId, unlocks.bookId))
-    .where(and(eq(unlocks.recruiterId, recruiterId), eq(bookMembers.status, "accepted")));
+    .where(and(activeUnlocks(), eq(unlocks.recruiterId, recruiterId), eq(bookMembers.status, "accepted")));
 
   return unlocked;
 }
@@ -71,14 +71,24 @@ export async function getUnlockQuote(rawResumeId: unknown): Promise<UnlockQuote 
     .where(and(eq(bookMembers.resumeId, resume.id), eq(bookMembers.status, "accepted")))
     .orderBy(clubs.name);
 
+  const { appArn, mode, liveProductId } = billingConfig();
+  const prepared = mode === "live" ? await db.select().from(billingProducts).where(and(
+    eq(billingProducts.id, liveProductId!), isNotNull(billingProducts.metricId),
+  )) : [];
   const pending = new Map((await pendingBookSplits(buyer.id, rows.map(({ book }) => book.id)))
     .map(({ bookId, ...split }) => [bookId, split]));
-  const offers = (await toBookSummaries(rows)).map((book) => ({
+  const eligible = mode === "live" ? rows.filter(({ book }) => pending.has(book.id) || prepared.some(
+    (product) => product.bookId === book.id && product.priceCents === book.priceCents && sameBillingApp(product.appArn, appArn),
+  )) : rows;
+  const offers = (await toBookSummaries(eligible)).map((book) => ({
     book,
     ...(pending.get(book.id) ?? splitBookPrice(book.priceCents)),
   }));
 
-  const largest = offers.reduce((best, offer) => (offer.book.resumeCount > best.book.resumeCount ? offer : best));
+  const largest = [...offers].sort((a, b) => b.book.resumeCount - a.book.resumeCount)[0];
+  const unavailableReason = mode === "live" && isDemoBuyer(buyer)
+    ? "Create your own company account to make a real purchase. Shared demo accounts cannot pay."
+    : offers.length === 0 ? "Live checkout has not been enabled for this book at this price." : null;
 
-  return { resume, offers, recommendedBookId: largest.book.id };
+  return { resume, offers, recommendedBookId: largest?.book.id ?? "", billingMode: mode, unavailableReason };
 }

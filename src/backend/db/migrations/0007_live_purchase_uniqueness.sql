@@ -1,0 +1,1 @@
+ALTER TABLE "unlocks" DROP CONSTRAINT "unlocks_book_recruiter_unique";

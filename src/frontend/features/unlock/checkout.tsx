@@ -49,6 +49,16 @@ export function Checkout({ quote, resumeHref }: { quote: UnlockQuote; resumeHref
     return <AlreadyUnlocked resumeHref={resumeHref} />;
   }
 
+  if (quote.unavailableReason) {
+    return (
+      <div className={styles.already}>
+        <h1 className={styles.title}>Checkout unavailable</h1>
+        <p className={styles.lead}>{quote.unavailableReason}</p>
+        <LinkButton href={resumeHref} variant="ghost">Back to resume</LinkButton>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page}>
       <Link href={resumeHref} replace className={styles.back}>
@@ -134,7 +144,7 @@ export function Checkout({ quote, resumeHref }: { quote: UnlockQuote; resumeHref
         </div>
 
         <aside className={styles.summary} aria-label="Order summary">
-          <OrderSummary offer={selected} />
+          <OrderSummary offer={selected} live={quote.billingMode === "live"} />
 
           <Button variant="primary" size="lg" block loading={isUnlocking} onClick={unlock}>
             <LockKeyhole size={18} strokeWidth={3} aria-hidden />
@@ -147,7 +157,7 @@ export function Checkout({ quote, resumeHref }: { quote: UnlockQuote; resumeHref
             </p>
           )}
 
-          <p className={styles.fineprint}>Test mode: you won&apos;t be charged.</p>
+          <p className={styles.fineprint}>{quote.billingMode === "sandbox" ? "Test mode: you won’t be charged." : "Real payment. Any applicable tax is shown at checkout. Club payouts are handled manually."}</p>
         </aside>
       </div>
     </div>
@@ -203,7 +213,7 @@ function CheckItem({ children }: { children: ReactNode }) {
 }
 
 /** Line items plus a bar showing how much of the price reaches the club. */
-function OrderSummary({ offer }: { offer: UnlockOffer }) {
+function OrderSummary({ offer, live }: { offer: UnlockOffer; live: boolean }) {
   const { club } = offer.book;
   const clubShare = offer.priceCents > 0 ? offer.clubPayoutCents / offer.priceCents : 0;
 
@@ -236,7 +246,7 @@ function OrderSummary({ offer }: { offer: UnlockOffer }) {
       </div>
 
       <div className={`${styles.lineItem} ${styles.total}`}>
-        <span>Total today</span>
+        <span>{live ? "Subtotal before tax" : "Total today"}</span>
         <span className="tabular">{formatMoney(offer.priceCents)}</span>
       </div>
     </div>

@@ -178,7 +178,7 @@ export const billingProducts = pgTable("billing_products", {
 }, (table) => [
   unique("billing_products_book_price_app_unique").on(table.bookId, table.priceCents, table.appArn),
   check("billing_products_positive_price", sql`${table.priceCents} > 0`),
-  check("billing_products_sandbox_only", sql`${table.appArn} like '%/sandbox'`),
+  check("billing_products_app_arn", sql`${table.appArn} ~ '^arn:aws:appmonetization:[a-z0-9-]+:[0-9]{12}:apps/[a-zA-Z0-9_-]+(/sandbox)?$'`),
 ]);
 
 /** Pending payment is not access. Only a verified checkout may create an unlock. */
@@ -201,11 +201,11 @@ export const bookCheckouts = pgTable("book_checkouts", {
   expiredAt: timestamp("expired_at", { withTimezone: true }),
   createdAt: createdAt(),
 }, (table) => [
-  uniqueIndex("book_checkouts_one_pending").on(table.recruiterId, table.bookId)
+  uniqueIndex("book_checkouts_one_pending").on(table.recruiterId, table.bookId, table.appArn)
     .where(sql`${table.paidAt} is null and ${table.expiredAt} is null`),
   check("book_checkouts_fee_within_price", sql`${table.platformFeeCents} between 0 and ${table.priceCents}`),
   check("book_checkouts_product_for_paid_book", sql`(${table.priceCents} = 0) = (${table.productId} is null)`),
-  check("book_checkouts_sandbox_only", sql`${table.appArn} like '%/sandbox'`),
+  check("book_checkouts_app_arn", sql`${table.appArn} ~ '^arn:aws:appmonetization:[a-z0-9-]+:[0-9]{12}:apps/[a-zA-Z0-9_-]+(/sandbox)?$'`),
 ]);
 
 /**
@@ -222,7 +222,9 @@ export const unlocks = pgTable(
     recruiterId: text("recruiter_id")
       .notNull()
       .references(() => users.id),
-    /** Null for pre-integration/sample rows. A linked checkout records the sandbox and payment proof. */
+    /** Existing samples remain sandbox records; every real purchase explicitly sets live. */
+    billingMode: text("billing_mode", { enum: ["sandbox", "live"] }).notNull().default("sandbox"),
+    /** Null for pre-integration/sample rows. A linked checkout records the environment and payment proof. */
     checkoutId: uuid("checkout_id").unique().references(() => bookCheckouts.id),
     /** Gross paid at purchase time; independent of later book repricing. */
     priceCents: integer("price_cents").notNull(),
@@ -236,7 +238,8 @@ export const unlocks = pgTable(
   },
   (table) => [
     check("unlocks_fee_within_price", sql`${table.platformFeeCents} between 0 and ${table.priceCents}`),
-    unique("unlocks_book_recruiter_unique").on(table.bookId, table.recruiterId),
+    unique("unlocks_book_recruiter_mode_unique").on(table.bookId, table.recruiterId, table.billingMode),
+    check("unlocks_billing_mode", sql`${table.billingMode} in ('sandbox', 'live') and (${table.billingMode} = 'sandbox' or ${table.checkoutId} is not null)`),
     index("unlocks_recruiter_id_idx").on(table.recruiterId),
   ],
 );

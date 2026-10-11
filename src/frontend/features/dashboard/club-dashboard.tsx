@@ -127,7 +127,7 @@ export function ClubDashboard({ dashboard }: { dashboard: Dashboard }) {
         </div>
 
         <aside className={styles.side}>
-          <EarningsCard unlocks={unlocks} earnedCents={earnedCents} />
+          <EarningsCard unlocks={unlocks} earnedCents={earnedCents} billingMode={dashboard.billingMode} />
           <PriceCard priceCents={book.priceCents} memberCount={members.length} />
           <p className={styles.sideNote}>Companies see {pluralize(members.length, "accepted member")} when they unlock your book.</p>
         </aside>

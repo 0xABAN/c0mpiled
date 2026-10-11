@@ -12,7 +12,7 @@ import styles from "./checkout.module.css";
 /** A callback URL can be forged. Only the server's paid-product check changes this screen to unlocked. */
 export function CheckoutReturn({ checkout }: { checkout: CheckoutView }) {
   const [unlocked, setUnlocked] = useState(false);
-  const [message, setMessage] = useState("Checking your test payment…");
+  const [message, setMessage] = useState("Checking your payment…");
   const [checking, startChecking] = useTransition();
 
   const verify = useCallback(() => {
@@ -37,7 +37,7 @@ export function CheckoutReturn({ checkout }: { checkout: CheckoutView }) {
 
   return (
     <div className={`${styles.page} ${styles.already}`}>
-      <p className={`eyebrow ${styles.eyebrow}`}>Test checkout · {formatMoney(checkout.priceCents)}</p>
+      <p className={`eyebrow ${styles.eyebrow}`}>{checkout.billingMode === "sandbox" ? "Test checkout" : "Checkout"} · {formatMoney(checkout.priceCents)}</p>
       <h1 className={styles.title}>{unlocked ? "Book unlocked" : "Confirm your payment"}</h1>
       <p className={styles.lead}>{checkout.bookName}</p>
       <p className={styles.lead} role="status" aria-live="polite">{message}</p>
@@ -48,13 +48,13 @@ export function CheckoutReturn({ checkout }: { checkout: CheckoutView }) {
         <>
           <Button variant="primary" size="lg" loading={checking} onClick={verify}>Check payment again</Button>
           {checkout.checkoutUrl && !checkout.expired && (
-            <LinkButton href={checkout.checkoutUrl} variant="secondary">Continue test checkout</LinkButton>
+            <LinkButton href={checkout.checkoutUrl} variant="secondary">{checkout.billingMode === "sandbox" ? "Continue test checkout" : "Continue checkout"}</LinkButton>
           )}
           {checkout.expired && <p className={styles.lead}>This checkout expired. Return to the resume to start another.</p>}
           <LinkButton href={checkout.returnPath} variant="ghost">Back to resume</LinkButton>
         </>
       )}
-      <p className={styles.fineprint}>Test mode only. No real charge or club payout occurs.</p>
+      <p className={styles.fineprint}>{checkout.billingMode === "sandbox" ? "Test mode only. No real charge or club payout occurs." : "Real payment. Club proceeds are recorded here; payouts to clubs are handled manually."}</p>
     </div>
   );
 }

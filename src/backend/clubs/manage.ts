@@ -6,6 +6,7 @@ import { z } from "zod";
 import type { BookSummary, ClubCreated, ClubDashboard, ClubSummary, Membership } from "@/backend/api/types";
 import { getCurrentAccount, requireAccount } from "@/backend/accounts";
 import { bookMembers, books, clubs, db, isUniqueViolation, resumes, unlocks, users } from "@/backend/db";
+import { activeUnlocks, billingConfig } from "@/backend/billing";
 import { UserError } from "@/backend/errors";
 import { parseInput } from "@/backend/validation";
 
@@ -188,7 +189,7 @@ export async function getClubDashboard(origin: string): Promise<ClubDashboard | 
       })
       .from(unlocks)
       .innerJoin(users, eq(users.id, unlocks.recruiterId))
-      .where(eq(unlocks.bookId, owned.book.id))
+      .where(and(eq(unlocks.bookId, owned.book.id), activeUnlocks()))
       .orderBy(desc(unlocks.createdAt)),
   ]);
 
@@ -218,6 +219,7 @@ export async function getClubDashboard(origin: string): Promise<ClubDashboard | 
 
   return {
     club: toClubSummary(owned.club),
+    billingMode: billingConfig().mode,
     book,
     joinUrl: joinUrl(origin, owned.club.slug),
     memberships,

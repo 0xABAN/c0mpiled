@@ -22,6 +22,7 @@ import { z } from "zod";
 import type { ResumeFilters, ResumePage } from "@/backend/api/types";
 import { requireAccount } from "@/backend/accounts";
 import { bookMembers, books, clubs, db, resumes, unlocks, users } from "@/backend/db";
+import { activeUnlocks } from "@/backend/billing";
 import { UserError } from "@/backend/errors";
 import { parseInput } from "@/backend/validation";
 
@@ -103,6 +104,7 @@ function filterConditions(filters: ResumeFilters, viewerId: string): SQL[] {
               eq(bookMembers.resumeId, resumes.id),
               eq(bookMembers.status, "accepted"),
               eq(unlocks.recruiterId, viewerId),
+              activeUnlocks(),
             ),
           ),
       ),

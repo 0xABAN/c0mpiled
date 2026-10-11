@@ -3,6 +3,7 @@ import "server-only";
 import { and, eq, exists, inArray, sql } from "drizzle-orm";
 
 import type { BookRef, ResumeView } from "@/backend/api/types";
+import { activeUnlocks } from "@/backend/billing";
 import { schoolName, toClubSummary } from "@/backend/clubs";
 import { bookMembers, books, clubs, db, resumes, unlocks, users } from "@/backend/db";
 
@@ -54,7 +55,7 @@ export async function presentResumes(rows: ResumeViewRow[], viewerId: string): P
       .innerJoin(clubs, eq(clubs.id, books.clubId))
       .where(and(inArray(bookMembers.resumeId, ids), eq(bookMembers.status, "accepted")))
       .orderBy(clubs.name),
-    db.select({ bookId: unlocks.bookId }).from(unlocks).where(eq(unlocks.recruiterId, viewerId)),
+    db.select({ bookId: unlocks.bookId }).from(unlocks).where(and(eq(unlocks.recruiterId, viewerId), activeUnlocks())),
   ]);
 
   const purchasedBookIds = new Set(purchased.map((row) => row.bookId));

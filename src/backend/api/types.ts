@@ -178,6 +178,8 @@ export type UnlockOffer = {
 };
 
 export type UnlockQuote = {
+  billingMode: "sandbox" | "live";
+  unavailableReason: string | null;
   resume: ResumeView;
   /** In display order, one per book the resume is in. */
   offers: UnlockOffer[];
@@ -301,6 +303,7 @@ export type BookUnlock = {
 
 /** Everything /dashboard shows for the viewer's club. `null` if they don't run one. */
 export type ClubDashboard = {
+  billingMode: "sandbox" | "live";
   club: ClubSummary;
   book: BookSummary;
   joinUrl: string;
