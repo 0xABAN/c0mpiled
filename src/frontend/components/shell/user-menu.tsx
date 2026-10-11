@@ -1,10 +1,12 @@
 "use client";
 
+import { signOut } from "aws-amplify/auth";
 import { KeyRound, LayoutDashboard, LogOut } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import { signOut } from "@/frontend/lib/api/actions";
+import { ConfigureAmplify } from "@/frontend/features/auth/configure-amplify";
 import type { Viewer } from "@/frontend/lib/api/types";
 import { hueFor } from "@/frontend/lib/hue";
 
@@ -12,8 +14,18 @@ import styles from "./user-menu.module.css";
 
 /** Avatar button with an account popover. */
 export function UserMenu({ viewer }: { viewer: Viewer }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const root = useRef<HTMLDivElement>(null);
+
+  // Sign-out must run in the browser: only it can clear Amplify's token cookies.
+  async function logOut() {
+    setSigningOut(true);
+    await signOut();
+    router.push("/login");
+    router.refresh();
+  }
 
   const name = viewer.company ?? viewer.ownedClub?.name ?? viewer.email;
   const subtitle = viewer.accountType === "recruiter" ? "Company account" : (viewer.school?.name ?? "School account");
@@ -35,6 +47,7 @@ export function UserMenu({ viewer }: { viewer: Viewer }) {
 
   return (
     <div ref={root} className={styles.root}>
+      <ConfigureAmplify />
       <button
         type="button"
         className={styles.avatar}
@@ -69,12 +82,12 @@ export function UserMenu({ viewer }: { viewer: Viewer }) {
             </Link>
           )}
 
-          <form action={signOut} className={styles.signOut}>
-            <button type="submit" className={styles.item} role="menuitem">
+          <div className={styles.signOut}>
+            <button type="button" className={styles.item} role="menuitem" onClick={logOut} disabled={signingOut}>
               <LogOut size={18} strokeWidth={2.5} aria-hidden />
-              Log out
+              {signingOut ? "Logging out…" : "Log out"}
             </button>
-          </form>
+          </div>
         </div>
       )}
     </div>

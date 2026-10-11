@@ -9,7 +9,6 @@
  */
 
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 import { findMockResume, listResumes, quoteOffers, searchSchools as searchMockSchools } from "./mock/api";
 import { SCHOOLS } from "./mock/fixtures";
@@ -148,9 +147,4 @@ export async function finishSetup(): Promise<void> {
 export async function completeRecruiterSetup(input: RecruiterSetupInput): Promise<void> {
   await wait(700);
   await updateSession({ company: input.company, onboarded: true });
-}
-
-export async function signOut(): Promise<void> {
-  await writeSession(null);
-  redirect("/login");
 }

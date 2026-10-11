@@ -1,0 +1,84 @@
+.prompt {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.mark {
+  flex-shrink: 0;
+  animation: bob 2.4s ease-in-out infinite;
+}
+
+@keyframes bob {
+  50% {
+    transform: translateY(-4px) rotate(-2deg);
+  }
+}
+
+/* Speech bubble with a tail pointing back at the mark. */
+.bubble {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 16px 20px;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  animation: bubble-in var(--dur-slow) var(--ease-spring) both;
+}
+
+.bubble::before,
+.bubble::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  border-style: solid;
+  transform: translateY(-50%);
+}
+
+.bubble::before {
+  left: -12px;
+  border-width: 10px 12px 10px 0;
+  border-color: transparent var(--line) transparent transparent;
+}
+
+.bubble::after {
+  left: -8px;
+  border-width: 8px 10px 8px 0;
+  border-color: transparent var(--surface) transparent transparent;
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateX(-6px);
+  }
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.lead {
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .prompt {
+    align-items: flex-start;
+  }
+
+  .mark svg {
+    width: 52px;
+    height: 52px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+}

@@ -1,0 +1,84 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.top {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) minmax(48px, auto);
+  align-items: center;
+  gap: 20px;
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: 28px var(--page-x) 12px;
+}
+
+.iconButton {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--subtle);
+}
+
+.iconButton:hover {
+  background: var(--sunken);
+  color: var(--muted);
+}
+
+.progress {
+  min-width: 0;
+}
+
+.aside {
+  justify-self: end;
+}
+
+.content {
+  flex: 1;
+  width: min(100%, 680px);
+  margin: 0 auto;
+  padding: 40px var(--page-x) 48px;
+}
+
+.footer {
+  position: sticky;
+  bottom: 0;
+  border-top: var(--border) solid var(--line);
+  background: var(--surface);
+}
+
+.footerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: 24px var(--page-x) calc(28px + env(safe-area-inset-bottom));
+}
+
+/* The main action always sits at the right, even when alone. */
+.footerInner > :last-child {
+  margin-left: auto;
+  min-width: 160px;
+}
+
+@media (max-width: 600px) {
+  .top {
+    gap: 12px;
+    padding-top: 16px;
+  }
+
+  .content {
+    padding-top: 24px;
+  }
+
+  .footerInner > :last-child {
+    flex: 1;
+  }
+}

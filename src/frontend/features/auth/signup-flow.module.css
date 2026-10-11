@@ -1,0 +1,71 @@
+.types {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.logIn {
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.logIn:hover {
+  background: var(--blue-wash);
+}
+
+.auth {
+  width: min(100%, 400px);
+  margin: 0 auto;
+}
+
+.schoolNote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: fit-content;
+  margin: 0 auto 28px;
+  padding: 8px 14px 8px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--blue-wash);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.schoolNote strong {
+  color: var(--blue-lip);
+  font-weight: 900;
+}
+
+.accountError {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 32px;
+  border: var(--border) solid var(--red-soft);
+  border-radius: var(--radius);
+  background: var(--red-wash);
+  text-align: center;
+}
+
+.accountError h1 {
+  font-size: 24px;
+}
+
+.accountError p {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .types {
+    grid-template-columns: 1fr;
+  }
+}
