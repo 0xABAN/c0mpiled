@@ -32,6 +32,9 @@ export function Checkout({ quote }: { quote: UnlockQuote }) {
   const selected = offers.find((offer) => offer.book.id === selectedId) ?? offers[0];
   const hue = seekingHue(resume.profile.seeking);
 
+  // "Best value" means the lowest price per resume, whichever book is preselected.
+  const bestValueId = [...offers].sort((a, b) => perResumeCents(a) - perResumeCents(b))[0]?.book.id;
+
   function unlock() {
     startUnlocking(async () => {
       const next = await unlockBook(selected.book.id, resume.id);
@@ -110,7 +113,7 @@ export function Checkout({ quote }: { quote: UnlockQuote }) {
                     value={offer.book.id}
                     checked={offer.book.id === selected.book.id}
                     onChange={() => setSelectedId(offer.book.id)}
-                    badge={offer.book.id === quote.recommendedBookId ? "Best value" : undefined}
+                    badge={offer.book.id === bestValueId ? "Best value" : undefined}
                     art={<Monogram name={offer.book.club.name} hue={offer.book.club.hue} size={48} />}
                     title={offer.book.club.name}
                     description={describeBook(offer)}
@@ -166,9 +169,12 @@ function AlreadyUnlocked({ resumeId }: { resumeId: string }) {
   );
 }
 
+function perResumeCents(offer: UnlockOffer) {
+  return Math.round(offer.priceCents / Math.max(1, offer.book.resumeCount));
+}
+
 function describeBook(offer: UnlockOffer) {
-  const perResume = formatMoney(Math.round(offer.priceCents / Math.max(1, offer.book.resumeCount)));
-  return `${pluralize(offer.book.resumeCount, "resume")} · about ${perResume} each`;
+  return `${pluralize(offer.book.resumeCount, "resume")} · about ${formatMoney(perResumeCents(offer))} each`;
 }
 
 /** Static version of the offer card, for the common single-book case. */
@@ -226,10 +232,15 @@ function OrderSummary({ offer }: { offer: UnlockOffer }) {
           <span className="tabular">{formatMoney(offer.clubPayoutCents)}</span>
         </div>
 
-        <div className={`${styles.lineItem} ${styles.fee}`}>
-          <span>Roster fee</span>
-          <span className="tabular">{formatMoney(feeCents)}</span>
-        </div>
+        {/* No fee is decided yet; show the row only once there is one. */}
+        {feeCents > 0 ? (
+          <div className={`${styles.lineItem} ${styles.fee}`}>
+            <span>Roster fee</span>
+            <span className="tabular">{formatMoney(feeCents)}</span>
+          </div>
+        ) : (
+          <p className={styles.fee}>All of it goes to the club.</p>
+        )}
       </div>
 
       <div className={`${styles.lineItem} ${styles.total}`}>

@@ -11,14 +11,16 @@ import styles from "./resume-access.module.css";
 
 /** Recruiter call to action for a locked resume. */
 export function UnlockCard({ resume }: { resume: ResumeView }) {
-  const clubNames = resume.books.map((book) => book.club.name).join(" and ");
+  const { books } = resume;
 
   return (
     <div className={styles.unlockCard}>
       <p className="eyebrow">Locked</p>
       <h3 className={styles.unlockTitle}>See who this is</h3>
       <p className={styles.unlockBody}>
-        Unlock their name, email, and original PDF. Your purchase pays {clubNames}.
+        {books.length === 1
+          ? `Unlock ${books[0].club.name}'s book to see their name, email, and original PDF. The club gets paid.`
+          : `They're in ${books.length} books. Unlock any one to see their name, email, and original PDF. That club gets paid.`}
       </p>
 
       <LinkButton href={`/unlock/${resume.id}`} variant="premium" block>

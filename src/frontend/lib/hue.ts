@@ -24,7 +24,12 @@ const MINOR_WORDS = new Set(["of", "the", "and", "at", "for", "in"]);
  * significant words ("Society of Women Engineers" → "SW", "Lockheed Martin" → "LM").
  */
 export function initials(name: string): string {
-  const words = name.replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/).filter(Boolean);
+  // Drop apostrophes first so "Builder's" stays one word.
+  const words = name
+    .replace(/['’]/g, "")
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .split(/\s+/)
+    .filter(Boolean);
 
   const acronym = words.find((word) => word.length >= 2 && word.length <= 3 && word === word.toUpperCase() && /\p{L}/u.test(word));
   if (acronym) return acronym;
