@@ -16,6 +16,8 @@ type OnboardingShellProps = {
   aside?: ReactNode;
   /** Fixed action bar at the bottom. Omit when the step has its own submit (the Authenticator). */
   footer?: ReactNode;
+  /** Wider content column, for steps with a side preview. */
+  wide?: boolean;
   children: ReactNode;
 };
 
@@ -23,7 +25,7 @@ type OnboardingShellProps = {
  * Full-screen, one-question-at-a-time layout for signup, setup, and joining a book:
  * a progress bar on top, the question in the middle, and the main action at the bottom.
  */
-export function OnboardingShell({ progress, exitHref, onBack, aside, footer, children }: OnboardingShellProps) {
+export function OnboardingShell({ progress, exitHref, onBack, aside, footer, wide, children }: OnboardingShellProps) {
   return (
     <div className={styles.shell}>
       <header className={styles.top}>
@@ -42,7 +44,7 @@ export function OnboardingShell({ progress, exitHref, onBack, aside, footer, chi
         <div className={styles.aside}>{aside}</div>
       </header>
 
-      <main className={styles.content}>{children}</main>
+      <main className={wide ? `${styles.content} ${styles.wide}` : styles.content}>{children}</main>
 
       {footer && (
         <footer className={styles.footer}>

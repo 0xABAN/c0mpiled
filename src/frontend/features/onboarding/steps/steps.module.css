@@ -1,0 +1,60 @@
+/* Layout helpers shared by onboarding steps. */
+
+.twoUp {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stack {
+  display: grid;
+  gap: 22px;
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+}
+
+.fieldLabel {
+  margin-bottom: 10px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.note {
+  display: flex;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  background: var(--blue-wash);
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.note svg {
+  flex-shrink: 0;
+  color: var(--blue);
+}
+
+.error {
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--red-tint);
+  color: var(--red-lip);
+  font-weight: 800;
+}
+
+@media (max-width: 600px) {
+  .twoUp {
+    grid-template-columns: 1fr;
+  }
+}

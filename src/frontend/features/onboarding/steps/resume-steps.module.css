@@ -1,0 +1,189 @@
+/* ---------- Upload ---------- */
+
+.dropzone {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 48px 24px;
+  border: 3px dashed var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--sunken);
+  text-align: center;
+  transition:
+    border-color var(--dur) ease,
+    background-color var(--dur) ease;
+}
+
+.dragging {
+  border-color: var(--blue);
+  background: var(--blue-wash);
+}
+
+.dropIcon {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 8px;
+  border-radius: 24px;
+  background: var(--blue);
+  box-shadow: inset 0 -6px 0 var(--blue-lip);
+  color: #fff;
+}
+
+.dropTitle {
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.dropHint {
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.uploadError {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--red-tint);
+  color: var(--red-lip);
+  font-weight: 800;
+}
+
+.reading {
+  display: grid;
+  gap: 16px;
+  padding: 36px 28px;
+  border: var(--border) solid var(--blue-soft);
+  border-radius: var(--radius);
+  background: var(--blue-wash);
+}
+
+.fileName {
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.readingMessage {
+  color: var(--blue-lip);
+  font-weight: 800;
+  animation: fade-in var(--dur-slow) ease both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* ---------- Review ---------- */
+
+.review {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  align-items: start;
+  gap: 40px;
+}
+
+.editor {
+  display: grid;
+  gap: 24px;
+}
+
+.previewColumn {
+  position: sticky;
+  top: 24px;
+  display: grid;
+  gap: 10px;
+}
+
+.previewLabel {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.privacy {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.jobs {
+  display: grid;
+  gap: 10px;
+}
+
+.job {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px;
+  align-items: end;
+  gap: 10px;
+}
+
+.addJob {
+  justify-self: start;
+}
+
+/* ---------- Books ---------- */
+
+.consent {
+  margin-top: 8px;
+  padding: 18px;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius);
+}
+
+/* ---------- Done ---------- */
+
+.requests {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.request {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius);
+  text-align: left;
+}
+
+.requestName {
+  flex: 1;
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.pending {
+  padding: 4px 10px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--yellow-tint);
+  box-shadow: inset 0 -3px 0 var(--yellow-soft);
+  color: #6b5200;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 860px) {
+  .review {
+    grid-template-columns: 1fr;
+  }
+
+  .previewColumn {
+    position: static;
+    order: -1;
+    max-width: 300px;
+  }
+}
