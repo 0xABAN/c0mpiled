@@ -18,10 +18,7 @@ type ResumeCardProps = {
   onOpen?: (event: MouseEvent<HTMLAnchorElement>) => void;
 };
 
-/**
- * A compact profile thumbnail in the browse grid. The card's height follows its content
- * (experience count, skill list), which produces the masonry.
- */
+/** A compact profile thumbnail. The grid stretches the paper so every card lines up. */
 export function ResumeCard({ resume, href, onOpen }: ResumeCardProps) {
   const { profile, books, contact } = resume;
   // Empty only in a student's own preview, before any club accepts them.
@@ -78,13 +75,4 @@ export function ResumeCard({ resume, href, onOpen }: ResumeCardProps) {
       </div>
     </div>
   );
-}
-
-/**
- * Approximate rendered height of a card, for balancing masonry columns. Tracks the parts
- * that vary: one block per job, and the skills line wrapping at roughly 44 characters.
- */
-export function estimateCardHeight(resume: ResumeView): number {
-  const skillLines = Math.ceil(resume.profile.skills.join(" · ").length / 44);
-  return 272 + resume.profile.experience.length * 46 + skillLines * 14;
 }

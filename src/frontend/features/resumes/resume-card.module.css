@@ -1,10 +1,12 @@
 .wrap {
   display: grid;
+  grid-template-rows: 1fr auto;
   gap: 10px;
 }
 
 .card {
-  display: block;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   border: var(--border) solid var(--line);
   border-bottom-width: 5px;
@@ -31,6 +33,9 @@
 /* Tinted area holding the paper. The tag breaks the paper's top edge. */
 .preview {
   position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   padding: 22px 14px 0;
   background: var(--wash);
 }
@@ -44,6 +49,7 @@
 }
 
 .paper {
+  flex: 1;
   overflow: hidden;
   border: var(--border) solid var(--soft);
   border-bottom: 0;
@@ -57,6 +63,7 @@
 
 .body {
   display: grid;
+  flex-shrink: 0;
   gap: 2px;
   padding: 14px 16px 15px;
   border-top: var(--border) solid var(--soft);
@@ -70,9 +77,12 @@
 }
 
 .subtitle {
+  overflow: hidden;
   color: var(--muted);
   font-size: 14px;
   font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Sits outside the card, as on resumes.fyi. */

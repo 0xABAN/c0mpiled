@@ -15,9 +15,8 @@ import styles from "./browser.module.css";
 import { FilterRail } from "./filter-rail";
 import { FilterSheet } from "./filter-sheet";
 import { activeFilterCount, browseHref, EMPTY_FILTERS, filtersKey, SELECTED_PARAM, unlockHref } from "./filters";
-import { Masonry } from "./masonry";
 import { ContactCard, LockedNote, UnlockCard } from "./resume-access";
-import { estimateCardHeight, ResumeCard } from "./resume-card";
+import { ResumeCard } from "./resume-card";
 import { ResumeDetail } from "./resume-detail";
 
 type BrowserProps = {
@@ -140,12 +139,11 @@ export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock
 
         <div className={isFiltering ? `${styles.grid} ${styles.pending}` : styles.grid}>
           {pages.items.length > 0 ? (
-            <Masonry
-              items={pages.items}
-              getKey={(resume) => resume.id}
-              estimateHeight={estimateCardHeight}
-              renderItem={(resume) => <ResumeCard resume={resume} href={browseHref(filters, resume.id)} onOpen={(event) => openResume(event, resume.id)} />}
-            />
+            <div className={styles.cards}>
+              {pages.items.map((resume) => (
+                <ResumeCard key={resume.id} resume={resume} href={browseHref(filters, resume.id)} onOpen={(event) => openResume(event, resume.id)} />
+              ))}
+            </div>
           ) : (
             <BrowseEmpty hasFilters={filterCount > 0 || filters.q !== ""} onClear={() => applyFilters(EMPTY_FILTERS)} />
           )}
