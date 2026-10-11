@@ -87,19 +87,26 @@ src/backend/    server-only feature modules, each with an index.ts as its public
 
 ## Design
 
-resumes.fyi's catalog layout with Duolingo's surfaces. The evidence for both is in the Copycat profiles
-`resumes-fyi` and `duolingo` (`~/.copycat/designs`, outside this repo). Borrow the system, never either brand's
-logo, mascot, illustrations, fonts, or copy.
+resumes.fyi's catalog layout, Duolingo's surfaces and shapes, and Firecrawl's colors. The evidence is in the
+Copycat profiles `resumes-fyi`, `duolingo`, and `firecrawl` (`~/.copycat/designs`, outside this repo). Borrow
+the systems, never any brand's logo, mascot, illustrations, fonts, or copy.
 
-- **Tokens** live in `src/frontend/styles/globals.css`. Use them instead of raw colors. Put `data-hue="…"` on an
-  element to get `--face`, `--lip`, `--deep`, `--tint`, `--wash`, and `--soft` for that hue.
+- **Tokens** live in `src/frontend/styles/globals.css`. Use the role tokens (`--accent`, `--secondary`,
+  `--success`, `--warning`, `--danger`, each with `-lip`, `-deep`, `-tint`, …) and neutrals, never a hue name or
+  a raw color, so a palette change stays in that file. Put `data-hue="…"` on an element to get `--face`,
+  `--lip`, `--deep`, `--tint`, `--wash`, and `--soft` for a category hue (or `"accent"`).
 - **Surfaces:** 2px `--line` outlines, 16px radius, no drop shadows. Anything pressable sits on a solid lip (a
   thicker bottom border in a darker shade) and presses down onto it. Reuse `Button`, `SelectionCard`,
   `ToggleChip`, and `Monogram` from `src/frontend/components/ui` instead of restyling.
 - **Type:** Nunito. Buttons, nav, tabs, and eyebrows are 800 weight, uppercase, and tracked. Body is 16px/500.
-- **Color roles:** green is progress (Continue, Accept, Download). Blue is secondary actions, selection, links, and
-  the active nav item. Indigo is money only (unlock, purchase). The other hues are categories: what a candidate
-  seeks (internship blue, full-time orange, both purple) and each club's own color.
+- **Color roles (Firecrawl):** an off-white `--canvas` page, white cards, `#262626` ink, and hairline grays. One
+  orange `--accent` carries every primary action (Continue, Accept, Unlock), selection, focus, the active nav
+  item, links, and one key phrase in big headlines. Ink `--secondary` buttons take the second action. Status uses
+  `--success` (earned, accepted), `--warning` (pending), and `--danger` (errors). The other hues are categories:
+  what a candidate seeks (internship blue, full-time green, both purple; never orange, so cards don't compete
+  with actions) and each club's own color.
+- **Restraint:** orange never floods a large surface. Decorative fields use the `.grid-field` utility (Firecrawl's
+  faint grid); the landing's closing band is the one solid accent block.
 - **Contrast:** bright faces with white labels only on large buttons and art. Small colored text and tags use
   `--{hue}-deep` (at least 4.5:1 on white and on the hue's tint). `--subtle` is for icons, borders, and
   placeholders; text uses `--muted` or darker.
