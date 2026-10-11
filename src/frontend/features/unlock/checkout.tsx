@@ -237,12 +237,6 @@ function OrderSummary({ offer, live }: { offer: UnlockOffer; live: boolean }) {
           </span>
           <span className="tabular">{formatMoney(offer.clubPayoutCents)}</span>
         </div>
-
-        <div className={`${styles.lineItem} ${styles.fee}`}>
-          <span>Roster fee (5%)</span>
-          <span className="tabular">{formatMoney(offer.platformFeeCents)}</span>
-        </div>
-        <p className={styles.fee}>Included in the book price.</p>
       </div>
 
       <div className={`${styles.lineItem} ${styles.total}`}>

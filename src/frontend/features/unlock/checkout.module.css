@@ -263,11 +263,6 @@
   color: var(--success-deep);
 }
 
-.fee {
-  color: var(--muted);
-  font-weight: 700;
-}
-
 .total {
   font-size: 20px;
   font-weight: 900;
