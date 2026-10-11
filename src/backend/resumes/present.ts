@@ -19,6 +19,7 @@ export const resumeViewColumns = {
   id: resumes.id,
   profile: resumes.profile,
   contactName: resumes.contactName,
+  previewKeys: resumes.previewKeys,
   createdAt: resumes.createdAt,
   email: users.email,
   schoolDomain: users.schoolDomain,
@@ -28,6 +29,7 @@ type ResumeViewRow = {
   id: string;
   profile: ResumeView["profile"];
   contactName: string;
+  previewKeys: string[];
   createdAt: Date;
   email: string;
   schoolDomain: string | null;
@@ -74,6 +76,7 @@ export async function presentResumes(rows: ResumeViewRow[], recruiterId: string)
       school: { name: schoolName(row.schoolDomain), domain: row.schoolDomain },
       books: bookRefs,
       profile: row.profile,
+      previewPageCount: row.previewKeys.length,
       contact: unlocked ? { name: row.contactName, email: row.email } : null,
       createdAt: row.createdAt.toISOString(),
     };

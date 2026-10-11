@@ -172,6 +172,7 @@ export async function getClubDashboard(origin: string): Promise<ClubDashboard | 
         name: resumes.contactName,
         email: users.email,
         profile: resumes.profile,
+        previewKeys: resumes.previewKeys,
       })
       .from(bookMembers)
       .innerJoin(resumes, eq(resumes.id, bookMembers.resumeId))
@@ -198,6 +199,7 @@ export async function getClubDashboard(origin: string): Promise<ClubDashboard | 
     name: row.name,
     email: row.email,
     profile: row.profile,
+    previewPageCount: row.previewKeys.length,
     status: row.status,
     requestedAt: row.requestedAt.toISOString(),
   }));

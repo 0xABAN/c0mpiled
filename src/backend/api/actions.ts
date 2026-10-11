@@ -89,6 +89,14 @@ export async function uploadResume(formData: FormData): Promise<UploadResult> {
   return result.status === "ok" ? { status: "ok", ...result.data } : result;
 }
 
+/**
+ * The uploaded PDF with the student's identity blacked out (Contract 3), as PNG data URLs.
+ * Saves nothing; the review step shows it before the student consents.
+ */
+export async function previewRedaction(uploadId: string, name: string): Promise<ActionResult<{ pages: string[] }>> {
+  return runAction(() => resumes.previewRedaction(uploadId, name));
+}
+
 /** Saves the student's resume and requests to join the chosen books at their school. */
 export async function submitResume(submission: ResumeSubmission): Promise<ActionResult> {
   return runAction(async () => {

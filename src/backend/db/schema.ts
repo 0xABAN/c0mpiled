@@ -114,6 +114,11 @@ export const resumes = pgTable(
     /** Name as it appears once a book is unlocked. */
     contactName: text("contact_name").notNull(),
     pdfKey: text("pdf_key").notNull(),
+    /**
+     * The redacted pages recruiters see before they buy a book (Contract 3), in page order.
+     * Empty for resumes without previews, such as seed data.
+     */
+    previewKeys: text("preview_keys").array().notNull().default(sql`'{}'::text[]`),
     gradYear: integer("grad_year").notNull(),
     majors: text("majors").array().notNull(),
     seeking: text("seeking").array().notNull(),

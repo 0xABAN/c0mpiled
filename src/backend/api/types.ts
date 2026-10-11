@@ -107,6 +107,11 @@ export type ResumeView = {
   /** Books this resume was accepted into. Never empty for resumes shown to recruiters. */
   books: BookRef[];
   profile: ResumeProfile;
+  /**
+   * Redacted pages (Contract 3) at `/api/resumes/{id}/preview/{n}`, n = 1..previewPageCount.
+   * 0 when there are none (seed data); the UI then draws the document from `profile`.
+   */
+  previewPageCount: number;
   contact: Contact | null;
   createdAt: string; // ISO 8601
 };
@@ -251,7 +256,7 @@ export type UploadResult =
 /** A school account's resume and where it stands in each book it asked to join. */
 export type StudentHome = {
   /** `null` until the student submits a resume. */
-  resume: { id: string; name: string; profile: ResumeProfile; updatedAt: string } | null;
+  resume: { id: string; name: string; profile: ResumeProfile; previewPageCount: number; updatedAt: string } | null;
   /** Every book the student asked to join, newest request first, including rejections. */
   memberships: { book: BookSummary; status: MembershipStatus; requestedAt: string }[];
 };
@@ -270,6 +275,8 @@ export type Membership = {
   /** Verified school email. */
   email: string;
   profile: ResumeProfile;
+  /** Redacted pages, as on `ResumeView`, so officers can check a request. */
+  previewPageCount: number;
   status: MembershipStatus;
   requestedAt: string; // ISO 8601
 };

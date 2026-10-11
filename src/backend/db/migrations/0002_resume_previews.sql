@@ -1,0 +1,1 @@
+ALTER TABLE "resumes" ADD COLUMN "preview_keys" text[] DEFAULT '{}'::text[] NOT NULL;

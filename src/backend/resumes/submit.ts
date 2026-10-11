@@ -10,7 +10,8 @@ import { requireAccount } from "@/backend/accounts";
 import { schoolName } from "@/backend/clubs";
 import { db, resumes } from "@/backend/db";
 import { UserError } from "@/backend/errors";
-import { deleteResumePdf, putResumePdf, resumePdfExists, resumePdfKey } from "@/backend/storage";
+import { redactResume } from "@/backend/redaction";
+import { deleteFiles, getResumePdf, putPreviewPages, putResumePdf, resumePdfKey } from "@/backend/storage";
 import { parseInput } from "@/backend/validation";
 
 import { resumeColumns } from "./columns";
@@ -48,6 +49,31 @@ export async function uploadResume(formData: FormData): Promise<{ uploadId: stri
   return { uploadId, parsed: null };
 }
 
+const uploadIdInput = z.uuid();
+const nameInput = z.string().trim().min(2, "Enter your name.").max(100);
+
+/** The PDF the viewer uploaded as `uploadId`, redacted for `name` (Contract 3). */
+async function redactUpload(userId: string, uploadId: string, name: string) {
+  const pdfKey = resumePdfKey(userId, uploadId);
+  const pdf = await getResumePdf(pdfKey);
+  if (!pdf) throw new UserError("Upload your resume again.");
+
+  return { pdfKey, pages: await redactResume(pdf, { name }) };
+}
+
+/**
+ * What recruiters will see: the uploaded PDF with the student's identity blacked out, as PNG
+ * data URLs. Saves nothing, so the review step can call it whenever the name changes.
+ */
+export async function previewRedaction(rawUploadId: unknown, rawName: unknown): Promise<{ pages: string[] }> {
+  const uploadId = parseInput(uploadIdInput, rawUploadId);
+  const name = parseInput(nameInput, rawName);
+  const account = await requireAccount("school");
+
+  const { pages } = await redactUpload(account.id, uploadId, name);
+  return { pages: pages.map((png) => `data:image/png;base64,${Buffer.from(png).toString("base64")}`) };
+}
+
 const profileInput = z.object({
   gradYear: z.int().min(2000).max(2100),
   majors: z.array(z.string().trim().min(1).max(80)).min(1, "Add your major.").max(3),
@@ -59,8 +85,8 @@ const profileInput = z.object({
 
 const submissionInput = z.object({
   bookIds: z.array(z.uuid()).min(1, "Pick at least one club.").max(20),
-  uploadId: z.uuid(),
-  name: z.string().trim().min(2, "Enter your name.").max(100),
+  uploadId: uploadIdInput,
+  name: nameInput,
   profile: profileInput,
   consent: z.literal(true, "Agree to share your resume with employers."),
 });
@@ -69,34 +95,52 @@ const submissionInput = z.object({
  * Saves the student's one resume (replacing any earlier one everywhere) and requests to
  * join the chosen books, which must belong to clubs at the student's school. See
  * `requestMemberships` for how each request starts.
+ *
+ * The PDF is redacted again with the submitted name rather than trusting an earlier preview;
+ * redaction is deterministic, so the stored pages match what the student reviewed.
  */
 export async function submitResume(rawSubmission: unknown): Promise<void> {
   const submission = parseInput(submissionInput, rawSubmission);
   const account = await requireAccount("school");
   const schoolDomain = account.schoolDomain!;
 
-  const pdfKey = resumePdfKey(account.id, submission.uploadId);
-  if (!(await resumePdfExists(pdfKey))) throw new UserError("Upload your resume again.");
-
   const requested = await requireBooksAtSchool(submission.bookIds, schoolDomain);
+  const { pdfKey, pages } = await redactUpload(account.id, submission.uploadId, submission.name);
+  const previewKeys = await putPreviewPages(account.id, pages);
 
-  const columns = { contactName: submission.name, pdfKey, ...resumeColumns(submission.profile, schoolName(schoolDomain)) };
+  const columns = {
+    contactName: submission.name,
+    pdfKey,
+    previewKeys,
+    ...resumeColumns(submission.profile, schoolName(schoolDomain)),
+  };
   const now = new Date();
 
-  const previousPdfKey = await db.transaction(async (tx) => {
-    const [previous] = await tx.select({ pdfKey: resumes.pdfKey }).from(resumes).where(eq(resumes.userId, account.id));
+  let replaced: { pdfKey: string; previewKeys: string[] } | null;
+  try {
+    replaced = await db.transaction(async (tx) => {
+      const [previous] = await tx
+        .select({ pdfKey: resumes.pdfKey, previewKeys: resumes.previewKeys })
+        .from(resumes)
+        .where(eq(resumes.userId, account.id));
 
-    const [resume] = await tx
-      .insert(resumes)
-      .values({ userId: account.id, ...columns })
-      .onConflictDoUpdate({ target: resumes.userId, set: { ...columns, updatedAt: now } })
-      .returning({ id: resumes.id });
+      const [resume] = await tx
+        .insert(resumes)
+        .values({ userId: account.id, ...columns })
+        .onConflictDoUpdate({ target: resumes.userId, set: { ...columns, updatedAt: now } })
+        .returning({ id: resumes.id });
 
-    await requestMemberships(tx, { resumeId: resume.id, accountId: account.id, books: requested, consentedAt: now });
+      await requestMemberships(tx, { resumeId: resume.id, accountId: account.id, books: requested, consentedAt: now });
 
-    return previous?.pdfKey ?? null;
-  });
+      return previous ?? null;
+    });
+  } catch (error) {
+    await deleteFiles(previewKeys);
+    throw error;
+  }
 
-  // Delete the replaced PDF only after the new resume is committed.
-  if (previousPdfKey && previousPdfKey !== pdfKey) await deleteResumePdf(previousPdfKey);
+  // Delete the replaced files only after the new resume is committed.
+  if (replaced) {
+    await deleteFiles([...(replaced.pdfKey === pdfKey ? [] : [replaced.pdfKey]), ...replaced.previewKeys]);
+  }
 }

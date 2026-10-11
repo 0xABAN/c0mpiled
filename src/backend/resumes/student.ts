@@ -8,7 +8,7 @@ import { getCurrentAccount, requireAccount } from "@/backend/accounts";
 import { toBookSummaries } from "@/backend/clubs";
 import { bookMembers, books, clubs, db, resumes } from "@/backend/db";
 import { UserError } from "@/backend/errors";
-import { deleteResumePdf } from "@/backend/storage";
+import { deleteFiles } from "@/backend/storage";
 import { parseInput } from "@/backend/validation";
 
 import { requestMemberships, requireBooksAtSchool } from "./membership";
@@ -32,7 +32,13 @@ export async function getStudentHome(): Promise<StudentHome | null> {
   const summaries = await toBookSummaries(rows);
 
   return {
-    resume: { id: resume.id, name: resume.contactName, profile: resume.profile, updatedAt: resume.updatedAt.toISOString() },
+    resume: {
+      id: resume.id,
+      name: resume.contactName,
+      profile: resume.profile,
+      previewPageCount: resume.previewKeys.length,
+      updatedAt: resume.updatedAt.toISOString(),
+    },
     memberships: rows.map((row, index) => ({
       book: summaries[index],
       status: row.status,
@@ -73,8 +79,8 @@ export async function leaveBook(rawBookId: unknown): Promise<void> {
 }
 
 /**
- * Deletes the viewer's resume everywhere: the row, every membership (by cascade), and the PDF.
- * Recruiters who bought a book lose access to it from then on.
+ * Deletes the viewer's resume everywhere: the row, every membership (by cascade), the PDF, and
+ * its preview pages. Recruiters who bought a book lose access to it from then on.
  */
 export async function deleteResume(): Promise<void> {
   const account = await requireAccount("school");
@@ -82,10 +88,10 @@ export async function deleteResume(): Promise<void> {
   const [deleted] = await db
     .delete(resumes)
     .where(eq(resumes.userId, account.id))
-    .returning({ pdfKey: resumes.pdfKey });
+    .returning({ pdfKey: resumes.pdfKey, previewKeys: resumes.previewKeys });
 
   if (!deleted) throw new UserError("You haven't added a resume yet.");
 
-  // Delete the PDF only after the row is gone, so a failure here can't leave a resume without its file.
-  await deleteResumePdf(deleted.pdfKey);
+  // Delete the files only after the row is gone, so a failure here can't leave a resume without them.
+  await deleteFiles([deleted.pdfKey, ...deleted.previewKeys]);
 }
