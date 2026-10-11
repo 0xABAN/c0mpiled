@@ -44,7 +44,14 @@ export function PriceCard({ priceCents, memberCount }: { priceCents: number; mem
           Book price
         </p>
         {!editing && (
-          <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setDollars(String(priceCents / 100));
+              setEditing(true);
+            }}
+          >
             <Pencil size={14} strokeWidth={3} aria-hidden />
             Edit
           </Button>

@@ -71,6 +71,17 @@ try {
   await page.getByRole("menuitem", { name: "Browse", exact: true }).click();
   await page.waitForURL(`${base}/browse`);
   console.log("PASS mobile: student pages and company header fit 320/390px; account menu exposes Browse.");
+
+  await page.goto(`${base}/dashboard`);
+  const price = page.getByRole("region", { name: "Book price", exact: true });
+  await price.getByRole("button", { name: "Edit", exact: true }).click();
+  const savedPrice = await price.getByRole("textbox", { name: "Price in dollars" }).inputValue();
+  await price.getByRole("textbox", { name: "Price in dollars" }).fill("425");
+  await price.getByRole("button", { name: "Cancel", exact: true }).click();
+  await price.getByRole("button", { name: "Edit", exact: true }).click();
+  assert.equal(await price.getByRole("textbox", { name: "Price in dollars" }).inputValue(), savedPrice);
+  await price.getByRole("button", { name: "Cancel", exact: true }).click();
+  console.log("PASS price editor: Cancel discards the draft without changing the saved price.");
 } finally {
   await browser.close();
 }
