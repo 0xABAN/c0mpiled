@@ -137,12 +137,6 @@
   gap: 10px;
 }
 
-.redactionHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .redactionHeader p {
   display: flex;
   align-items: center;
@@ -158,13 +152,110 @@
   font-weight: 700;
 }
 
-/* Thumbnails side by side by default; one column when enlarged. */
-.redactionPages > div {
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+.redactionTrigger {
+  justify-self: start;
+  justify-content: start;
+  gap: 20px;
+  height: auto;
+  max-width: 100%;
+  padding: 12px 20px 12px 12px;
+  text-align: left;
+  white-space: normal;
 }
 
-.redactionPagesBig > div {
-  grid-template-columns: 1fr;
+.redactionThumbnail {
+  width: 104px;
+  height: 136px;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.redactionSummary {
+  display: grid;
+  gap: 12px;
+}
+
+.redactionCount {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.4;
+  text-transform: none;
+}
+
+.redactionAction {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-deep);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.redactionDialog {
+  width: min(960px, calc(100% - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.redactionDialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.redactionDialog::backdrop {
+  background: rgb(0 0 0 / 0.5);
+}
+
+:global(body):has(.redactionDialog[open]) {
+  overflow: hidden;
+}
+
+.redactionToolbar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: var(--border) solid var(--line);
+}
+
+.redactionToolbar h2 {
+  font-size: 18px;
+}
+
+.redactionDocument {
+  min-height: 0;
+  padding: 24px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--sunken);
+}
+
+@media (max-width: 560px) {
+  .redactionDialog {
+    width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .redactionToolbar,
+  .redactionDocument {
+    padding: 12px;
+  }
 }
 
 /* ---------- Books ---------- */

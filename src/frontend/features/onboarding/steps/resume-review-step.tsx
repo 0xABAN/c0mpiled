@@ -1,7 +1,7 @@
 "use client";
 
-import { EyeOff, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { EyeOff, Maximize2, Plus, Trash2, X } from "lucide-react";
+import { useRef } from "react";
 
 import { OnboardingShell } from "@/frontend/components/onboarding/onboarding-shell";
 import { Prompt } from "@/frontend/components/onboarding/prompt";
@@ -11,6 +11,7 @@ import { Checkbox, TextField } from "@/frontend/components/ui/field";
 import { TagInput } from "@/frontend/components/ui/tag-input";
 import { ResumeCard } from "@/frontend/features/resumes/resume-card";
 import type { BookSummary, Degree, ResumeProfile, SchoolRef, Seeking } from "@/frontend/lib/api/types";
+import { pluralize } from "@/frontend/lib/format";
 
 import { RedactedPages } from "@/frontend/features/resumes/redacted-pages";
 
@@ -193,7 +194,7 @@ export function ResumeReviewStep(props: ResumeReviewStepProps) {
 
 /** "Here's your resume as companies see it", with the redaction status. */
 function RedactionSection({ redaction }: { redaction: RedactionPreview }) {
-  const [expanded, setExpanded] = useState(false);
+  const dialog = useRef<HTMLDialogElement>(null);
 
   return (
     <section className={styles.redaction} aria-labelledby="redaction-heading" aria-busy={redaction.status === "loading"}>
@@ -201,11 +202,6 @@ function RedactionSection({ redaction }: { redaction: RedactionPreview }) {
         <p id="redaction-heading" className={shared.fieldLabel}>
           <EyeOff size={16} strokeWidth={2.75} aria-hidden /> Your resume, as companies see it
         </p>
-        {redaction.status === "ready" && (
-          <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)}>
-            {expanded ? "Smaller" : "Bigger"}
-          </Button>
-        )}
       </div>
 
       {redaction.status === "waiting" && <p className={styles.redactionNote}>Enter your name above. We black out your name, contact info, links, and photos.</p>}
@@ -216,9 +212,41 @@ function RedactionSection({ redaction }: { redaction: RedactionPreview }) {
         </p>
       )}
       {redaction.status === "ready" && (
-        <div className={expanded ? styles.redactionPagesBig : styles.redactionPages}>
-          <RedactedPages pages={redaction.pages} label="Your redacted resume" />
-        </div>
+        <>
+          <Button
+            variant="outline"
+            className={styles.redactionTrigger}
+            aria-label="View full size"
+            aria-haspopup="dialog"
+            onClick={() => dialog.current?.showModal()}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element -- an in-memory redacted preview, not an optimizable asset */}
+            <img src={redaction.pages[0]} alt="" className={styles.redactionThumbnail} />
+            <span className={styles.redactionSummary}>
+              <span className={styles.redactionCount}>
+                {pluralize(redaction.pages.length, "page")} · Redacted
+              </span>
+              <span className={styles.redactionAction}>
+                <Maximize2 size={16} strokeWidth={2.75} aria-hidden />
+                View full size
+              </span>
+            </span>
+          </Button>
+
+          {/* Native dialog keeps focus inside, supports Escape, and returns focus to the trigger. */}
+          <dialog ref={dialog} className={styles.redactionDialog} aria-label="Your redacted resume">
+            <header className={styles.redactionToolbar}>
+              <h2>Your redacted resume</h2>
+              <Button variant="quiet" size="sm" onClick={() => dialog.current?.close()}>
+                <X size={18} strokeWidth={2.75} aria-hidden />
+                Close
+              </Button>
+            </header>
+            <div className={styles.redactionDocument}>
+              <RedactedPages pages={redaction.pages} label="Your redacted resume" />
+            </div>
+          </dialog>
+        </>
       )}
     </section>
   );
