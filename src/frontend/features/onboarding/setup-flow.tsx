@@ -123,7 +123,7 @@ function SchoolSetup({ email, school, books, only }: Extract<SetupFlowProps, { a
       return;
     }
 
-    router.replace(created ? "/dashboard" : "/resume");
+    router.replace(goals.resume ? "/browse" : "/dashboard");
     router.refresh();
   }
 

@@ -53,7 +53,7 @@ export function JoinFlow({ club, blocker, school, finishesSetup }: JoinFlowProps
       }
     }
 
-    router.replace("/resume");
+    router.replace("/browse");
     router.refresh();
   }
 

@@ -1,7 +1,8 @@
 // Run against a dev server with demo accounts enabled:
 // PLAYWRIGHT_MODULE=/path/to/playwright/index.mjs node scripts/check-resume-preview.mjs
 // Optional: BASE_URL (default :3100), SHOT_DIR (screenshots outside the repo).
-// Uploads an invented two-page draft; never submits it or changes demo memberships.
+// Uploads an invented two-page draft; mocks final submission responses so the saved
+// demo resume and memberships are never changed.
 import assert from "node:assert/strict";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
@@ -67,6 +68,35 @@ try {
     assert.ok(await trigger.evaluate((element) => element === document.activeElement), "Close must restore focus");
     console.log(`PASS: ${width}px preview, all pages, keyboard, focus, and form preservation`);
   }
+
+  await page.getByRole("button", { name: "2028", exact: true }).click();
+  await page.getByRole("button", { name: "Internship", exact: true }).click();
+  await page.getByPlaceholder("Add a major").fill("Computer Science");
+  await page.getByPlaceholder("Add a major").press("Enter");
+
+  // Exercise the real UI completion callbacks without replacing the shared demo's resume.
+  // Next's action response contains the action result (a) and no router patch (f).
+  let submissionResult = { status: "error", message: "Test submission rejected" };
+  await page.route(`${baseUrl}/join/psu-demo-club`, async (route) => {
+    if (route.request().method() !== "POST") return route.continue();
+    assert.ok(route.request().headers()["next-action"], "Expected a server action.");
+    await route.fulfill({
+      status: 200,
+      contentType: "text/x-component",
+      body: `0:{"a":"$@1","f":[]}\n1:${JSON.stringify(submissionResult)}\n`,
+    });
+  });
+
+  await page.getByRole("button", { name: "Send request", exact: true }).click();
+  await page.getByRole("alert").getByText("Test submission rejected").waitFor();
+  assert.equal(new URL(page.url()).pathname, "/join/psu-demo-club", "Failed submissions must not navigate.");
+
+  submissionResult = { status: "ok" };
+  await page.getByRole("button", { name: "Send request", exact: true }).click();
+  await page.getByRole("heading", { name: "Request sent!", exact: true }).waitFor();
+  await page.getByRole("button", { name: "Done", exact: true }).click();
+  await page.waitForURL(`${baseUrl}/browse`);
+  console.log("PASS: rejected submission stays on review; successful completion opens browse.");
 
   assert.deepEqual(errors, [], "No browser runtime errors");
 } finally {
