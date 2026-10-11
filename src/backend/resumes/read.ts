@@ -33,12 +33,12 @@ export async function hasSubmittedResume(userId: string): Promise<boolean> {
   return Boolean(row);
 }
 
-/** A resume a recruiter can see, or `null` if it doesn't exist or isn't in any book. */
+/** A resume any signed-in account can see, or `null` if it doesn't exist or isn't in any book. */
 export async function getResume(rawId: unknown): Promise<ResumeView | null> {
   const id = z.uuid().safeParse(rawId);
   if (!id.success) return null;
 
-  const recruiter = await requireAccount("recruiter");
+  const viewer = await requireAccount();
 
   const rows = await db
     .select(resumeViewColumns)
@@ -46,7 +46,7 @@ export async function getResume(rawId: unknown): Promise<ResumeView | null> {
     .innerJoin(users, eq(users.id, resumes.userId))
     .where(and(eq(resumes.id, id.data), isVisibleResume));
 
-  const [view] = await presentResumes(rows, recruiter.id);
+  const [view] = await presentResumes(rows, viewer.id);
   return view ?? null;
 }
 
@@ -56,6 +56,9 @@ export async function getResume(rawId: unknown): Promise<ResumeView | null> {
  * the most resumes is preselected.
  */
 export async function getUnlockQuote(rawResumeId: unknown): Promise<UnlockQuote | null> {
+  // Anyone signed in can browse, but only companies buy books.
+  await requireAccount("recruiter");
+
   const resume = await getResume(rawResumeId);
   if (!resume) return null;
 

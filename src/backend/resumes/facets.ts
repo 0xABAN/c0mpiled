@@ -38,9 +38,9 @@ async function termFacet(field: "majors" | "skills"): Promise<FacetOption[]> {
   return rows;
 }
 
-/** Filter rail options with counts over every resume a recruiter can see (not the current filters). */
+/** Filter rail options with counts over every resume a signed-in account can see (not the current filters). */
 export async function getResumeFacets(): Promise<ResumeFacets> {
-  await requireAccount("recruiter");
+  await requireAccount();
 
   const [schoolRows, yearRows, seekingRows, majors, skills, clubRows] = await Promise.all([
     db

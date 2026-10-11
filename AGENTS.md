@@ -130,7 +130,9 @@ the systems, never any brand's logo, mascot, illustrations, fonts, or copy.
 
 - **School account:** a verified email at a US school's domain. It can upload one resume and request to join
   books at its own school, and it can create a club. An officer is a school account that owns a club.
-- **Recruiter account:** any email, plus a company. Only signed-in recruiters can browse.
+- **Recruiter account:** any email, plus a company. Only recruiters buy books.
+- **Browse** is open to every signed-in account, students included. Names, emails, and original PDFs stay
+  hidden until a company buys a book the resume is in.
 - Signup: choose school or recruiter → school accounts type their school and must use one of its email
   domains → Cognito sends a code → setup. The server rechecks the verified email against the school's
   domains before creating the account.
@@ -230,7 +232,7 @@ unlocks       id, book_id → books, recruiter_id → users, price_cents (what w
               unique (book_id, recruiter_id)
 ```
 
-Recruiters only ever see resumes with an `accepted` membership. `majors` and `skills` are stored
+Browse only ever shows resumes with an `accepted` membership. `majors` and `skills` are stored
 lowercased for filtering; `profile` keeps the original casing for display. A school is identified by its
 primary email domain ("psu.edu").
 
@@ -243,7 +245,7 @@ primary email domain ("psu.edu").
 | `/setup` | new account | School: create a club and/or add a resume and request books. Recruiter: company, title, hiring defaults |
 | `/dashboard` | officer | Copy join link, accept or reject join requests, members, unlocks + earnings |
 | `/join/[slug]` | school account | Request to join this club's book with your resume (consent checkbox) |
-| `/browse` | recruiter | Cross-book search with filters; a resume opens as a redacted teaser until unlocked |
+| `/browse` | any signed-in account | Cross-book search with filters; a resume opens as a redacted teaser until a company unlocks it |
 | `/pricing`, `/billing` | recruiter | Delivered by the `/monetize` PR |
 
 ## Flows
@@ -253,7 +255,7 @@ primary email domain ("psu.edu").
 and picks books at their school → redact, save the resume, and add `pending` memberships. The officer
 accepts or rejects on `/dashboard`. Re-uploading replaces the one resume in every book.
 
-**Search:** recruiters only, accepted memberships only. Any-of within school, grad year, seeking, major,
+**Search:** any signed-in account, accepted memberships only. Any-of within school, grad year, seeking, major,
 and club; skills must all match (`skills @> $1`). Free text: every word must appear in `search_text`
 (trigram-indexed) or an accepted club's name. Order by grad year then newest, or newest. No ranking.
 

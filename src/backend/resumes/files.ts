@@ -43,12 +43,11 @@ async function isOfficerFor(account: Account, resumeId: string): Promise<boolean
 }
 
 /**
- * Redacted pages: recruiters once the resume is accepted into any book (the same rule as
- * browse), the student who owns it, and officers of any club it asked to join.
+ * Redacted pages: any signed-in account once the resume is accepted into a book (the same rule
+ * as browse), and before that only the student who owns it and officers of clubs it asked to join.
  */
 async function canSeePreview(account: Account, resume: ResumeFiles): Promise<boolean> {
   if (resume.userId === account.id) return true;
-  if (account.accountType === "school") return isOfficerFor(account, resume.id);
 
   const [accepted] = await db
     .select({ one: sql`1` })
@@ -56,7 +55,8 @@ async function canSeePreview(account: Account, resume: ResumeFiles): Promise<boo
     .where(and(eq(bookMembers.resumeId, resume.id), eq(bookMembers.status, "accepted")))
     .limit(1);
 
-  return Boolean(accepted);
+  if (accepted) return true;
+  return account.accountType === "school" && isOfficerFor(account, resume.id);
 }
 
 /**

@@ -6,7 +6,7 @@ import type { BookRef, ResumeView } from "@/backend/api/types";
 import { schoolName, toClubSummary } from "@/backend/clubs";
 import { bookMembers, books, clubs, db, resumes, unlocks, users } from "@/backend/db";
 
-/** Recruiters only ever see resumes accepted into at least one book. */
+/** Browse only ever shows resumes accepted into at least one book. */
 export const isVisibleResume = exists(
   db
     .select({ one: sql`1` })
@@ -36,10 +36,10 @@ type ResumeViewRow = {
 };
 
 /**
- * Turns resume rows into what a recruiter sees: the books each resume was accepted into,
- * and contact info only if the recruiter has bought one of those books.
+ * Turns resume rows into what a viewer sees: the books each resume was accepted into, and
+ * contact info only if the viewer (a company) has bought one of those books.
  */
-export async function presentResumes(rows: ResumeViewRow[], recruiterId: string): Promise<ResumeView[]> {
+export async function presentResumes(rows: ResumeViewRow[], viewerId: string): Promise<ResumeView[]> {
   if (rows.length === 0) return [];
 
   const ids = rows.map((row) => row.id);
@@ -52,7 +52,7 @@ export async function presentResumes(rows: ResumeViewRow[], recruiterId: string)
       .innerJoin(clubs, eq(clubs.id, books.clubId))
       .where(and(inArray(bookMembers.resumeId, ids), eq(bookMembers.status, "accepted")))
       .orderBy(clubs.name),
-    db.select({ bookId: unlocks.bookId }).from(unlocks).where(eq(unlocks.recruiterId, recruiterId)),
+    db.select({ bookId: unlocks.bookId }).from(unlocks).where(eq(unlocks.recruiterId, viewerId)),
   ]);
 
   const purchasedBookIds = new Set(purchased.map((row) => row.bookId));

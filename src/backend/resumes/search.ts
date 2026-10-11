@@ -80,7 +80,7 @@ function inAcceptedClub(condition: SQL) {
 }
 
 /** The WHERE conditions for a set of filters. Any-of within a filter; every skill must match. */
-function filterConditions(filters: ResumeFilters, recruiterId: string): SQL[] {
+function filterConditions(filters: ResumeFilters, viewerId: string): SQL[] {
   const conditions: SQL[] = [isVisibleResume];
 
   if (filters.schools.length) conditions.push(inArray(users.schoolDomain, filters.schools));
@@ -90,6 +90,7 @@ function filterConditions(filters: ResumeFilters, recruiterId: string): SQL[] {
   if (filters.skills.length) conditions.push(arrayContains(resumes.skills, filters.skills));
   if (filters.clubs.length) conditions.push(inAcceptedClub(inArray(clubs.slug, filters.clubs)));
 
+  // Only companies buy books, so for students this matches nothing.
   if (filters.unlockedOnly) {
     conditions.push(
       exists(
@@ -101,7 +102,7 @@ function filterConditions(filters: ResumeFilters, recruiterId: string): SQL[] {
             and(
               eq(bookMembers.resumeId, resumes.id),
               eq(bookMembers.status, "accepted"),
-              eq(unlocks.recruiterId, recruiterId),
+              eq(unlocks.recruiterId, viewerId),
             ),
           ),
       ),
@@ -132,14 +133,14 @@ function afterCursor(sort: ResumeFilters["sort"], cursor: Cursor): SQL {
 }
 
 /**
- * One page of resumes for a recruiter, sorted by grad year then newest, or just newest.
+ * One page of resumes for any signed-in account, sorted by grad year then newest, or just newest.
  * Pass the previous page's `nextCursor` to continue.
  */
 export async function listResumes(rawFilters: unknown, rawCursor: string | null): Promise<ResumePage> {
   const filters = parseInput(filtersInput, rawFilters);
-  const recruiter = await requireAccount("recruiter");
+  const viewer = await requireAccount();
 
-  const conditions = filterConditions(filters, recruiter.id);
+  const conditions = filterConditions(filters, viewer.id);
   const cursor = rawCursor ? decodeCursor(rawCursor) : null;
   const order =
     filters.sort === "newest"
@@ -167,7 +168,7 @@ export async function listResumes(rawFilters: unknown, rawCursor: string | null)
   const hasMore = rows.length > PAGE_SIZE;
 
   return {
-    items: await presentResumes(page, recruiter.id),
+    items: await presentResumes(page, viewer.id),
     total,
     nextCursor: hasMore && last ? encodeCursor({ gradYear: last.gradYear, createdAt: last.cursorTime, id: last.id }) : null,
   };

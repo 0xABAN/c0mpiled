@@ -26,7 +26,7 @@ import type {
   UploadResult,
 } from "./types";
 
-/** Next page of browse results, for infinite scroll. Recruiters only. */
+/** Next page of browse results, for infinite scroll. Any signed-in account. */
 export async function loadMoreResumes(filters: ResumeFilters, cursor: string): Promise<ResumePage> {
   return resumes.listResumes(filters, cursor);
 }
@@ -64,7 +64,7 @@ export async function createClub(input: unknown): Promise<ActionResult<ClubCreat
   return runAction(async () => clubs.createClub(input, await getOrigin()));
 }
 
-/** Officer decision on a join request. Only accepted members are shown to recruiters. */
+/** Officer decision on a join request. Only accepted members show up on browse. */
 export async function decideJoinRequest(resumeId: string, decision: "accepted" | "rejected"): Promise<ActionResult> {
   return runAction(async () => {
     await clubs.decideJoinRequest(resumeId, decision);

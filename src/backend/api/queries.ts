@@ -6,8 +6,9 @@ import { getOrigin } from "./request";
 import type { ClubDashboard } from "./types";
 
 /**
- * Reads for server components. Each checks the session itself; recruiter-only reads throw
- * for anyone else, so pages check `getViewer()` first and redirect.
+ * Reads for server components. Each checks the session itself and throws for viewers it doesn't
+ * serve (browse reads need any signed-in account, unlock quotes need a company), so pages check
+ * `getViewer()` first and redirect.
  */
 
 export { getClubBySlug, listOpenBooks } from "@/backend/clubs";
