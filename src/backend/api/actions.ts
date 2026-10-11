@@ -9,6 +9,7 @@ import { z } from "zod";
 
 import * as accounts from "@/backend/accounts";
 import * as clubs from "@/backend/clubs";
+import * as billing from "@/backend/billing";
 import * as resumes from "@/backend/resumes";
 import { searchSchools as searchSchoolDirectory } from "@/backend/schools";
 import { parseInput } from "@/backend/validation";
@@ -134,9 +135,13 @@ export async function deleteResume(): Promise<ActionResult> {
   });
 }
 
-/** Not built yet: purchases need billing (`@/backend/billing`), so this says so instead of pretending. */
-export async function unlockBook(bookId: string, resumeId: string): Promise<UnlockResult> {
-  void bookId;
-  void resumeId;
-  return { status: "error", message: "Book purchases aren't open yet." };
+/** Starts a test checkout; neither the redirect nor session creation grants access. */
+export async function unlockBook(input: billing.CheckoutInput): Promise<UnlockResult> {
+  const result = await runAction(async () => billing.beginCheckout(input, await getOrigin()));
+  return result.status === "ok" ? { status: "checkout", url: result.data.url } : result;
+}
+
+/** The return page asks the server to verify payment. Browser query parameters are not evidence. */
+export async function confirmCheckout(checkoutId: string): Promise<ActionResult<{ unlocked: boolean }>> {
+  return runAction(() => billing.confirmCheckout(checkoutId));
 }

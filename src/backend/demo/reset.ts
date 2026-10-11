@@ -31,7 +31,7 @@ import { createDatabase, type Database } from "@/backend/db/client";
 import { makeTextPdf } from "@/backend/db/fake/pdf";
 import { fakePeople } from "@/backend/db/fake/people";
 import { storeFakeResumeFiles } from "@/backend/db/fake/resume-files";
-import { bookMembers, books, clubs, resumes, unlocks, users } from "@/backend/db/schema";
+import { bookCheckouts, bookMembers, books, clubs, resumes, unlocks, users } from "@/backend/db/schema";
 import { redactResume } from "@/backend/redaction";
 import { resumeColumns } from "@/backend/resumes/columns";
 import { deleteFiles, putPreviewPages, putResumePdf, resumePdfKey } from "@/backend/storage";
@@ -130,6 +130,7 @@ async function removeDemoData(db: Database, loginIds: string[]) {
   // Purchases block deleting their book, so they go first. Clubs cascade to books and
   // memberships; users cascade to resumes.
   await db.delete(unlocks).where(or(inArray(unlocks.bookId, demoBookIds), like(unlocks.recruiterId, `${DEMO_PREFIX}%`), inArray(unlocks.recruiterId, loginIds)));
+  await db.delete(bookCheckouts).where(or(inArray(bookCheckouts.bookId, demoBookIds), like(bookCheckouts.recruiterId, `${DEMO_PREFIX}%`), inArray(bookCheckouts.recruiterId, loginIds)));
   await db.delete(clubs).where(or(like(clubs.ownerId, `${DEMO_PREFIX}%`), inArray(clubs.ownerId, loginIds)));
   await db.delete(users).where(isDemoUser);
 

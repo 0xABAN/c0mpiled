@@ -12,6 +12,7 @@ import type { ClubDashboard } from "./types";
  */
 
 export { getClubBySlug, listOpenBooks } from "@/backend/clubs";
+export { getCheckout } from "@/backend/billing";
 export {
   getResume,
   getResumeFacets,

@@ -34,7 +34,7 @@ export function Checkout({ quote, resumeHref }: { quote: UnlockQuote; resumeHref
 
   function unlock() {
     startUnlocking(async () => {
-      const next = await unlockBook(selected.book.id, resume.id);
+      const next = await unlockBook({ bookId: selected.book.id, resumeId: resume.id, priceCents: selected.priceCents, returnPath: resumeHref });
       if (next.status === "checkout") window.location.assign(next.url);
       setResult(next);
     });
@@ -138,7 +138,7 @@ export function Checkout({ quote, resumeHref }: { quote: UnlockQuote; resumeHref
 
           <Button variant="primary" size="lg" block loading={isUnlocking} onClick={unlock}>
             <LockKeyhole size={18} strokeWidth={3} aria-hidden />
-            {selected.priceCents === 0 ? "Unlock with my plan" : `Unlock for ${formatMoney(selected.priceCents)}`}
+            {selected.priceCents === 0 ? "Unlock free book" : `Unlock for ${formatMoney(selected.priceCents)}`}
           </Button>
 
           {result?.status === "error" && (

@@ -1,4 +1,5 @@
 import "server-only";
 
-/** Book transaction accounting. Payment authorization is not enabled yet. */
 export { splitBookPrice } from "./fees";
+export { beginCheckout, confirmCheckout, getCheckout, pendingBookSplits } from "./purchases";
+export type { CheckoutInput, CheckoutView } from "./purchases";

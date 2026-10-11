@@ -185,6 +185,8 @@ export type UnlockQuote = {
   recommendedBookId: string;
 };
 
+export type { CheckoutInput, CheckoutView } from "@/backend/billing";
+
 export type UnlockResult =
   | { status: "unlocked"; offer: UnlockOffer; contact: Contact }
   /** Payment needs a hosted checkout (e.g. App Monetization). The UI navigates to `url`. */

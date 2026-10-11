@@ -8,7 +8,7 @@
   display: grid;
   justify-items: center;
   gap: 14px;
-  padding: 96px 0;
+  padding: 96px var(--page-x);
   text-align: center;
 }
 
@@ -62,6 +62,7 @@
 
 .lead {
   max-width: 560px;
+  overflow-wrap: anywhere;
   color: var(--muted);
   font-size: 18px;
   font-weight: 600;

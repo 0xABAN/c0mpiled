@@ -17,6 +17,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -164,6 +165,49 @@ export const bookMembers = pgTable(
   ],
 );
 
+/** Immutable provider catalog entries. Repricing creates a new product, not a cheaper entitlement. */
+export const billingProducts = pgTable("billing_products", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  bookId: uuid("book_id").notNull().references(() => books.id, { onDelete: "cascade" }),
+  appArn: text("app_arn").notNull(),
+  name: text("name").notNull(),
+  priceCents: integer("price_cents").notNull(),
+  /** Null until both the metric and usage pack have been created and checked. */
+  metricId: text("metric_id"),
+  createdAt: createdAt(),
+}, (table) => [
+  unique("billing_products_book_price_app_unique").on(table.bookId, table.priceCents, table.appArn),
+  check("billing_products_positive_price", sql`${table.priceCents} > 0`),
+  check("billing_products_sandbox_only", sql`${table.appArn} like '%/sandbox'`),
+]);
+
+/** Pending payment is not access. Only a verified checkout may create an unlock. */
+export const bookCheckouts = pgTable("book_checkouts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  bookId: uuid("book_id").notNull().references(() => books.id, { onDelete: "cascade" }),
+  recruiterId: text("recruiter_id").notNull().references(() => users.id),
+  productId: uuid("product_id").references(() => billingProducts.id),
+  appArn: text("app_arn").notNull(),
+  priceCents: integer("price_cents").notNull(),
+  platformFeeCents: integer("platform_fee_cents").notNull(),
+  returnPath: text("return_path").notNull(),
+  /** Immutable provider return URL: idempotent retries must send the identical request. */
+  callbackUrl: text("callback_url").notNull(),
+  checkoutUrl: text("checkout_url"),
+  providerSessionId: text("provider_session_id"),
+  providerPurchaseId: text("provider_purchase_id"),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+  paidAt: timestamp("paid_at", { withTimezone: true }),
+  expiredAt: timestamp("expired_at", { withTimezone: true }),
+  createdAt: createdAt(),
+}, (table) => [
+  uniqueIndex("book_checkouts_one_pending").on(table.recruiterId, table.bookId)
+    .where(sql`${table.paidAt} is null and ${table.expiredAt} is null`),
+  check("book_checkouts_fee_within_price", sql`${table.platformFeeCents} between 0 and ${table.priceCents}`),
+  check("book_checkouts_product_for_paid_book", sql`(${table.priceCents} = 0) = (${table.productId} is null)`),
+  check("book_checkouts_sandbox_only", sql`${table.appArn} like '%/sandbox'`),
+]);
+
 /**
  * A recruiter's purchase of a whole book. This is the payout ledger, so deleting a book with
  * purchases is blocked rather than cascaded.
@@ -178,6 +222,8 @@ export const unlocks = pgTable(
     recruiterId: text("recruiter_id")
       .notNull()
       .references(() => users.id),
+    /** Null for pre-integration/sample rows. A linked checkout records the sandbox and payment proof. */
+    checkoutId: uuid("checkout_id").unique().references(() => bookCheckouts.id),
     /** Gross paid at purchase time; independent of later book repricing. */
     priceCents: integer("price_cents").notNull(),
     /** Fee snapshot. Required on new purchases; the migration preserves historical fees as zero. */

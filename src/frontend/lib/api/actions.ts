@@ -5,6 +5,7 @@
 
 export {
   completeRecruiterSetup,
+  confirmCheckout,
   createAccount,
   createClub,
   decideJoinRequest,

@@ -5,6 +5,7 @@
  */
 
 export {
+  getCheckout,
   getClubBySlug,
   getClubDashboard,
   getResume,

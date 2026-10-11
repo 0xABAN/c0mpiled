@@ -81,7 +81,7 @@ src/backend/    server-only feature modules, each with an index.ts as its public
   redaction/    redactResume (Contract 3)
   storage/      resume PDFs and preview pages in S3, presigned links
   demo/         shared demo logins and `npm run demo:reset`
-  billing/      Contract 2 (teammate)
+  billing/      sandbox checkout, paid-product verification, fee accounting (Contract 2)
   api/          the view models and functions the UI calls
 ```
 
@@ -170,19 +170,25 @@ saved after the student has reviewed the profile. The types live in `src/backend
 
 ## Contract 2: billing boundary
 
-Every page calls billing through `src/backend/billing` and nowhere else, so the `/monetize` PR only touches
-this file, the pricing page, and the billing portal.
+Every page calls billing through `src/backend/billing`, via the frontend API bridge. This is an
+**evaluation-only integration for all books**, including real clubs. Test cards may unlock real accepted
+resumes, but no real charge or club payout occurs. The configuration rejects non-sandbox app ARNs.
 
-```ts
-/** Whether the recruiter may unlock this book now (e.g. payment went through). */
-canUnlock(userId: string, bookId: string): Promise<boolean>
+- `beginCheckout(input, origin)` checks the company, accepted membership, and quoted price, then persists
+  an immutable checkout before opening hosted payment. Its UUID is the provider idempotency token.
+- `confirmCheckout(id)` checks ownership and server-side entitlement: `ALLOW`,
+  `COVERED_BY_PURCHASED_UNITS`, and exactly the expected book/price metric with an available unit. Only then
+  does it insert the unique buyer/book unlock with the saved gross and fee. A deliberately free book needs
+  no card. Neither a callback URL nor session creation proves payment.
+- `getCheckout(id)` returns buyer-only confirmation-page data. Confirmation can lag the redirect; the page
+  offers an explicit recheck. Expired unpaid sessions can be replaced; paid callbacks remain idempotent.
+- `billing_products` maps each book/price to an immutable draft usage pack. Repricing never reuses a cheaper
+  entitlement. No subscription or publish call is made. Purchased capacity represents the book license;
+  opening resumes does not consume it. The provider records the payment; Roster records the unlock.
 
-/** Reports the book purchase to billing. Call after inserting the `unlocks` row. */
-recordUnlock(userId: string, bookId: string): Promise<void>
-```
-
-Purchases remain disabled until payment authorization is integrated. Fee calculation alone never
-unlocks a book; do not substitute an unconditional `canUnlock` stub for confirmed payment.
+The pinned beta SDK lacks a catalog-creation wrapper, so `provider.ts` isolates its bundled generated
+command. Do not copy vendor code, publish drafts, or switch to live mode to work around provider errors.
+Refund/reversal handling and production charges remain out of scope.
 
 **Pricing (decided by Adam):** a recruiter buys a club's entire book, once, at a price the club sets
 (`books.price_cents`; clubs charge $250–$650 today). There are no single-resume purchases and no plan tiers.
@@ -191,7 +197,7 @@ is not surcharged. A $250 book records $12.50 for Roster and $237.50 for the clu
 `splitBookPrice` in `src/backend/billing` calculates the quote. Purchases snapshot gross and fee;
 Postgres stores the club share as gross minus fee. Historical purchases retain a zero fee, and club
 earnings sum their recorded club shares, never today's rate or book price. This accounting is not a payout
-transfer; payment authorization and payout integration remain separate.
+transfer; test payment authorization and actual payout integration remain separate.
 
 ## Contract 3: redaction
 
@@ -251,7 +257,14 @@ resumes       id, user_id → users unique (one per student), contact_name, link
 book_members  book_id → books, resume_id → resumes, status 'pending' | 'accepted' | 'rejected',
               consented_at, requested_at, decided_at null, PK (book_id, resume_id)
 unlocks       id, book_id → books, recruiter_id → users, price_cents (gross paid), platform_fee_cents,
-              club_payout_cents (stored generated gross − fee), created_at, unique (book_id, recruiter_id)
+              club_payout_cents (stored generated gross − fee), checkout_id null → book_checkouts,
+              created_at, unique (book_id, recruiter_id)
+billing_products id, book_id → books, app_arn, name, price_cents, metric_id null, created_at,
+              unique (book_id, price_cents, app_arn)
+book_checkouts id, book_id → books, recruiter_id → users, product_id null → billing_products,
+              app_arn, price_cents, platform_fee_cents, return_path, callback_url, checkout_url null,
+              provider_session_id null, provider_purchase_id null, expires_at null, paid_at null,
+              expired_at null, created_at; at most one pending checkout per buyer/book
 ```
 
 Browse only ever shows resumes with an `accepted` membership. `majors` and `skills` are stored
@@ -281,7 +294,9 @@ accepts or rejects on `/dashboard`. Re-uploading replaces the one resume in ever
 and club; skills must all match (`skills @> $1`). Free text: every word must appear in `search_text`
 (trigram-indexed) or an accepted club's name. Order by grad year then newest, or newest. No ranking.
 
-**Unlock:** `canUnlock` → insert `unlocks` row → `recordUnlock` → page reveals contact info and downloads.
+**Unlock:** persist quoted price/fee → hosted sandbox checkout → `/checkout/[id]` → server verifies the
+exact paid product → idempotent `unlocks` insert → contact info and downloads. Historical purchases remain
+valid; a pending checkout does not grant access.
 
 **Withdraw:** leaving a book deletes the membership; deleting the resume deletes the S3 objects (the PDF
 and its preview pages), the row, and every membership.
@@ -305,7 +320,12 @@ and its preview pages), the row, and every membership.
 
 Env vars: `DATABASE_URL`, `APP_REGION`, `RESUME_BUCKET`, `BEDROCK_MODEL_ID`,
 `NEXT_PUBLIC_COGNITO_USER_POOL_ID`, `NEXT_PUBLIC_COGNITO_CLIENT_ID`, `NEXT_PUBLIC_DEMO_PASSWORD` (public on
-purpose: anyone may use the demo logins).
+purpose: anyone may use the demo logins), `MONETIZATION_APP_ID` (sandbox ARN), `MONETIZATION_ENDPOINT`.
+Billing builds also need private `MONETIZATION_NPM_REGISTRY` and `MONETIZATION_NPM_TOKEN` values. The build
+writes an ignored, mode-0600 `.npmrc`; these build credentials must never enter `.env.production` or client
+assets. Keep their values outside this public repo. `infra/billing.sh <env-file> [compute-role-name]` adds
+only the four required billing permissions, scoped to the dedicated app; it does not deploy. An existing
+hosting environment needs those permissions and the billing build/runtime variables before release.
 
 Setting up an environment (each script prints env lines to append to `.env.local`, and refuses to
 overwrite what exists):

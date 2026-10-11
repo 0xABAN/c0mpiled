@@ -22,7 +22,7 @@ import { deleteFiles } from "@/backend/storage";
 import { createDatabase } from "./client";
 import { fakePeople } from "./fake/people";
 import { storeFakeResumeFiles } from "./fake/resume-files";
-import { bookMembers, books, clubs, resumes, unlocks, users } from "./schema";
+import { bookCheckouts, bookMembers, books, clubs, resumes, unlocks, users } from "./schema";
 
 const SEED_PREFIX = "seed:";
 
@@ -75,6 +75,7 @@ async function removeSeedData(db: ReturnType<typeof createDatabase>["db"]) {
   // Purchases block deleting their book, so they go first. Clubs cascade to books and
   // memberships; users cascade to resumes.
   await db.delete(unlocks).where(or(inArray(unlocks.bookId, seedBookIds), like(unlocks.recruiterId, `${SEED_PREFIX}%`)));
+  await db.delete(bookCheckouts).where(or(inArray(bookCheckouts.bookId, seedBookIds), like(bookCheckouts.recruiterId, `${SEED_PREFIX}%`)));
   await db.delete(clubs).where(like(clubs.ownerId, `${SEED_PREFIX}%`));
   await db.delete(users).where(seedUsers);
   await deleteFiles(files.flatMap((file) => [file.pdfKey, ...file.previewKeys]));

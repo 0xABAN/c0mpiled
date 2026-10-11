@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import type { ResumeView, UnlockQuote } from "@/backend/api/types";
 import { requireAccount } from "@/backend/accounts";
-import { splitBookPrice } from "@/backend/billing";
+import { pendingBookSplits, splitBookPrice } from "@/backend/billing";
 import { toBookSummaries } from "@/backend/clubs";
 import { bookMembers, books, clubs, db, resumes, unlocks, users } from "@/backend/db";
 
@@ -58,7 +58,7 @@ export async function getResume(rawId: unknown): Promise<ResumeView | null> {
  */
 export async function getUnlockQuote(rawResumeId: unknown): Promise<UnlockQuote | null> {
   // Anyone signed in can browse, but only companies buy books.
-  await requireAccount("recruiter");
+  const buyer = await requireAccount("recruiter");
 
   const resume = await getResume(rawResumeId);
   if (!resume) return null;
@@ -71,9 +71,11 @@ export async function getUnlockQuote(rawResumeId: unknown): Promise<UnlockQuote 
     .where(and(eq(bookMembers.resumeId, resume.id), eq(bookMembers.status, "accepted")))
     .orderBy(clubs.name);
 
+  const pending = new Map((await pendingBookSplits(buyer.id, rows.map(({ book }) => book.id)))
+    .map(({ bookId, ...split }) => [bookId, split]));
   const offers = (await toBookSummaries(rows)).map((book) => ({
     book,
-    ...splitBookPrice(book.priceCents),
+    ...(pending.get(book.id) ?? splitBookPrice(book.priceCents)),
   }));
 
   const largest = offers.reduce((best, offer) => (offer.book.resumeCount > best.book.resumeCount ? offer : best));

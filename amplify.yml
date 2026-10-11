@@ -4,12 +4,13 @@ frontend:
     preBuild:
       commands:
         - nvm install 22
+        - node infra/lib/configure-billing-registry.mjs
         - npm ci
     build:
       commands:
         # Amplify SSR only sees server env vars that are written to .env.production at build
         # time. The app's environment holds them (see infra/amplify.sh).
-        - env | grep -E '^(DATABASE_URL|APP_REGION|RESUME_BUCKET|BEDROCK_MODEL_ID|NEXT_PUBLIC_[A-Z_]+)=' >> .env.production
+        - env | grep -E '^(DATABASE_URL|APP_REGION|RESUME_BUCKET|BEDROCK_MODEL_ID|MONETIZATION_APP_ID|MONETIZATION_ENDPOINT|NEXT_PUBLIC_[A-Z_]+)=' >> .env.production
         - npm run build
   artifacts:
     baseDirectory: .next

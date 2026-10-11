@@ -14,6 +14,8 @@ export function EarningsCard({ unlocks, earnedCents }: { unlocks: BookUnlock[]; 
       <p className={`${styles.total} tabular`}>{formatMoney(earnedCents)}</p>
       <p className={styles.caption}>{unlocks.length > 0 ? `From ${pluralize(unlocks.length, "company", "companies")} · after Roster fees` : "No sales yet. Your first company is coming."}</p>
 
+      <p className={styles.caption}>Test activity only. No money has been collected or paid out.</p>
+
       {unlocks.length > 0 && (
         <ul className={styles.unlocks}>
           {unlocks.map((unlock, index) => (

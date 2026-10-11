@@ -36,6 +36,13 @@
       "when": 1791751811724,
       "tag": "0004_unlock_fee_split",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791754216681,
+      "tag": "0005_book_checkouts",
+      "breakpoints": true
     }
   ]
 }
