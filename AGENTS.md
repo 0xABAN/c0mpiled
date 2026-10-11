@@ -92,33 +92,38 @@ Copycat profiles `resumes-fyi`, `duolingo`, and `firecrawl` (`~/.copycat/designs
 the systems, never any brand's logo, mascot, illustrations, fonts, or copy.
 
 - **Tokens** live in `src/frontend/styles/globals.css`. Use the role tokens (`--accent`, `--secondary`,
-  `--success`, `--warning`, `--danger`, each with `-lip`, `-deep`, `-tint`, …) and neutrals, never a hue name or
-  a raw color, so a palette change stays in that file. Put `data-hue="…"` on an element to get `--face`,
-  `--lip`, `--deep`, `--tint`, `--wash`, and `--soft` for a category hue (or `"accent"`).
+  `--success`, `--warning`, `--danger`, each with `-lip`, `-deep`, `-tint`, …) and neutrals, never a raw color,
+  so a palette change stays in that file. Tiles, tags, and cards take a tone (`Tone` in
+  `src/frontend/lib/tone.ts`): `data-tone="neutral" | "accent" | "yellow" | "ink"` sets `--face`, `--lip`,
+  `--deep`, `--tint`, `--wash`, and `--soft`. Neutral is the default.
 - **Surfaces:** 2px `--line` outlines, 16px radius, no drop shadows. Anything pressable sits on a solid lip (a
   thicker bottom border in a darker shade) and presses down onto it. Reuse `Button`, `SelectionCard`,
   `ToggleChip`, and `Monogram` from `src/frontend/components/ui` instead of restyling.
 - **Type:** Nunito. Buttons, nav, tabs, and eyebrows are 800 weight, uppercase, and tracked. Body is 16px/500.
-- **Color roles (Firecrawl):** an off-white `--canvas` page, white cards, `#262626` ink, and hairline grays. One
-  orange `--accent` carries every primary action (Continue, Accept, Unlock), selection, focus, the active nav
-  item, links, and one key phrase in big headlines. Ink `--secondary` buttons take the second action. Status uses
-  `--success` (earned, accepted), `--warning` (pending), and `--danger` (errors). The other hues are categories:
-  what a candidate seeks (internship blue, full-time green, both purple; never orange, so cards don't compete
-  with actions) and each club's own color.
+- **Palette (Firecrawl):** red-orange, yellow, gray, and white, with pure black on rare occasions. The page is
+  an off-white `--canvas` with white cards, `#262626` ink, and hairline grays.
+  - Red-orange `--accent` is every primary action (Continue, Accept, Unlock), selection, focus, the active nav
+    item, links, money (earnings), one key phrase in big headlines, and also `--success` and `--danger`.
+  - Yellow `--warning` marks things worth noticing that aren't actions: pending, waiting, BEST VALUE, coins.
+  - Everything else is gray: clubs, companies, schools, resume cards, and tags. The seeking type is read from
+    the tag's label, not a color. Clubs still store a `hue`, but nothing renders it.
+  - Ink (near-black on a black lip) is for `--secondary` buttons and rare heavy art: choice screens, the
+    officer's own club tile, the account avatar.
 - **Restraint:** orange never floods a large surface. Decorative fields use the `.grid-field` utility (Firecrawl's
   faint grid); the landing's closing band is the one solid accent block.
-- **Contrast:** bright faces with white labels only on large buttons and art. Small colored text and tags use
-  `--{hue}-deep` (at least 4.5:1 on white and on the hue's tint). `--subtle` is for icons, borders, and
+- **Contrast:** white labels sit on the bright accent only on large buttons and art (3.3:1). Small colored text
+  and tags use the `-deep` shades (at least 4.5:1 on white and on their tint). `--subtle` is for icons, borders, and
   placeholders; text uses `--muted` or darker.
 - **Redaction is visible:** hidden text is a dark hatched bar (`RedactedResume`, drawn from the profile). Cards
   always use it; the detail view shows Contract 3's redacted pages when a resume has them.
 - **Page patterns:**
   - Recruiter pages (browse, detail, unlock) follow resumes.fyi: a filter rail beside a masonry grid of
-    hue-tinted cards, a meta row outside each card, and a full-screen detail with the document on the left and
+    gray cards, a meta row outside each card, and a full-screen detail with the document on the left and
     an info panel on the right.
   - Onboarding (signup, setup, join) follows Duolingo: one question per screen, a progress bar on top, our mark
     asking the question in a speech bubble, and the main action in a bottom bar (`OnboardingShell`, `Prompt`).
-  - Officer and student pages: stat tiles and list rows on white.
+  - Student pages (`/resume`, and `/dashboard` for a student who runs a club): stat tiles and list rows on white.
+    There are two kinds of user, a student (who may run a club) and a company.
 - **Motion:** quick and springy (120–320ms, `--ease-spring` for pops). The global reduced-motion rule covers it.
 
 ## Accounts
