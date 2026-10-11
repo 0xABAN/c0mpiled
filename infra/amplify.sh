@@ -26,16 +26,8 @@ branch="main"
 app_name="roster-${stage}"
 role_name="roster-${stage}-amplify-compute"
 
-# The env vars the app needs, as JSON, read from the env file without sourcing it.
-env_json=$(node -e '
-  const lines = require("fs").readFileSync(process.argv[1], "utf8").split("\n");
-  const wanted = /^(DATABASE_URL|APP_REGION|RESUME_BUCKET|BEDROCK_MODEL_ID|NEXT_PUBLIC_[A-Z_]+)=(.*)$/;
-  const env = Object.fromEntries(lines.map((line) => line.match(wanted)).filter(Boolean).map((m) => [m[1], m[2]]));
-  for (const name of ["DATABASE_URL", "APP_REGION", "RESUME_BUCKET", "NEXT_PUBLIC_COGNITO_USER_POOL_ID", "NEXT_PUBLIC_COGNITO_CLIENT_ID"]) {
-    if (!env[name]) throw new Error(`${name} is missing from ${process.argv[1]}`);
-  }
-  console.log(JSON.stringify(env));
-' "$env_file")
+# The runtime env vars the app needs, as JSON.
+env_json=$(node "$(dirname "$0")/lib/app-env.mjs" "$env_file")
 bucket=$(node -e 'console.log(JSON.parse(process.argv[1]).RESUME_BUCKET)' "$env_json")
 account_id=$(aws sts get-caller-identity --query Account --output text)
 
