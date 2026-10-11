@@ -4,7 +4,7 @@
  */
 export { resumeColumns } from "./columns";
 export { getResumeFacets } from "./facets";
-export { getResumePreviewUrl } from "./preview";
+export { getResumePdfUrl, getResumePreviewUrl } from "./files";
 export { countUnlockedResumes, getResume, getUnlockQuote, hasSubmittedResume } from "./read";
 export { listResumes } from "./search";
 export { deleteResume, getStudentHome, leaveBook, requestBooks } from "./student";

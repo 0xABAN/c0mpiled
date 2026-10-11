@@ -80,7 +80,16 @@ export async function deleteFiles(keys: string[]): Promise<void> {
   }
 }
 
-/** A short-lived link that downloads one file straight from S3. */
-export async function presignedFileUrl(key: string): Promise<string> {
-  return getSignedUrl(s3, new GetObjectCommand({ Bucket: bucket, Key: key }), { expiresIn: LINK_SECONDS });
+/**
+ * A short-lived link that serves one file straight from S3. With `downloadAs`, the browser
+ * saves it under that file name instead of displaying it.
+ */
+export async function presignedFileUrl(key: string, { downloadAs }: { downloadAs?: string } = {}): Promise<string> {
+  const command = new GetObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    ResponseContentDisposition: downloadAs ? `attachment; filename="${downloadAs.replaceAll('"', "")}"` : undefined,
+  });
+
+  return getSignedUrl(s3, command, { expiresIn: LINK_SECONDS });
 }

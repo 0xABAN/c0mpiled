@@ -14,6 +14,7 @@ export { getClubBySlug, listOpenBooks } from "@/backend/clubs";
 export {
   getResume,
   getResumeFacets,
+  getResumePdfUrl,
   getResumePreviewUrl,
   getStudentHome,
   getUnlockQuote,
