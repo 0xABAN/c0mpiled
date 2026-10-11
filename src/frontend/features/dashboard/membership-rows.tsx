@@ -12,7 +12,7 @@ import styles from "./membership-rows.module.css";
 
 /**
  * Opens the student's original PDF so the officer can check it's really a member.
- * Seeded resumes have no PDF; anything uploaded has redacted pages, so that's the signal.
+ * A rendered preview signals that the source PDF exists, including for synthetic members.
  */
 function PdfLink({ membership }: { membership: Membership }) {
   if (membership.previewPageCount === 0) return null;

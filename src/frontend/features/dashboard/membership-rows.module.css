@@ -101,10 +101,13 @@
   }
 
   .actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     width: 100%;
   }
 
-  .actions > * {
-    flex: 1;
+  /* The PDF gets its own row; decision buttons stay side by side on narrow screens. */
+  .actions > a {
+    grid-column: 1 / -1;
   }
 }
