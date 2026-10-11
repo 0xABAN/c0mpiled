@@ -9,7 +9,8 @@
     "lint": "eslint",
     "db:generate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs generate",
     "db:migrate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs migrate",
-    "db:seed": "tsx --conditions=react-server --env-file=.env.local src/backend/db/seed.ts"
+    "db:seed": "tsx --conditions=react-server --env-file=.env.local src/backend/db/seed.ts",
+    "redact": "tsx --conditions=react-server scripts/redact.ts"
   },
   "dependencies": {
     "@aws-amplify/adapter-nextjs": "^1.8.0",
@@ -18,6 +19,7 @@
     "aws-amplify": "^6.22.1",
     "drizzle-orm": "^0.45.4",
     "lucide-react": "^1.55.0",
+    "mupdf": "^1.28.1",
     "next": "15.5.27",
     "pg": "^8.23.1",
     "react": "19.1.0",
