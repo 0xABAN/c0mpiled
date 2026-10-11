@@ -31,6 +31,22 @@ export function UnlockCard({ resume }: { resume: ResumeView }) {
   );
 }
 
+/** What a student sees instead of the unlock card: who can reveal this resume, and how. */
+export function LockedNote({ resume }: { resume: ResumeView }) {
+  const { books } = resume;
+
+  return (
+    <div className={styles.lockedNote}>
+      <p className="eyebrow">Locked</p>
+      <p className={styles.unlockBody}>
+        {books.length === 1
+          ? `Companies unlock ${books[0].club.name}'s book to see who this is.`
+          : "Companies unlock one of these clubs' books to see who this is."}
+      </p>
+    </div>
+  );
+}
+
 /** Contact details and PDF downloads for an unlocked resume. */
 export function ContactCard({ resumeId, email }: { resumeId: string; email: string | null }) {
   const toast = useToast();

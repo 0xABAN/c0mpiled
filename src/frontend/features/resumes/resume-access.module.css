@@ -7,6 +7,20 @@
   border-radius: var(--radius);
 }
 
+/* Students: the same card shape, without the call to action. */
+.lockedNote {
+  display: grid;
+  gap: 6px;
+  padding: 20px 22px;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--sunken);
+}
+
+.lockedNote .unlockBody {
+  margin-bottom: 0;
+}
+
 .unlockCard {
   border-color: var(--accent-soft);
   background: var(--accent-wash);

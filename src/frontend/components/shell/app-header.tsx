@@ -14,10 +14,12 @@ import { UserMenu } from "./user-menu";
 /** Top bar for app pages: logo, navigation, global search, and the account area. */
 export function AppHeader({ viewer }: { viewer: Viewer | null }) {
   const isRecruiter = viewer?.accountType === "recruiter";
+  const canBrowse = !!viewer?.accountType;
 
-  // Each account type gets its own pages. Visitors get none: the landing's doors cover signup.
+  // Every account can browse; students also get their own pages. Visitors get none: the
+  // landing's doors cover signup.
   const links = [
-    ...(isRecruiter ? [{ href: "/browse", label: "Browse" }] : []),
+    ...(canBrowse ? [{ href: "/browse", label: "Browse" }] : []),
     ...(viewer?.accountType === "school" ? [{ href: "/resume", label: "My resume" }] : []),
     ...(viewer?.ownedClub ? [{ href: "/dashboard", label: "My club" }] : []),
   ];
@@ -25,11 +27,11 @@ export function AppHeader({ viewer }: { viewer: Viewer | null }) {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <Logo compact={isRecruiter} />
+        <Logo compact={canBrowse} />
         <NavLinks links={links} />
 
         <div className={styles.right}>
-          {isRecruiter && <HeaderSearch />}
+          {canBrowse && <HeaderSearch />}
 
           {isRecruiter && (
             <Link href="/browse?unlocked=1" className={styles.stat} title="Resumes you've unlocked">

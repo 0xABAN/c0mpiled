@@ -16,7 +16,7 @@ import { FilterRail } from "./filter-rail";
 import { FilterSheet } from "./filter-sheet";
 import { activeFilterCount, browseHref, EMPTY_FILTERS, filtersKey, SELECTED_PARAM } from "./filters";
 import { Masonry } from "./masonry";
-import { ContactCard, UnlockCard } from "./resume-access";
+import { ContactCard, LockedNote, UnlockCard } from "./resume-access";
 import { estimateCardHeight, ResumeCard } from "./resume-card";
 import { ResumeDetail } from "./resume-detail";
 
@@ -30,11 +30,13 @@ type BrowserProps = {
   initialPage: ResumePage;
   /** How many resumes the recruiter has unlocked; shows the All / Unlocked switch when > 0. */
   unlockedCount: number;
+  /** Companies buy books; students browse with every resume locked and no unlock actions. */
+  canUnlock: boolean;
   /** The resume named in `?r=`, when it isn't on the first page (e.g. a shared link). */
   linkedResume: ResumeView | null;
 };
 
-export function Browser({ filters, facets, initialPage, unlockedCount, linkedResume }: BrowserProps) {
+export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock, linkedResume }: BrowserProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isFiltering, startFiltering] = useTransition();
@@ -138,7 +140,7 @@ export function Browser({ filters, facets, initialPage, unlockedCount, linkedRes
           </Button>
         </div>
 
-        <BrowseToolbar filters={filters} facets={facets} total={initialPage.total} unlockedCount={unlockedCount} onChange={applyFilters} />
+        <BrowseToolbar filters={filters} facets={facets} total={initialPage.total} unlockedCount={canUnlock ? unlockedCount : 0} onChange={applyFilters} />
 
         <div className={isFiltering ? `${styles.grid} ${styles.pending}` : styles.grid}>
           {pages.items.length > 0 ? (
@@ -173,9 +175,17 @@ export function Browser({ filters, facets, initialPage, unlockedCount, linkedRes
       {selected && (
         <ResumeDetail
           resume={selected}
-          action={selected.contact ? <ContactCard resumeId={selected.id} email={selected.contact.email} /> : <UnlockCard resume={selected} />}
+          action={
+            !canUnlock ? (
+              <LockedNote resume={selected} />
+            ) : selected.contact ? (
+              <ContactCard resumeId={selected.id} email={selected.contact.email} />
+            ) : (
+              <UnlockCard resume={selected} />
+            )
+          }
           mobileAction={
-            selected.contact ? (
+            !canUnlock ? undefined : selected.contact ? (
               <AnchorButton href={resumePdfUrl(selected.id, { download: true })} variant="primary" block>
                 Download PDF
               </AnchorButton>

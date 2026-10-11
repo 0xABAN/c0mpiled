@@ -13,12 +13,10 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
   const filters = parseFilters(params);
   const selectedId = typeof params[SELECTED_PARAM] === "string" ? params[SELECTED_PARAM] : null;
 
-  // Browsing is for signed-in recruiters who have finished setup.
+  // Any signed-in account can browse; only companies can unlock.
   const viewer = await getViewer();
   if (!viewer) redirect("/login?next=/browse");
   if (!viewer.accountType) redirect("/signup");
-  if (!viewer.onboarded) redirect("/setup");
-  if (viewer.accountType !== "recruiter") redirect("/");
 
   const [facets, page] = await Promise.all([getResumeFacets(), listResumes(filters, null)]);
 
@@ -33,6 +31,7 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
           filters={filters}
           facets={facets}
           initialPage={page}
+          canUnlock={viewer.accountType === "recruiter"}
           unlockedCount={viewer.unlockedCount}
           linkedResume={linkedResume}
         />
