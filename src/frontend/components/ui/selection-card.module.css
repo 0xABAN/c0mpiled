@@ -34,6 +34,7 @@
 .card:has(input:checked) {
   border-color: var(--accent-lip);
   background: var(--accent);
+  color: var(--ink);
 }
 
 .card:has(input:focus-visible) {
@@ -86,9 +87,9 @@
   line-height: 1.25;
 }
 
-/* Dark text stays readable on the bright selected face, including small descriptions. */
+/* Selected labels follow the card's text color; checkout uses white. */
 .card:has(input:checked) :is(.title, .description) {
-  color: var(--ink);
+  color: inherit;
 }
 
 .description {

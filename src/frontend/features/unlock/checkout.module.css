@@ -124,6 +124,7 @@
   border-bottom-width: 6px;
   border-radius: var(--radius);
   background: var(--accent);
+  color: var(--surface);
 }
 
 .bookText {
@@ -134,14 +135,14 @@
 }
 
 .bookName {
-  color: var(--ink);
+  color: inherit;
   font-size: 19px;
   font-weight: 900;
 }
 
 .bookTagline,
 .bookMeta {
-  color: var(--ink);
+  color: inherit;
   font-size: 15px;
   font-weight: 600;
 }
@@ -160,9 +161,13 @@
   gap: 14px;
 }
 
+.offerList > label:has(input:checked) {
+  color: var(--surface);
+}
+
 .price {
   margin-right: 4px;
-  color: var(--ink);
+  color: inherit;
   font-size: 22px;
   font-weight: 900;
 }

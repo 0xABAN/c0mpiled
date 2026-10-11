@@ -99,7 +99,8 @@ the systems, never any brand's logo, mascot, illustrations, fonts, or copy.
 - **Surfaces:** 2px `--line` outlines, 16px radius, no drop shadows. Anything pressable sits on a solid lip (a
   thicker bottom border in a darker shade) and presses down onto it. Reuse `Button`, `SelectionCard`,
   `ToggleChip`, and `Monogram` from `src/frontend/components/ui` instead of restyling. Selected choice
-  cards use a solid accent face, darker lip, and dark text, not a pale tint.
+  cards use a solid accent face and darker lip, not a pale tint. Selected checkout offers use white
+  text; other selected choice cards use dark text.
 - **Type:** Nunito. Buttons, nav, tabs, and eyebrows are 800 weight, uppercase, and tracked. Body is 16px/500.
 - **Palette (Firecrawl):** red-orange, yellow, gray, and white, with pure black on rare occasions. The page is
   an off-white `--canvas` with white cards, `#262626` ink, and hairline grays.
@@ -115,7 +116,8 @@ the systems, never any brand's logo, mascot, illustrations, fonts, or copy.
   Decorative fields use the `.grid-field` utility (Firecrawl's faint grid).
 - **Contrast:** action buttons and internship badges keep the requested white-on-bright-orange treatment
   (3.3:1). Full-time badges also use white labels on yellow by request, despite the low contrast.
-  Gray badges and selected cards use dark text. Other small colored text uses the `-deep` shades
+  Selected checkout offers use white text too; gray badges and other selected cards keep dark text.
+  Other small colored text uses the `-deep` shades
   (at least 4.5:1 on white and on their tint).
   `--subtle` is for icons, borders, and placeholders; text uses `--muted` or darker.
 - **Redaction is visible:** small cards use profile-drawn `RedactedResume` thumbnails with hatched identity

@@ -85,11 +85,16 @@ try {
       await page.locator('label:has(input[name="book"]:not(:checked))').first().click();
       await checkSelected(selected);
       assert.equal(await page.locator('input[name="book"]:checked').count(), 1);
+      const unselectedPrice = page.locator('label:has(input[name="book"]:not(:checked)) .tabular').first();
+      assert.equal(await unselectedPrice.evaluate((node) => getComputedStyle(node).color), "rgb(38, 38, 38)");
     }
 
     for (const width of [320, 390, 1280]) {
       await page.setViewportSize({ width, height: 900 });
       await checkSelected(selected);
+      for (const text of [selected, selected.getByText(/resumes? · about/), selected.locator(".tabular")]) {
+        assert.equal(await text.evaluate((node) => getComputedStyle(node).color), "rgb(255, 255, 255)", "Selected checkout copy and prices must be white");
+      }
     }
   }
 
