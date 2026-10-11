@@ -2,19 +2,20 @@
  * Read-only browser smoke check against a running app; never modifies accounts or books.
  * Use saved Playwright storage states for a student and a company. LOCKED_RESUME_ID must
  * name an accepted resume with a real preview, outside the student's clubs and unbought
- * by the company. Keep these auth-state files outside the repository.
+ * by the company. PURCHASED_RESUME_ID must have a real PDF in a book the company owns.
+ * Keep these auth-state files outside the repository.
  *
  * STUDENT_STATE=/tmp/student.json COMPANY_STATE=/tmp/company.json \
- * LOCKED_RESUME_ID=<uuid> node scripts/check-browse-access.mjs
+ * LOCKED_RESUME_ID=<uuid> PURCHASED_RESUME_ID=<uuid> node scripts/check-browse-access.mjs
  *
  * BASE_URL defaults to localhost:3100. PLAYWRIGHT_MODULE can point to an existing Playwright
  * installation's index.mjs when it isn't locally installed; no new dependency is needed.
  */
 import assert from "node:assert/strict";
 
-const { STUDENT_STATE, COMPANY_STATE, LOCKED_RESUME_ID } = process.env;
-assert.ok(STUDENT_STATE && COMPANY_STATE && LOCKED_RESUME_ID, "Set STUDENT_STATE, COMPANY_STATE and LOCKED_RESUME_ID.");
-assert.match(LOCKED_RESUME_ID, /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i);
+const { STUDENT_STATE, COMPANY_STATE, LOCKED_RESUME_ID, PURCHASED_RESUME_ID } = process.env;
+assert.ok(STUDENT_STATE && COMPANY_STATE && LOCKED_RESUME_ID && PURCHASED_RESUME_ID, "Set STUDENT_STATE, COMPANY_STATE, LOCKED_RESUME_ID and PURCHASED_RESUME_ID.");
+for (const id of [LOCKED_RESUME_ID, PURCHASED_RESUME_ID]) assert.match(id, /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i);
 
 const base = process.env.BASE_URL ?? "http://localhost:3100";
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? "playwright");
@@ -30,6 +31,7 @@ try {
   assert.equal(await page.getByRole("link", { name: "Browse", exact: true }).count(), 1);
   assert.equal(await page.getByRole("link", { name: "My resume", exact: true }).count(), 1, "Use a student session.");
   assert.ok(await page.locator('a[href*="r="]').count() > 0, "Student sees no resume cards.");
+  assert.ok(await page.locator('a[href*="r="] article').count() > 0, "Small cards should retain their stylized thumbnails.");
   assert.equal(await page.locator('a[title="Resumes you\'ve unlocked"]').count(), 0);
   assert.equal(await page.getByRole("button", { name: /^Unlocked/ }).count(), 0);
 
@@ -44,6 +46,16 @@ try {
     await page.setViewportSize({ width, height: 900 });
     assert.equal(await dialog.locator('a[href^="/unlock/"]').count(), 0, "Student sees checkout.");
     assert.equal(await dialog.locator('a[href*="/pdf"], iframe').count(), 0, "Student sees original PDF controls.");
+    assert.equal(await dialog.locator("article").count(), 0, "The full-size document must never be drawn from a profile summary.");
+
+    const document = await dialog.locator('img[src*="/preview/"]').first().evaluate((img) => ({
+      radius: parseFloat(getComputedStyle(img.parentElement).borderRadius),
+      width: img.clientWidth,
+      height: img.clientHeight,
+      ratio: img.naturalHeight / img.naturalWidth,
+    }));
+    assert.ok(document.radius > 0, "Keep the rounded document frame.");
+    assert.ok(Math.abs(document.height - document.width * document.ratio) < 2, "Show the complete page without cropping or distorting rows.");
   }
 
   for (const [suffix, expected] of [["preview/1", 302], ["pdf", 404]]) {
@@ -64,6 +76,18 @@ try {
   await companyDialog.waitFor();
   assert.ok(await companyDialog.locator('a[href^="/unlock/"]').count() > 0, "Company lost checkout controls.");
   console.log("PASS company: browse and purchase controls retained.");
+
+  await companyPage.goto(`${base}/browse?r=${PURCHASED_RESUME_ID}`, { waitUntil: "networkidle" });
+  await companyDialog.waitFor();
+  const pdf = companyDialog.locator('iframe[src*="/pdf"]');
+  await pdf.waitFor();
+  assert.equal(await companyDialog.locator("article").count(), 0, "Purchased resumes must also show their source document.");
+  assert.equal(await companyDialog.getByRole("button", { name: "Summary", exact: true }).count(), 0);
+  assert.ok(await pdf.evaluate((frame) => parseFloat(getComputedStyle(frame).borderRadius) > 0));
+  const original = await company.request.get(new URL(await pdf.getAttribute("src"), base).href);
+  assert.equal(original.status(), 200, "The purchased original must load, not a placeholder key.");
+  assert.ok((await original.body()).subarray(0, 5).equals(Buffer.from("%PDF-")));
+  console.log("PASS documents: actual redacted pages before purchase, original PDF after; rounded frames retained.");
 
   const guest = await browser.newContext();
   const anonymous = await guest.request.get(`${base}/browse`, { maxRedirects: 0 });

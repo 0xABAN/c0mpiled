@@ -5,7 +5,6 @@ import type { CSSProperties } from "react";
 
 import { LinkButton } from "@/frontend/components/ui/button";
 import { browseHref, EMPTY_FILTERS } from "@/frontend/features/resumes/filters";
-import { REVEAL_PARAM } from "@/frontend/features/resumes/browser";
 import type { ResumeView, UnlockResult } from "@/frontend/lib/api/types";
 import { formatMoney, pluralize } from "@/frontend/lib/format";
 import type { Tone } from "@/frontend/lib/tone";
@@ -27,7 +26,6 @@ const CONFETTI_TONES: Tone[] = ["accent", "yellow", "accent", "ink", "neutral"];
 export function UnlockSuccess({ resume, result, resumeHref }: UnlockSuccessProps) {
   const { offer, contact } = result;
   const { club } = offer.book;
-  const viewHref = `${resumeHref}&${REVEAL_PARAM}=1`;
 
   return (
     <div className={styles.success}>
@@ -63,7 +61,7 @@ export function UnlockSuccess({ resume, result, resumeHref }: UnlockSuccessProps
       </div>
 
       <div className={styles.actions}>
-        <LinkButton href={viewHref} replace variant="primary" size="lg">
+        <LinkButton href={resumeHref} replace variant="primary" size="lg">
           View resume
         </LinkButton>
 

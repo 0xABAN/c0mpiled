@@ -19,8 +19,8 @@ type ResumeCardProps = {
 };
 
 /**
- * One resume in the browse grid. Color-coded by what the candidate is seeking. The card's
- * height follows its content (experience count, skill list), which produces the masonry.
+ * A compact profile thumbnail in the browse grid. The card's height follows its content
+ * (experience count, skill list), which produces the masonry.
  */
 export function ResumeCard({ resume, href, onOpen }: ResumeCardProps) {
   const { profile, books, contact } = resume;
@@ -35,7 +35,7 @@ export function ResumeCard({ resume, href, onOpen }: ResumeCardProps) {
             {seekingLabel(profile.seeking)}
           </Tag>
           <div className={styles.paper}>
-            <RedactedResume resume={resume} size="card" />
+            <RedactedResume resume={resume} />
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, Link2, LockKeyhole, X } from "lucide-react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import { Button } from "@/frontend/components/ui/button";
 import { Chip } from "@/frontend/components/ui/chip";
@@ -13,7 +13,6 @@ import type { ResumeView } from "@/frontend/lib/api/types";
 import { formatDegree, seekingLabel } from "@/frontend/lib/format";
 
 import { RedactedPages } from "./redacted-pages";
-import { RedactedResume } from "./redacted-resume";
 import styles from "./resume-detail.module.css";
 
 type ResumeDetailProps = {
@@ -27,15 +26,12 @@ type ResumeDetailProps = {
   onPrevious: (() => void) | null;
   onNext: (() => void) | null;
   onClose: () => void;
-  /** Play the un-redaction animation (arriving from a purchase). */
-  revealing?: boolean;
 };
 
 /** Full-screen view of one resume: the document on the left, details and actions on the right. */
-export function ResumeDetail({ resume, action, mobileAction, position, onPrevious, onNext, onClose, revealing }: ResumeDetailProps) {
+export function ResumeDetail({ resume, action, mobileAction, position, onPrevious, onNext, onClose }: ResumeDetailProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const toast = useToast();
-  const [view, setView] = useState<"summary" | "pdf">("summary");
 
   const { profile, contact, books } = resume;
 
@@ -51,9 +47,6 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
       if (previous instanceof HTMLElement && previous.isConnected) previous.focus({ preventScroll: true });
     };
   }, []);
-
-  // Each resume starts on its summary.
-  useEffect(() => setView("summary"), [resume.id]);
 
   // Arrow keys step through results, unless the user is typing.
   useEffect(() => {
@@ -110,20 +103,9 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
 
       <div className={styles.body}>
         <div className={styles.canvas}>
-          {contact && (
-            <div className={styles.viewTabs} role="group" aria-label="Resume view">
-              <button type="button" aria-pressed={view === "summary"} className={styles.viewTab} onClick={() => setView("summary")}>
-                Summary
-              </button>
-              <button type="button" aria-pressed={view === "pdf"} className={styles.viewTab} onClick={() => setView("pdf")}>
-                Original PDF
-              </button>
-            </div>
-          )}
-
-          {view === "pdf" && contact ? (
-            <iframe className={styles.pdf} src={resumePdfUrl(resume.id)} title={`${contact.name}'s resume PDF`} />
-          ) : !contact && resume.previewPageCount > 0 ? (
+          {contact ? (
+            <iframe key={resume.id} className={styles.pdf} src={resumePdfUrl(resume.id)} title={`${contact.name}'s resume PDF`} />
+          ) : resume.previewPageCount > 0 ? (
             // Before unlock: the real resume with identity blacked out (Contract 3).
             <div key={resume.id} className={styles.pages}>
               <RedactedPages
@@ -132,9 +114,10 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
               />
             </div>
           ) : (
-            // Seed resumes have no rendered pages, so draw the document from the profile.
-            <div key={resume.id} className={styles.sheet}>
-              <RedactedResume resume={resume} size="full" revealing={revealing} />
+            // A profile summary cannot stand in for missing source pages.
+            <div className={styles.unavailable} role="status">
+              <h2>Resume preview unavailable</h2>
+              <p>This resume doesn&apos;t have a redacted document to display.</p>
             </div>
           )}
         </div>

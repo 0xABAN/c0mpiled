@@ -20,9 +20,6 @@ import { ContactCard, LockedNote, UnlockCard } from "./resume-access";
 import { estimateCardHeight, ResumeCard } from "./resume-card";
 import { ResumeDetail } from "./resume-detail";
 
-/** Query param set by the unlock flow so the detail view plays its reveal animation. */
-export const REVEAL_PARAM = "revealed";
-
 type BrowserProps = {
   filters: ResumeFilters;
   facets: ResumeFacets;
@@ -75,7 +72,6 @@ export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock
   /* ---------- Detail view, driven by ?r= ---------- */
 
   const selectedId = searchParams.get(SELECTED_PARAM);
-  const revealing = searchParams.get(REVEAL_PARAM) === "1";
   const openedInPlace = useRef(false);
 
   const selectedIndex = selectedId ? pages.items.findIndex((resume) => resume.id === selectedId) : -1;
@@ -199,7 +195,6 @@ export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock
           onPrevious={selectedIndex >= 0 ? step(-1) : null}
           onNext={selectedIndex >= 0 ? step(1) : null}
           onClose={closeResume}
-          revealing={revealing}
         />
       )}
     </div>

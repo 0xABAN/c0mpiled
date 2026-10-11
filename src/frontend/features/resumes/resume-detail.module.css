@@ -82,14 +82,19 @@
   background: var(--wash);
 }
 
-.sheet {
-  width: min(100%, 680px);
-  overflow: hidden;
-  border: var(--border) solid var(--soft);
+.unavailable {
+  display: grid;
+  gap: 8px;
+  width: min(100%, 720px);
+  padding: 32px;
+  border: var(--border) solid var(--line);
   border-bottom-width: 6px;
   border-radius: var(--radius);
   background: var(--surface);
-  animation: sheet-in var(--dur-slow) var(--ease-spring) both;
+}
+
+.unavailable p {
+  color: var(--muted);
 }
 
 @keyframes sheet-in {
@@ -111,33 +116,6 @@
   border: var(--border) solid var(--soft);
   border-radius: var(--radius);
   background: var(--surface);
-}
-
-/* Segmented control: Summary / Original PDF. */
-.viewTabs {
-  display: inline-flex;
-  padding: 4px;
-  border: var(--border) solid var(--soft);
-  border-radius: var(--radius);
-  background: var(--surface);
-}
-
-.viewTab {
-  height: 36px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: var(--radius-md);
-  background: transparent;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.viewTab[aria-pressed="true"] {
-  background: var(--tint);
-  color: var(--deep);
 }
 
 /* ---------- Panel ---------- */

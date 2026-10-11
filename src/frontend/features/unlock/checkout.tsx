@@ -72,7 +72,7 @@ export function Checkout({ quote, resumeHref }: { quote: UnlockQuote; resumeHref
 
           <section className={styles.preview} aria-label="The resume you started from">
             <div className={styles.previewPaper}>
-              <RedactedResume resume={resume} size="card" />
+              <RedactedResume resume={resume} />
             </div>
             <div className={styles.previewText}>
               <Tag>{seekingLabel(resume.profile.seeking)}</Tag>

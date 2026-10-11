@@ -1,7 +1,4 @@
-/*
- * The paper. All internal sizes are in `em`, so the `card` and `full` sizes only
- * change the root font size.
- */
+/* Compact profile-drawn paper for thumbnails only. */
 
 .paper {
   display: grid;
@@ -10,20 +7,9 @@
   border-radius: 0.8em;
   background: var(--surface);
   color: var(--ink-body);
-  font-size: var(--doc-size);
+  font-size: 10.5px;
   line-height: 1.35;
   text-align: left;
-}
-
-.card {
-  --doc-size: 10.5px;
-}
-
-.full {
-  --doc-size: 15px;
-
-  padding: 2.6em 2.8em 3em;
-  gap: 1.5em;
 }
 
 /* ---------- Header ---------- */
@@ -70,29 +56,6 @@
 .thin {
   height: 0.75em;
   background: var(--line-strong);
-}
-
-/*
- * Reveal after purchase: the text is rendered under a bar that slides off to the right.
- */
-.revealing {
-  position: relative;
-  display: inline-block;
-}
-
-.peel {
-  position: absolute;
-  inset: -0.08em -0.2em;
-  border-radius: 0.3em;
-  background: var(--ink-body);
-  transform-origin: right center;
-  animation: peel 700ms var(--ease-out) 350ms both;
-}
-
-@keyframes peel {
-  to {
-    transform: scaleX(0);
-  }
 }
 
 /* ---------- Sections ---------- */
