@@ -3,7 +3,7 @@ import "server-only";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 
-import type { BookSummary, ClubCreated, ClubDashboard, Membership } from "@/backend/api/types";
+import type { BookSummary, ClubCreated, ClubDashboard, ClubSummary, Membership } from "@/backend/api/types";
 import { getCurrentAccount, requireAccount } from "@/backend/accounts";
 import { bookMembers, books, clubs, db, isUniqueViolation, resumes, unlocks, users } from "@/backend/db";
 import { UserError } from "@/backend/errors";
@@ -123,6 +123,20 @@ export async function updateBookPrice(rawPriceCents: unknown): Promise<void> {
   const { book } = await requireOwnedClub();
 
   await db.update(books).set({ priceCents: newPrice }).where(eq(books.id, book.id));
+}
+
+/** A club and its book id, for the public join page. `null` if no club has this slug. */
+export async function getClubBySlug(rawSlug: unknown): Promise<(ClubSummary & { bookId: string }) | null> {
+  const slug = z.string().max(120).safeParse(rawSlug);
+  if (!slug.success) return null;
+
+  const [row] = await db
+    .select({ club: clubs, bookId: books.id })
+    .from(clubs)
+    .innerJoin(books, eq(books.clubId, clubs.id))
+    .where(eq(clubs.slug, slug.data));
+
+  return row ? { ...toClubSummary(row.club), bookId: row.bookId } : null;
 }
 
 /** Books at the viewer's school that they can request to join. */

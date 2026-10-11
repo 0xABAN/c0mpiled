@@ -2,6 +2,7 @@
 export {
   createClub,
   decideJoinRequest,
+  getClubBySlug,
   getClubDashboard,
   joinUrl,
   listOpenBooks,

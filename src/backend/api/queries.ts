@@ -10,7 +10,7 @@ import type { ClubDashboard } from "./types";
  * for anyone else, so pages check `getViewer()` first and redirect.
  */
 
-export { listOpenBooks } from "@/backend/clubs";
+export { getClubBySlug, listOpenBooks } from "@/backend/clubs";
 export { getResume, getResumeFacets, getUnlockQuote, listResumes } from "@/backend/resumes";
 export { getViewer } from "./viewer";
 
