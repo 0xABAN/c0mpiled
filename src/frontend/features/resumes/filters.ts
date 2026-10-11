@@ -80,6 +80,13 @@ export function browseHref(filters: ResumeFilters, selectedId?: string | null): 
   return query ? `/browse?${query}` : "/browse";
 }
 
+/** Carry the browse filters through checkout, including direct links and reloads. */
+export function unlockHref(filters: ResumeFilters, resumeId: string): string {
+  const query = filtersToSearchParams(filters).toString();
+  const path = `/unlock/${encodeURIComponent(resumeId)}`;
+  return query ? `${path}?${query}` : path;
+}
+
 /** Filters that narrow results (sort and search text don't count). */
 export function activeFilterCount(filters: ResumeFilters): number {
   return (

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { AppHeader } from "@/frontend/components/shell/app-header";
 import { Browser } from "@/frontend/features/resumes/browser";
-import { parseFilters, SELECTED_PARAM } from "@/frontend/features/resumes/filters";
+import { browseHref, parseFilters, SELECTED_PARAM } from "@/frontend/features/resumes/filters";
 import { getResume, getResumeFacets, getViewer, listResumes } from "@/frontend/lib/api";
 
 export const metadata: Metadata = { title: "Browse resumes · Roster" };
@@ -15,7 +15,7 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
 
   // Any signed-in account can browse; only companies can unlock.
   const viewer = await getViewer();
-  if (!viewer) redirect("/login?next=/browse");
+  if (!viewer) redirect(`/login?next=${encodeURIComponent(browseHref(filters, selectedId))}`);
   if (!viewer.accountType) redirect("/signup");
 
   const [facets, page] = await Promise.all([getResumeFacets(), listResumes(filters, null)]);

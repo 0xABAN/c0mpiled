@@ -14,6 +14,7 @@ import styles from "./unlock-success.module.css";
 
 type UnlockSuccessProps = {
   resume: ResumeView;
+  resumeHref: string;
   result: Extract<UnlockResult, { status: "unlocked" }>;
 };
 
@@ -23,10 +24,10 @@ const CONFETTI_PIECES = 28;
 const CONFETTI_TONES: Tone[] = ["accent", "yellow", "accent", "ink", "neutral"];
 
 /** Celebration after a purchase: who you unlocked, and what the club earned. */
-export function UnlockSuccess({ resume, result }: UnlockSuccessProps) {
+export function UnlockSuccess({ resume, result, resumeHref }: UnlockSuccessProps) {
   const { offer, contact } = result;
   const { club } = offer.book;
-  const viewHref = `${browseHref(EMPTY_FILTERS, resume.id)}&${REVEAL_PARAM}=1`;
+  const viewHref = `${resumeHref}&${REVEAL_PARAM}=1`;
 
   return (
     <div className={styles.success}>
@@ -62,7 +63,7 @@ export function UnlockSuccess({ resume, result }: UnlockSuccessProps) {
       </div>
 
       <div className={styles.actions}>
-        <LinkButton href={viewHref} variant="primary" size="lg">
+        <LinkButton href={viewHref} replace variant="primary" size="lg">
           View resume
         </LinkButton>
 

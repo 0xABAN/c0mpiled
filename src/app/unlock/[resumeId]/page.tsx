@@ -3,15 +3,20 @@ import { notFound, redirect } from "next/navigation";
 
 import { AppHeader } from "@/frontend/components/shell/app-header";
 import { Checkout } from "@/frontend/features/unlock/checkout";
+import { browseHref, parseFilters, unlockHref } from "@/frontend/features/resumes/filters";
 import { getUnlockQuote, getViewer } from "@/frontend/lib/api";
 
 export const metadata: Metadata = { title: "Unlock · Roster" };
 
-export default async function UnlockPage({ params }: { params: Promise<{ resumeId: string }> }) {
+export default async function UnlockPage({ params, searchParams }: {
+  params: Promise<{ resumeId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { resumeId } = await params;
+  const filters = parseFilters(await searchParams);
 
   const viewer = await getViewer();
-  if (!viewer) redirect(`/login?next=/unlock/${resumeId}`);
+  if (!viewer) redirect(`/login?next=${encodeURIComponent(unlockHref(filters, resumeId))}`);
   if (viewer.accountType !== "recruiter") redirect("/");
 
   const quote = await getUnlockQuote(resumeId);
@@ -21,7 +26,7 @@ export default async function UnlockPage({ params }: { params: Promise<{ resumeI
     <>
       <AppHeader viewer={viewer} />
       <main>
-        <Checkout quote={quote} />
+        <Checkout quote={quote} resumeHref={browseHref(filters, resumeId)} />
       </main>
     </>
   );

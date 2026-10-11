@@ -9,7 +9,6 @@ import { Chip } from "@/frontend/components/ui/chip";
 import { Monogram } from "@/frontend/components/ui/monogram";
 import { SelectionCard } from "@/frontend/components/ui/selection-card";
 import { Tag } from "@/frontend/components/ui/tag";
-import { browseHref, EMPTY_FILTERS } from "@/frontend/features/resumes/filters";
 import { RedactedResume } from "@/frontend/features/resumes/redacted-resume";
 import { unlockBook } from "@/frontend/lib/api/actions";
 import type { UnlockOffer, UnlockQuote, UnlockResult } from "@/frontend/lib/api/types";
@@ -22,7 +21,7 @@ import { UnlockSuccess } from "./unlock-success";
  * Companies unlock a club's whole book. This page starts from one resume, shows which
  * book(s) would reveal it, and where the money goes.
  */
-export function Checkout({ quote }: { quote: UnlockQuote }) {
+export function Checkout({ quote, resumeHref }: { quote: UnlockQuote; resumeHref: string }) {
   const { resume, offers } = quote;
   const [selectedId, setSelectedId] = useState(quote.recommendedBookId);
   const [result, setResult] = useState<UnlockResult | null>(null);
@@ -42,17 +41,17 @@ export function Checkout({ quote }: { quote: UnlockQuote }) {
   }
 
   if (result?.status === "unlocked") {
-    return <UnlockSuccess resume={resume} result={result} />;
+    return <UnlockSuccess resume={resume} result={result} resumeHref={resumeHref} />;
   }
 
   // Checked after `result`: the purchase itself refreshes the quote with contact info filled in.
   if (resume.contact) {
-    return <AlreadyUnlocked resumeId={resume.id} />;
+    return <AlreadyUnlocked resumeHref={resumeHref} />;
   }
 
   return (
     <div className={styles.page}>
-      <Link href={browseHref(EMPTY_FILTERS, resume.id)} className={styles.back}>
+      <Link href={resumeHref} replace className={styles.back}>
         <ArrowLeft size={18} strokeWidth={3} aria-hidden />
         Back to resume
       </Link>
@@ -155,12 +154,12 @@ export function Checkout({ quote }: { quote: UnlockQuote }) {
   );
 }
 
-function AlreadyUnlocked({ resumeId }: { resumeId: string }) {
+function AlreadyUnlocked({ resumeHref }: { resumeHref: string }) {
   return (
     <div className={styles.already}>
       <h1 className={styles.title}>You already have this resume</h1>
       <p className={styles.lead}>One of its books is unlocked for your company.</p>
-      <LinkButton href={browseHref(EMPTY_FILTERS, resumeId)} variant="primary" size="lg">
+      <LinkButton href={resumeHref} replace variant="primary" size="lg">
         View resume
       </LinkButton>
     </div>

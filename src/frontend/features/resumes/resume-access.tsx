@@ -10,7 +10,7 @@ import type { ResumeView } from "@/frontend/lib/api/types";
 import styles from "./resume-access.module.css";
 
 /** Recruiter call to action for a locked resume. */
-export function UnlockCard({ resume }: { resume: ResumeView }) {
+export function UnlockCard({ resume, href }: { resume: ResumeView; href: string }) {
   const { books } = resume;
 
   return (
@@ -23,7 +23,7 @@ export function UnlockCard({ resume }: { resume: ResumeView }) {
           : `They're in ${books.length} books. Unlock any one to see their name, email, and original PDF. That club gets paid.`}
       </p>
 
-      <LinkButton href={`/unlock/${resume.id}`} variant="primary" block>
+      <LinkButton href={href} variant="primary" block>
         <LockKeyhole size={18} strokeWidth={3} aria-hidden />
         Unlock resume
       </LinkButton>

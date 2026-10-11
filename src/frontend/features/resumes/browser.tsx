@@ -14,7 +14,7 @@ import { BrowseToolbar } from "./browse-toolbar";
 import styles from "./browser.module.css";
 import { FilterRail } from "./filter-rail";
 import { FilterSheet } from "./filter-sheet";
-import { activeFilterCount, browseHref, EMPTY_FILTERS, filtersKey, SELECTED_PARAM } from "./filters";
+import { activeFilterCount, browseHref, EMPTY_FILTERS, filtersKey, SELECTED_PARAM, unlockHref } from "./filters";
 import { Masonry } from "./masonry";
 import { ContactCard, LockedNote, UnlockCard } from "./resume-access";
 import { estimateCardHeight, ResumeCard } from "./resume-card";
@@ -181,7 +181,7 @@ export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock
             ) : selected.contact ? (
               <ContactCard resumeId={selected.id} email={selected.contact.email} />
             ) : (
-              <UnlockCard resume={selected} />
+              <UnlockCard resume={selected} href={unlockHref(filters, selected.id)} />
             )
           }
           mobileAction={
@@ -190,7 +190,7 @@ export function Browser({ filters, facets, initialPage, unlockedCount, canUnlock
                 Download PDF
               </AnchorButton>
             ) : (
-              <LinkButton href={`/unlock/${selected.id}`} variant="primary" block>
+              <LinkButton href={unlockHref(filters, selected.id)} variant="primary" block>
                 Unlock resume
               </LinkButton>
             )
