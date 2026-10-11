@@ -1,0 +1,122 @@
+.card {
+  display: grid;
+  gap: 6px;
+  padding: 22px;
+  border: var(--border) solid var(--line);
+  border-bottom-width: 5px;
+  border-radius: var(--radius);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 32px;
+}
+
+.earnings {
+  border-color: var(--green-soft);
+  background: var(--green-wash);
+}
+
+.earnings :global(.eyebrow) {
+  color: var(--green-lip);
+}
+
+.total {
+  color: var(--green-lip);
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.price {
+  color: var(--ink);
+}
+
+.caption {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.unlocks {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 14px;
+  border-top: var(--border) solid var(--green-soft);
+}
+
+.unlock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.company {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.amount {
+  display: grid;
+  justify-items: end;
+  color: var(--green-lip);
+  font-weight: 900;
+}
+
+.when {
+  color: var(--subtle);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* ---------- Price editor ---------- */
+
+.priceEditor {
+  display: grid;
+  gap: 12px;
+}
+
+.priceInput {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.priceInput span {
+  position: absolute;
+  left: 16px;
+  color: var(--subtle);
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.priceInput input {
+  width: 100%;
+  height: 56px;
+  padding: 0 16px 0 38px;
+  border: var(--border) solid var(--blue-soft);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.priceInput input:focus {
+  outline: none;
+}
+
+.priceActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

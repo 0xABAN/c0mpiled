@@ -1,0 +1,206 @@
+.page {
+  display: grid;
+  gap: 28px;
+  width: min(100%, 1160px);
+  margin: 0 auto;
+  padding: 32px var(--page-x) 96px;
+}
+
+/* ---------- Club header ---------- */
+
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px 24px;
+  padding: 26px 28px;
+  border: var(--border) solid var(--soft);
+  border-bottom-width: 6px;
+  border-radius: var(--radius);
+  background: var(--wash);
+}
+
+.heroText {
+  display: grid;
+  flex: 1 1 260px;
+  gap: 4px;
+}
+
+.clubName {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.015em;
+}
+
+.clubMeta {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.share {
+  display: grid;
+  flex: 1 1 360px;
+  gap: 8px;
+}
+
+.shareLabel {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.linkBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 16px;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.linkBox code {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: inherit;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Stats ---------- */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius);
+}
+
+.statIcon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding-bottom: 3px;
+  border-radius: 14px;
+  background: var(--face);
+  box-shadow: inset 0 -4px 0 var(--lip);
+  color: var(--on-face);
+}
+
+.statText {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.statValue {
+  margin: 0;
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.statLabel {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ---------- Columns ---------- */
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  align-items: start;
+  gap: 32px;
+}
+
+.main {
+  display: grid;
+  gap: 36px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 22px;
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px 2px;
+  border-radius: var(--radius-pill);
+  background: var(--yellow);
+  box-shadow: inset 0 -3px 0 var(--yellow-lip);
+  color: #4b3a00;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.count {
+  color: var(--subtle);
+  font-weight: 900;
+}
+
+.rows {
+  display: grid;
+  gap: 10px;
+}
+
+.empty {
+  padding: 22px;
+  border: var(--border) dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-weight: 700;
+  text-align: center;
+}
+
+.side {
+  position: sticky;
+  top: calc(var(--header-h) + 24px);
+  display: grid;
+  gap: 16px;
+}
+
+.sideNote {
+  color: var(--subtle);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 1000px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+
+  .side {
+    position: static;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

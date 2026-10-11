@@ -25,3 +25,18 @@ export function classOf(year: number): string {
 export function pluralize(count: number, singular: string, plural = `${singular}s`): string {
   return `${count.toLocaleString("en-US")} ${count === 1 ? singular : plural}`;
 }
+
+const RELATIVE = new Intl.RelativeTimeFormat("en-US", { numeric: "auto", style: "short" });
+
+/** "5 min. ago", "3 hr. ago", "yesterday". `now` is injectable so server and client agree. */
+export function timeAgo(iso: string, now = Date.now()): string {
+  const seconds = Math.round((new Date(iso).getTime() - now) / 1000);
+  const minutes = Math.round(seconds / 60);
+  const hours = Math.round(minutes / 60);
+  const days = Math.round(hours / 24);
+
+  if (Math.abs(minutes) < 1) return "just now";
+  if (Math.abs(minutes) < 60) return RELATIVE.format(minutes, "minute");
+  if (Math.abs(hours) < 24) return RELATIVE.format(hours, "hour");
+  return RELATIVE.format(days, "day");
+}

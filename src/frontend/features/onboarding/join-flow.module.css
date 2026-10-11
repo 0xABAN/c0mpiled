@@ -1,0 +1,74 @@
+.intro {
+  display: grid;
+  justify-items: center;
+  gap: 24px;
+  text-align: center;
+}
+
+/* The invitation itself: the club's tile on a wash of its color. */
+.card {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 40px 24px 36px;
+  border: var(--border) solid var(--soft);
+  border-bottom-width: 8px;
+  border-radius: 24px;
+  background: var(--wash);
+  animation: invite-in 500ms var(--ease-spring) both;
+}
+
+@keyframes invite-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+}
+
+.card > span:first-child {
+  margin-bottom: 14px;
+}
+
+.invited {
+  color: var(--lip);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.name {
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -0.015em;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.explain {
+  max-width: 520px;
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.blocked {
+  max-width: 480px;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  background: var(--sunken);
+  color: var(--muted);
+  font-weight: 800;
+}
