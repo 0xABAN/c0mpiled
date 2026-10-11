@@ -10,7 +10,8 @@
     "db:generate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs generate",
     "db:migrate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs migrate",
     "db:seed": "tsx --conditions=react-server --env-file=.env.local src/backend/db/seed.ts",
-    "redact": "tsx --conditions=react-server scripts/redact.ts"
+    "redact": "tsx --conditions=react-server scripts/redact.ts",
+    "demo:reset": "node --conditions=react-server --env-file=.env.local --import tsx src/backend/demo/reset.ts"
   },
   "dependencies": {
     "@aws-amplify/adapter-nextjs": "^1.8.0",
@@ -29,6 +30,7 @@
     "zod": "^4.6.6"
   },
   "devDependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.1149.0",
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/pg": "^8.23.1",
