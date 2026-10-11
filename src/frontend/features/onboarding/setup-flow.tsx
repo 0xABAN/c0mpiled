@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useToast } from "@/frontend/components/ui/toast";
 import { browseHref, EMPTY_FILTERS } from "@/frontend/features/resumes/filters";
 import { completeRecruiterSetup, createClub, finishSetup } from "@/frontend/lib/api/actions";
 import type { BookSummary, ClubCreated, School } from "@/frontend/lib/api/types";
@@ -56,6 +57,7 @@ export function SetupFlow(props: SetupFlowProps) {
 
 function SchoolSetup({ email, school, books }: Extract<SetupFlowProps, { accountType: "school" }>) {
   const router = useRouter();
+  const toast = useToast();
   const [goals, setGoals] = useState<Goals>({ resume: false, club: false });
   const [step, setStep] = useState<Step>("goals");
 
@@ -86,26 +88,31 @@ function SchoolSetup({ email, school, books }: Extract<SetupFlowProps, { account
     setCreating(true);
     setClubError(null);
 
-    try {
-      const result = await createClub({
-        name: club.name.trim(),
-        tagline: club.tagline.trim() || null,
-        hue: club.hue,
-        priceCents: Number(pricing.dollars) * 100,
-        payoutEmail: pricing.payoutEmail.trim(),
-      });
-      setCreated(result);
-      next();
-    } catch (cause) {
-      setClubError(cause instanceof Error ? cause.message : "We couldn't create your club. Try again.");
-    } finally {
-      setCreating(false);
-    }
+    const result = await createClub({
+      name: club.name.trim(),
+      tagline: club.tagline.trim() || null,
+      hue: club.hue,
+      priceCents: Number(pricing.dollars) * 100,
+      payoutEmail: pricing.payoutEmail.trim(),
+    });
+
+    setCreating(false);
+    if (result.status === "error") return setClubError(result.message);
+
+    setCreated(result.data);
+    next();
   }
 
   async function finish() {
     setFinishing(true);
-    await finishSetup();
+    const result = await finishSetup();
+
+    if (result.status === "error") {
+      setFinishing(false);
+      toast(result.message);
+      return;
+    }
+
     router.replace(created ? "/dashboard" : "/");
     router.refresh();
   }
@@ -169,6 +176,7 @@ function SchoolSetup({ email, school, books }: Extract<SetupFlowProps, { account
 
 function RecruiterSetup({ majorOptions, gradYearOptions }: Extract<SetupFlowProps, { accountType: "recruiter" }>) {
   const router = useRouter();
+  const toast = useToast();
   const [step, setStep] = useState<Step>("company");
   const [company, setCompany] = useState<CompanyDetails>({ company: "", jobTitle: "" });
   const [hiring, setHiring] = useState<Hiring>({ seeking: [], gradYears: [], majors: [] });
@@ -176,7 +184,14 @@ function RecruiterSetup({ majorOptions, gradYearOptions }: Extract<SetupFlowProp
 
   async function submit() {
     setSubmitting(true);
-    await completeRecruiterSetup({ company: company.company.trim(), jobTitle: company.jobTitle.trim() || null, hiring });
+    const result = await completeRecruiterSetup({ company: company.company.trim(), jobTitle: company.jobTitle.trim() || null, hiring });
+
+    if (result.status === "error") {
+      setSubmitting(false);
+      toast(result.message);
+      return;
+    }
+
     router.replace(browseHref({ ...EMPTY_FILTERS, ...hiring }));
     router.refresh();
   }

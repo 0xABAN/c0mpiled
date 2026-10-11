@@ -33,22 +33,18 @@ export function useResumeDraft(initialBookIds: string[]) {
     setSubmitting(true);
     setError(null);
 
-    try {
-      await submitResume({
-        bookIds,
-        uploadId,
-        name: draft.name.trim(),
-        // Half-filled experience rows are dropped rather than sent with blanks.
-        profile: { ...draft.profile, experience: draft.profile.experience.filter((job) => job.title.trim() && job.org.trim()) },
-        consent: true,
-      });
-      return true;
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "We couldn't send your request. Try again.");
-      return false;
-    } finally {
-      setSubmitting(false);
-    }
+    const result = await submitResume({
+      bookIds,
+      uploadId,
+      name: draft.name.trim(),
+      // Half-filled experience rows are dropped rather than sent with blanks.
+      profile: { ...draft.profile, experience: draft.profile.experience.filter((job) => job.title.trim() && job.org.trim()) },
+      consent: true,
+    });
+
+    setSubmitting(false);
+    if (result.status === "error") setError(result.message);
+    return result.status === "ok";
   }
 
   return { bookIds, setBookIds, parseFailed, draft, setDraft, consent, setConsent, submitting, error, acceptUpload, submit };

@@ -43,13 +43,17 @@ export function SignupFlow({ initialType, joinSlug }: SignupFlowProps) {
   const progress = (steps.indexOf(step) + 1) / (steps.length + 1);
 
   const onAuthenticated = useCallback(async () => {
-    try {
-      await createAccount(accountType === "school" && school ? { accountType: "school", schoolDomain: school.domains[0] } : { accountType: "recruiter" });
-      router.replace(joinSlug ? `/join/${joinSlug}` : "/setup");
-      router.refresh();
-    } catch (error) {
-      setAccountError(error instanceof Error ? error.message : "We couldn't create your account.");
+    const result = await createAccount(
+      accountType === "school" && school ? { accountType: "school", schoolDomain: school.domains[0] } : { accountType: "recruiter" },
+    );
+
+    if (result.status === "error") {
+      setAccountError(result.message);
+      return;
     }
+
+    router.replace(joinSlug ? `/join/${joinSlug}` : "/setup");
+    router.refresh();
   }, [accountType, joinSlug, router, school]);
 
   const back = () => setStep(steps[steps.indexOf(step) - 1]);
