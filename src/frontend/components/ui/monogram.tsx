@@ -1,14 +1,13 @@
 import type { CSSProperties, ReactNode } from "react";
 
-import type { Hue } from "@/frontend/lib/api/types";
-import { hueFor, initials } from "@/frontend/lib/hue";
+import { hueFor, initials, type Tone } from "@/frontend/lib/hue";
 
 import styles from "./monogram.module.css";
 
 type MonogramProps = {
   /** The name to abbreviate. Also picks the hue unless `hue` is given. */
   name: string;
-  hue?: Hue;
+  hue?: Tone;
   size?: number;
   shape?: "square" | "circle";
   ringed?: boolean;

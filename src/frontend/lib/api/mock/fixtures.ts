@@ -25,7 +25,8 @@ export const SCHOOLS: School[] = [
   { name: "Villanova University", domains: ["villanova.edu"] },
 ];
 
-type ClubSeed = ClubSummary & { majors: string[]; size: number };
+/** `priceCents` is what the club charges for its whole book. */
+type ClubSeed = ClubSummary & { majors: string[]; size: number; priceCents: number };
 
 const SCHOOL = "Penn State";
 const SCHOOL_DOMAIN = "psu.edu";
@@ -34,6 +35,7 @@ const CLUB_SEEDS: ClubSeed[] = [
   {
     id: "club_hkn",
     slug: "psu-hkn",
+    priceCents: 30000,
     name: "Penn State HKN",
     tagline: "Electrical & computer engineering honor society",
     school: SCHOOL,
@@ -44,6 +46,7 @@ const CLUB_SEEDS: ClubSeed[] = [
   {
     id: "club_swe",
     slug: "psu-swe",
+    priceCents: 45000,
     name: "Society of Women Engineers",
     tagline: "Penn State's largest engineering org",
     school: SCHOOL,
@@ -54,6 +57,7 @@ const CLUB_SEEDS: ClubSeed[] = [
   {
     id: "club_nai",
     slug: "psu-nittany-ai",
+    priceCents: 25000,
     name: "Nittany AI Society",
     tagline: "Students building with machine learning",
     school: SCHOOL,
@@ -64,6 +68,7 @@ const CLUB_SEEDS: ClubSeed[] = [
   {
     id: "club_hackpsu",
     slug: "psu-hackpsu",
+    priceCents: 20000,
     name: "HackPSU",
     tagline: "Penn State's student-run hackathon",
     school: SCHOOL,
@@ -74,6 +79,7 @@ const CLUB_SEEDS: ClubSeed[] = [
   {
     id: "club_actsci",
     slug: "psu-actuarial-science",
+    priceCents: 65000,
     name: "Actuarial Science Club",
     tagline: "Future actuaries and risk analysts",
     school: SCHOOL,
@@ -84,6 +90,7 @@ const CLUB_SEEDS: ClubSeed[] = [
   {
     id: "club_bc",
     slug: "psu-builders-collective",
+    priceCents: 25000,
     name: "Builder's Collective",
     tagline: "Founders, hackers, and operators",
     school: SCHOOL,
@@ -251,8 +258,26 @@ export const RESUMES: MockResume[] = (() => {
 
 export const CLUBS: ClubSummary[] = CLUB_SEEDS.map(toClub);
 
-export const BOOKS: BookSummary[] = CLUBS.map((club) => ({
-  id: `book_${club.slug}`,
-  club,
-  resumeCount: RESUMES.filter((resume) => resume.books.some((book) => book.club.id === club.id)).length,
+export const BOOKS: BookSummary[] = CLUB_SEEDS.map((seed) => ({
+  id: `book_${seed.slug}`,
+  club: toClub(seed),
+  resumeCount: RESUMES.filter((resume) => resume.books.some((book) => book.club.id === seed.id)).length,
+  priceCents: seed.priceCents,
 }));
+
+/** Students waiting for an officer to accept them, three per club. Not visible to recruiters. */
+export const PENDING: MockResume[] = CLUB_SEEDS.flatMap((club) =>
+  Array.from({ length: 3 }, (_, i) => {
+    const resume = makeResume(club, 100 + i, new Date(Date.UTC(2026, 9, 11, 16, 30 - i * 9)));
+    return { ...resume, id: `req_${club.slug}_${i + 1}`, books: [{ id: `book_${club.slug}`, club: toClub(club) }] };
+  }),
+);
+
+/** Companies that already bought a book, for dashboard history. */
+export const PAST_UNLOCKS: Record<string, { company: string; minutesAgo: number }[]> = {
+  "book_psu-hkn": [
+    { company: "Lutron", minutesAgo: 42 },
+    { company: "AccuWeather", minutesAgo: 190 },
+  ],
+  "book_psu-swe": [{ company: "Boeing", minutesAgo: 75 }],
+};

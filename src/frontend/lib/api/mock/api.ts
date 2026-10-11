@@ -4,10 +4,14 @@
  * UI is exercised against realistic responses. Deleted when the real backend lands.
  */
 
+import { headers } from "next/headers";
+
 import type {
   BookSummary,
+  ClubDashboard,
   FacetOption,
-  OfferKind,
+  Membership,
+  MembershipStatus,
   ResumeFacets,
   ResumeFilters,
   ResumePage,
@@ -17,12 +21,11 @@ import type {
   UnlockQuote,
   Viewer,
 } from "../types";
-import { BOOKS, RESUMES, SCHOOLS, type MockResume } from "./fixtures";
-import { readSession, readUnlocks, type MockUnlocks } from "./session";
+import { BOOKS, PAST_UNLOCKS, PENDING, RESUMES, SCHOOLS, type MockResume } from "./fixtures";
+import { readDecisions, readSession, readUnlocks, type MockUnlocks } from "./session";
 
-/** Placeholder prices; real ones come from billing. Clubs keep 80%. */
-const PRICE_CENTS: Record<OfferKind, number> = { resume: 1900, book: 14900 };
-const CLUB_SHARE = 0.8;
+/** Placeholder: the platform's cut isn't decided. */
+const CLUB_SHARE = 0.85;
 
 export async function getViewer(): Promise<Viewer | null> {
   const session = await readSession();
@@ -154,32 +157,12 @@ export async function searchSchools(query: string): Promise<School[]> {
   ).slice(0, 8);
 }
 
-/** Every way to unlock a resume: by itself, or with one of the books it's in. */
+/** One offer per book the resume is in. */
 export function quoteOffers(resume: MockResume): UnlockOffer[] {
-  const split = (priceCents: number) => ({ priceCents, clubPayoutCents: Math.round(priceCents * CLUB_SHARE) });
-
-  const single: UnlockOffer = {
-    key: "resume",
-    kind: "resume",
-    book: null,
-    beneficiaries: resume.books.map((book) => book.club),
-    resumeCount: 1,
-    ...split(PRICE_CENTS.resume),
-  };
-
-  const books = resume.books.map((ref): UnlockOffer => {
+  return resume.books.map((ref) => {
     const book = BOOKS.find((candidate) => candidate.id === ref.id)!;
-    return {
-      key: `book:${book.id}`,
-      kind: "book",
-      book,
-      beneficiaries: [book.club],
-      resumeCount: book.resumeCount,
-      ...split(PRICE_CENTS.book),
-    };
+    return { book, priceCents: book.priceCents, clubPayoutCents: Math.round(book.priceCents * CLUB_SHARE) };
   });
-
-  return [single, ...books];
 }
 
 export async function getUnlockQuote(resumeId: string): Promise<UnlockQuote | null> {
@@ -188,7 +171,59 @@ export async function getUnlockQuote(resumeId: string): Promise<UnlockQuote | nu
 
   const offers = quoteOffers(resume);
 
-  return { resume: (await present([resume]))[0], offers, recommended: offers[1]?.key ?? offers[0].key };
+  // Suggest the book with the most resumes per dollar.
+  const best = [...offers].sort((a, b) => b.book.resumeCount / b.priceCents - a.book.resumeCount / a.priceCents)[0];
+
+  return { resume: (await present([resume]))[0], offers, recommendedBookId: best.book.id };
+}
+
+/** The viewer's club, with requests, members, and sales. */
+export async function getClubDashboard(): Promise<ClubDashboard | null> {
+  const session = await readSession();
+  const club = session?.ownedClub;
+  if (!club) return null;
+
+  const decisions = await readDecisions();
+  const bookId = `book_${club.slug}`;
+  const seededBook = BOOKS.find((book) => book.id === bookId);
+  const book = seededBook ?? { id: bookId, club, resumeCount: 0, priceCents: session.ownedClubPriceCents ?? 25000 };
+
+  const toMembership = (resume: MockResume, status: MembershipStatus): Membership => ({
+    resumeId: resume.id,
+    name: resume.contact.name,
+    email: resume.contact.email!,
+    profile: resume.profile,
+    status: decisions[resume.id] ?? status,
+    requestedAt: resume.createdAt,
+  });
+
+  const members = RESUMES.filter((resume) => resume.books.some((ref) => ref.id === bookId)).map((resume) => toMembership(resume, "accepted"));
+  const requests = PENDING.filter((resume) => resume.books[0].id === bookId).map((resume) => toMembership(resume, "pending"));
+
+  const all = [...requests, ...members].filter((membership) => membership.status !== "rejected");
+  const pending = all.filter((m) => m.status === "pending").sort((a, b) => a.requestedAt.localeCompare(b.requestedAt));
+  const accepted = all.filter((m) => m.status === "accepted").sort((a, b) => b.requestedAt.localeCompare(a.requestedAt));
+
+  const now = Date.UTC(2026, 9, 11, 17);
+  const unlocks = (PAST_UNLOCKS[bookId] ?? []).map(({ company, minutesAgo }) => ({
+    company,
+    amountCents: book.priceCents,
+    unlockedAt: new Date(now - minutesAgo * 60_000).toISOString(),
+  }));
+
+  return {
+    club,
+    book: { ...book, resumeCount: accepted.length },
+    joinUrl: `${await origin()}/join/${club.slug}`,
+    memberships: [...pending, ...accepted],
+    unlocks,
+    earnedCents: unlocks.reduce((sum, unlock) => sum + unlock.amountCents, 0),
+  };
+}
+
+async function origin() {
+  const host = (await headers()).get("host") ?? "localhost:3000";
+  return `${host.startsWith("localhost") ? "http" : "https"}://${host}`;
 }
 
 export function findMockResume(id: string) {

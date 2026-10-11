@@ -8,11 +8,12 @@
  * Mock implementations for now; see `./index.ts`.
  */
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { findMockResume, listResumes, quoteOffers, searchSchools as searchMockSchools } from "./mock/api";
 import { SCHOOLS } from "./mock/fixtures";
-import { EMPTY_ACCOUNT, readSession, readUnlocks, updateSession, writeSession, writeUnlocks } from "./mock/session";
+import { EMPTY_ACCOUNT, readSession, readUnlocks, updateSession, writeDecision, writeSession, writeUnlocks } from "./mock/session";
 import type {
   CreateAccountInput,
   ClubCreated,
@@ -53,23 +54,22 @@ export async function searchSchools(query: string): Promise<School[]> {
 }
 
 /**
- * Unlock a resume for the signed-in recruiter, using one of the offers from its quote.
+ * Unlock a club's whole book for the signed-in recruiter.
+ * `resumeId` is the resume they started from; its contact is returned for the success screen.
  * Real implementation: `canUnlock` → insert `unlocks` row → `recordUnlock` (AGENTS.md).
  */
-export async function unlockResume(resumeId: string, offerKey: string): Promise<UnlockResult> {
+export async function unlockBook(bookId: string, resumeId: string): Promise<UnlockResult> {
   await wait(900);
 
   const session = await readSession();
   if (session?.accountType !== "recruiter") return { status: "error", message: "Only company accounts can unlock resumes." };
 
   const resume = findMockResume(resumeId);
-  const offer = resume && quoteOffers(resume).find((candidate) => candidate.key === offerKey);
-  if (!resume || !offer) return { status: "error", message: "This resume is no longer available." };
+  const offer = resume && quoteOffers(resume).find((candidate) => candidate.book.id === bookId);
+  if (!resume || !offer) return { status: "error", message: "This book is no longer available." };
 
   const unlocks = await readUnlocks();
-  if (offer.book) unlocks.bookIds.push(offer.book.id);
-  else unlocks.resumeIds.push(resume.id);
-  await writeUnlocks(unlocks);
+  await writeUnlocks({ ...unlocks, bookIds: [...unlocks.bookIds, bookId] });
 
   return { status: "unlocked", offer, contact: resume.contact };
 }
@@ -118,12 +118,26 @@ export async function createClub(input: ClubInput): Promise<ClubCreated> {
   await wait(700);
 
   const session = await readSession();
-  const slug = input.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-  const club = { id: `club_${slug}`, slug, name: input.name, tagline: input.tagline, school: session?.school?.name ?? "Penn State", hue: input.hue };
+  const school = session?.school ?? SCHOOLS[0];
+  const slug = `${school.domains[0].split(".")[0]}-${input.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+  const club = { id: `club_${slug}`, slug, name: input.name, tagline: input.tagline, school: school.name, hue: input.hue };
 
-  await updateSession({ ownedClub: club });
+  await updateSession({ ownedClub: club, ownedClubPriceCents: input.priceCents });
 
-  return { club, bookId: `book_${slug}`, joinUrl: `https://roster.example/join/${slug}` };
+  const host = (await headers()).get("host") ?? "localhost:3000";
+  return { club, bookId: `book_${slug}`, joinUrl: `http://${host}/join/${slug}` };
+}
+
+/** Officer decision on a join request. Only accepted members are shown to recruiters. */
+export async function decideJoinRequest(resumeId: string, decision: "accepted" | "rejected"): Promise<void> {
+  await wait(350);
+  await writeDecision(resumeId, decision);
+}
+
+/** Change the price of the viewer's club book. */
+export async function updateBookPrice(priceCents: number): Promise<void> {
+  await wait(400);
+  await updateSession({ ownedClubPriceCents: priceCents });
 }
 
 /** Mark onboarding as finished. School accounts call this after their last step. */

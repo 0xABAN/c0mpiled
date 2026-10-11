@@ -88,6 +88,8 @@ export type BookSummary = {
   club: ClubSummary;
   /** Accepted, non-withdrawn resumes. */
   resumeCount: number;
+  /** What a company pays to unlock the whole book. Set by the club. */
+  priceCents: number;
 };
 
 /* ------------------------------------------------------------------ */
@@ -157,30 +159,24 @@ export type ResumePage = {
 /* Unlocking                                                           */
 /* ------------------------------------------------------------------ */
 
-/** What a purchase covers: one resume, or every accepted resume in one club's book. */
-export type OfferKind = "resume" | "book";
-
+/**
+ * Companies unlock a club's entire book at the price the club sets. A resume in several
+ * books gets one offer per book; unlocking any of them reveals it.
+ */
 export type UnlockOffer = {
-  /** Stable id to send back to `unlockResume`, e.g. "resume" or "book:book_hkn". */
-  key: string;
-  kind: OfferKind;
-  /** The book this offer opens; `null` for a single resume. */
-  book: BookSummary | null;
-  /** Clubs that get paid. A single resume pays every club whose book it's in. */
-  beneficiaries: ClubSummary[];
-  /** What the recruiter pays today. `0` means it is covered by their plan. */
+  book: BookSummary;
+  /** `book.priceCents`, or `0` if covered by the recruiter's plan. */
   priceCents: number;
-  /** The clubs' combined share of `priceCents`. The rest is the platform fee. */
+  /** The club's share of `priceCents`. The split is not decided yet; mocked for now. */
   clubPayoutCents: number;
-  /** Number of resumes this offer opens. */
-  resumeCount: number;
 };
 
 export type UnlockQuote = {
   resume: ResumeView;
-  /** In display order. The UI preselects the one whose key is `recommended`. */
+  /** In display order, one per book the resume is in. */
   offers: UnlockOffer[];
-  recommended: string;
+  /** Book id the UI preselects. */
+  recommendedBookId: string;
 };
 
 export type UnlockResult =
@@ -223,6 +219,8 @@ export type ClubInput = {
   name: string;
   tagline: string | null;
   hue: Hue;
+  /** Price of the club's book, editable later on /dashboard. */
+  priceCents: number;
   /** Where the club wants its earnings sent. Payouts are manual for now. */
   payoutEmail: string;
 };
@@ -247,3 +245,39 @@ export type RecruiterSetupInput = {
 export type UploadResult =
   | { status: "ok"; uploadId: string; parsed: ParsedResume | null }
   | { status: "error"; message: string };
+
+/* ------------------------------------------------------------------ */
+/* Club dashboard                                                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A student's request to join the book, or an accepted member. Not redacted: the officer
+ * is checking that these are real members.
+ */
+export type Membership = {
+  resumeId: string;
+  name: string;
+  /** Verified school email. */
+  email: string;
+  profile: ResumeProfile;
+  status: MembershipStatus;
+  requestedAt: string; // ISO 8601
+};
+
+export type BookUnlock = {
+  company: string;
+  amountCents: number;
+  unlockedAt: string; // ISO 8601
+};
+
+/** Everything /dashboard shows for the viewer's club. `null` if they don't run one. */
+export type ClubDashboard = {
+  club: ClubSummary;
+  book: BookSummary;
+  joinUrl: string;
+  /** Pending first, oldest first; then accepted, newest first. Rejected requests are omitted. */
+  memberships: Membership[];
+  unlocks: BookUnlock[];
+  /** Sum of what companies paid for the book. */
+  earnedCents: number;
+};

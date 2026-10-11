@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import type { Viewer } from "../types";
+import type { MembershipStatus, Viewer } from "../types";
 
 /**
  * Stand-in for the Cognito session while the backend is being built. It lives in two
@@ -9,8 +9,10 @@ import type { Viewer } from "../types";
 
 const SESSION_COOKIE = "roster_mock_session";
 const UNLOCKS_COOKIE = "roster_mock_unlocks";
+const DECISIONS_COOKIE = "roster_mock_decisions";
 
-export type MockSession = Omit<Viewer, "id" | "unlockedCount">;
+/** The viewer, plus the price of a club created during this session (no club table in the mock). */
+export type MockSession = Omit<Viewer, "id" | "unlockedCount"> & { ownedClubPriceCents?: number };
 
 export type MockUnlocks = { resumeIds: string[]; bookIds: string[] };
 
@@ -38,6 +40,7 @@ export async function writeSession(session: MockSession | null) {
   } else {
     jar.delete(SESSION_COOKIE);
     jar.delete(UNLOCKS_COOKIE);
+    jar.delete(DECISIONS_COOKIE);
   }
 }
 
@@ -53,4 +56,15 @@ export async function readUnlocks(): Promise<MockUnlocks> {
 
 export async function writeUnlocks(unlocks: MockUnlocks) {
   (await cookies()).set(UNLOCKS_COOKIE, JSON.stringify(unlocks), { path: "/", httpOnly: true, sameSite: "lax" });
+}
+
+/** Officer decisions on join requests, by resume id. */
+export async function readDecisions(): Promise<Record<string, MembershipStatus>> {
+  const raw = (await cookies()).get(DECISIONS_COOKIE)?.value;
+  return raw ? (JSON.parse(raw) as Record<string, MembershipStatus>) : {};
+}
+
+export async function writeDecision(resumeId: string, status: MembershipStatus) {
+  const decisions = { ...(await readDecisions()), [resumeId]: status };
+  (await cookies()).set(DECISIONS_COOKIE, JSON.stringify(decisions), { path: "/", httpOnly: true, sameSite: "lax" });
 }

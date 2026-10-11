@@ -15,8 +15,10 @@ export {
   getResume,
   /** Books that students can join during setup. */
   listOpenBooks,
-  /** Prices and payout split for unlocking a resume, or `null` if it doesn't exist. */
+  /** The books that would reveal a resume, with prices, or `null` if it doesn't exist. */
   getUnlockQuote,
+  /** The viewer's club: requests, members, sales. `null` if they don't run one. */
+  getClubDashboard,
 } from "./mock/api";
 
 export type * from "./types";

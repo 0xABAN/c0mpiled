@@ -1,5 +1,11 @@
 import type { Hue, Seeking } from "@/frontend/lib/api/types";
 
+/**
+ * Any color scope from the design tokens: category hues plus indigo, which is reserved
+ * for money (unlock and purchase) and so isn't offered to clubs.
+ */
+export type Tone = Hue | "indigo";
+
 /** Every category hue, in the order shown by the club color picker. */
 export const HUES: Hue[] = ["green", "blue", "purple", "orange", "teal", "pink", "red", "yellow"];
 
