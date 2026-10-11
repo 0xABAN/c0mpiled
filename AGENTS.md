@@ -106,8 +106,8 @@ type ResumeProfile = {
 }
 ```
 
-A parse that fails sets `parse_status = 'failed'` and the student fills in the profile by hand. Never guess
-fields.
+When a parse fails, the student fills in the profile by hand. Never guess fields. The resume row is only
+saved after the student has reviewed the profile. The types live in `src/backend/parsing/types.ts`.
 
 ## Contract 2: billing boundary
 
@@ -132,15 +132,18 @@ club-set, per-book price maps onto App Monetization. Confirm with the AWS team b
 
 ## Data model
 
+The source of truth is `src/backend/db/schema.ts`. After changing it, run `npm run db:generate`, commit the
+SQL in `src/backend/db/migrations`, and run `npm run db:migrate`.
+
 ```
 users         id (Cognito sub) PK, email unique, account_type 'school' | 'recruiter', school_domain null,
               company null, job_title null, hiring jsonb null, onboarded_at null, created_at
 clubs         id, slug unique ("psu-hkn"), school_domain, name, tagline null, hue, payout_email,
               owner_id → users, created_at
 books         id, club_id → clubs unique (one book per club), title, price_cents, created_at
-resumes       id, user_id → users unique (one per student), contact_name, pdf_key null,
+resumes       id, user_id → users unique (one per student), contact_name, pdf_key,
               grad_year int, majors text[], seeking text[], skills text[], profile jsonb, search_text text,
-              parse_status 'pending' | 'parsed' | 'failed', created_at, updated_at
+              created_at, updated_at
 book_members  book_id → books, resume_id → resumes, status 'pending' | 'accepted' | 'rejected',
               consented_at, requested_at, decided_at null, PK (book_id, resume_id)
 unlocks       id, book_id → books, recruiter_id → users, price_cents (what was paid), created_at,
