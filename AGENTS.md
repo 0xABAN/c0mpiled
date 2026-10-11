@@ -311,6 +311,10 @@ overwrite what exists):
   PDF keys and no previews. Add `-- --apply` to attach synthetic source PDFs/previews without a reset.
   It changes only file references, preserves IDs/profiles/timestamps/memberships/purchases, and excludes
   real Cognito users (including the shared demo logins), existing uploads, and existing previews.
+  `-- --refresh-generated` dry-runs a template refresh instead: it requires owner-scoped generated
+  keys and a source PDF with the synthetic label and matching profile facts. Add `--apply` to replace
+  only those verified sources with the current Jake-style template and varied fictional details.
+  Already-current PDFs are skipped; old generated objects are removed only after a successful CAS.
 - `npm run demo:reset`: the shared demo logins `demo.officer@psu.edu` (runs Demo Club, with members, requests,
   and sales) and `demo.student@psu.edu` (a resume with redacted previews in two books), with
   `NEXT_PUBLIC_DEMO_PASSWORD`. Run it again to undo whatever visitors did; `-- --remove` deletes the data.

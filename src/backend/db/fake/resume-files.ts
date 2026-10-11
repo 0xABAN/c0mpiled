@@ -1,86 +1,70 @@
 import { randomUUID } from "node:crypto";
 
-import type { ResumeProfile } from "@/backend/parsing/types";
 import { redactResume } from "@/backend/redaction";
 
-import { makeTextPdf } from "./pdf";
-
-type FakeResume = {
-  userId: string;
-  name: string;
-  email: string;
-  school: string;
-  profile: ResumeProfile;
-};
+import type { FakeResume } from "./resume-content";
+import { renderFakeResumePdf, SYNTHETIC_LABEL } from "./resume-pdf";
 
 /** Only these namespaces identify invented people; shared demo logins have real Cognito IDs. */
 export function isInventedUser(userId: string): boolean {
   return /^(seed|demo):/.test(userId);
 }
 
+type ResumeFiles = { userId: string; pdfKey: string; previewKeys: string[] };
+
 /** Backfill only the exact legacy placeholder, never a real upload or an existing preview. */
-export function isLegacyFakeResume(row: { id: string; userId: string; pdfKey: string; previewKeys: string[] }): boolean {
+export function isLegacyFakeResume(row: ResumeFiles & { id: string }): boolean {
   if (!isInventedUser(row.userId) || row.previewKeys.length !== 0) return false;
   const namespace = row.userId.split(":", 1)[0];
   return row.pdfKey === `${namespace}/${row.id}.pdf`;
 }
 
-/** Wrap invented ASCII text to fit the existing one-page PDF renderer. Never drop words. */
-function wrap(line: string): string[] {
-  const lines = [""];
-  for (const word of line.split(" ")) {
-    if (word.length > 68) throw new Error("Synthetic resume contains a word too wide for its PDF.");
-    const last = lines.length - 1;
-    if (lines[last].length + word.length + 1 > 68) lines.push(word);
-    else lines[last] += `${lines[last] ? " " : ""}${word}`;
-  }
-  return lines;
+/** Key shape alone is not proof of provenance; verify the PDF's synthetic marker as well. */
+export function hasGeneratedFakeKeys(row: ResumeFiles): boolean {
+  if (!isInventedUser(row.userId) || row.previewKeys.length !== 1) return false;
+  const pdfPrefix = `resumes/${row.userId}/`;
+  const previewPrefix = `previews/${row.userId}/`;
+  const uuid = "[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}";
+  return row.pdfKey.startsWith(pdfPrefix)
+    && new RegExp(`^${uuid}\\.pdf$`, "i").test(row.pdfKey.slice(pdfPrefix.length))
+    && row.previewKeys[0].startsWith(previewPrefix)
+    && new RegExp(`^${uuid}/1\\.png$`, "i").test(row.previewKeys[0].slice(previewPrefix.length));
 }
 
-/**
- * An explicitly synthetic source document, not a reconstruction of anyone's uploaded resume.
- * Names/profile facts come from the fake row; dates and bullets are invented sample content.
- * Expanded previews must render this PDF, including the details absent from teaser profiles.
- */
-export function makeFakeResumePdf(student: FakeResume): Uint8Array {
+/** Read a source without trusting S3 metadata; never regenerate an unlabeled upload. */
+export async function inspectFakeSource(pdf: Uint8Array, student: FakeResume): Promise<{ generated: boolean; creator: string | undefined }> {
+  const mupdf = await import("mupdf");
+  const document = mupdf.Document.openDocument(pdf, "application/pdf");
+  try {
+    if (!isInventedUser(student.userId) || document.countPages() !== 1) return { generated: false, creator: undefined };
+    const page = document.loadPage(0);
+    const text = page.toStructuredText("");
+    try {
+      const content = text.asText().replace(/\s+/g, " ");
+      const required = [
+        SYNTHETIC_LABEL, student.name, student.email, student.school, String(student.profile.gradYear),
+        ...student.profile.majors, ...student.profile.skills,
+        ...student.profile.experience.flatMap((job) => [job.title, job.org]),
+      ];
+      return { generated: required.every((value) => content.includes(value)), creator: document.getMetaData("info:Creator") };
+    } finally {
+      text.destroy();
+      page.destroy();
+    }
+  } finally {
+    document.destroy();
+  }
+}
+
+/** Explicitly fictional content with existing profile facts preserved in a real source PDF. */
+export async function makeFakeResumePdf(student: FakeResume): Promise<Uint8Array> {
   if (!isInventedUser(student.userId)) throw new Error("Synthetic PDFs are only for seed:/demo: people.");
-
-  const { profile } = student;
-  const lines = [
-    student.name,
-    student.email,
-    "SYNTHETIC DEMO RESUME - all experience below is invented.",
-    "",
-    "EDUCATION",
-    student.school,
-    `${profile.degree} - ${profile.majors.join(" and ")}`,
-    `Expected graduation: May ${profile.gradYear}`,
-    "",
-    "EXPERIENCE",
-    ...profile.experience.flatMap((job, index) => [
-      `${job.org} | ${job.title}`,
-      `May - August ${profile.gradYear - index - 1}`,
-      "- Completed a team project from initial research through testing.",
-      "- Documented findings and presented weekly progress to the team.",
-      "",
-    ]),
-    "PROJECTS",
-    `Student research project | September - December ${profile.gradYear - 2}`,
-    "- Compared sample datasets and checked results against a baseline.",
-    "- Delivered a written report and incorporated peer review feedback.",
-    "",
-    "SKILLS",
-    profile.skills.join(", "),
-  ].flatMap(wrap);
-
-  // 42 lines at 16 pt leading stay inside the existing letter-size page's margins.
-  if (lines.length > 42) throw new Error("Synthetic resume exceeds one page; shorten the sample template.");
-  return makeTextPdf(lines);
+  return renderFakeResumePdf(student);
 }
 
 /** Store both representations under fresh keys; callers attach them only after both succeed. */
 export async function storeFakeResumeFiles(student: FakeResume): Promise<{ pdfKey: string; previewKeys: string[] }> {
-  const pdf = makeFakeResumePdf(student);
+  const pdf = await makeFakeResumePdf(student);
   const pages = await redactResume(pdf, { name: student.name });
   const { deleteFiles, putPreviewPages, putResumePdf, resumePdfKey } = await import("@/backend/storage");
   const pdfKey = resumePdfKey(student.userId, randomUUID());
