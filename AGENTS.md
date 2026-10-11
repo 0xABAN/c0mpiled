@@ -84,6 +84,35 @@ src/backend/    server-only feature modules, each with an index.ts as its public
   api/          the view models and functions the UI calls
 ```
 
+## Design
+
+resumes.fyi's catalog layout with Duolingo's surfaces. The evidence for both is in the Copycat profiles
+`resumes-fyi` and `duolingo` (`~/.copycat/designs`, outside this repo). Borrow the system, never either brand's
+logo, mascot, illustrations, fonts, or copy.
+
+- **Tokens** live in `src/frontend/styles/globals.css`. Use them instead of raw colors. Put `data-hue="…"` on an
+  element to get `--face`, `--lip`, `--deep`, `--tint`, `--wash`, and `--soft` for that hue.
+- **Surfaces:** 2px `--line` outlines, 16px radius, no drop shadows. Anything pressable sits on a solid lip (a
+  thicker bottom border in a darker shade) and presses down onto it. Reuse `Button`, `SelectionCard`,
+  `ToggleChip`, and `Monogram` from `src/frontend/components/ui` instead of restyling.
+- **Type:** Nunito. Buttons, nav, tabs, and eyebrows are 800 weight, uppercase, and tracked. Body is 16px/500.
+- **Color roles:** green is progress (Continue, Accept, Download). Blue is secondary actions, selection, links, and
+  the active nav item. Indigo is money only (unlock, purchase). The other hues are categories: what a candidate
+  seeks (internship blue, full-time orange, both purple) and each club's own color.
+- **Contrast:** bright faces with white labels only on large buttons and art. Small colored text and tags use
+  `--{hue}-deep` (at least 4.5:1 on white and on the hue's tint). `--subtle` is for icons, borders, and
+  placeholders; text uses `--muted` or darker.
+- **Redaction is visible:** hidden text is a dark hatched bar (`RedactedResume`, drawn from the profile). Cards
+  always use it; the detail view shows Contract 3's redacted pages when a resume has them.
+- **Page patterns:**
+  - Recruiter pages (browse, detail, unlock) follow resumes.fyi: a filter rail beside a masonry grid of
+    hue-tinted cards, a meta row outside each card, and a full-screen detail with the document on the left and
+    an info panel on the right.
+  - Onboarding (signup, setup, join) follows Duolingo: one question per screen, a progress bar on top, our mark
+    asking the question in a speech bubble, and the main action in a bottom bar (`OnboardingShell`, `Prompt`).
+  - Officer and student pages: stat tiles and list rows on white.
+- **Motion:** quick and springy (120–320ms, `--ease-spring` for pops). The global reduced-motion rule covers it.
+
 ## Accounts
 
 - **School account:** a verified email at a US school's domain. It can upload one resume and request to join
