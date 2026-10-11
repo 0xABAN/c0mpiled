@@ -48,7 +48,7 @@
   padding: 12px 14px;
   border-radius: var(--radius-md);
   background: var(--red-tint);
-  color: var(--red-lip);
+  color: var(--red-deep);
   font-weight: 800;
 }
 
@@ -67,7 +67,7 @@
 }
 
 .readingMessage {
-  color: var(--blue-lip);
+  color: var(--blue-deep);
   font-weight: 800;
   animation: fade-in var(--dur-slow) ease both;
 }

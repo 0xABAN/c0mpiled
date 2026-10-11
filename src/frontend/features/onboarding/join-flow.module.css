@@ -31,7 +31,7 @@
 }
 
 .invited {
-  color: var(--lip);
+  color: var(--deep);
   font-size: 14px;
   font-weight: 900;
   letter-spacing: 0.1em;

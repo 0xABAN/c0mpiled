@@ -7,7 +7,7 @@
 .logIn {
   padding: 10px 12px;
   border-radius: var(--radius-md);
-  color: var(--blue);
+  color: var(--blue-deep);
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -39,7 +39,7 @@
 }
 
 .schoolNote strong {
-  color: var(--blue-lip);
+  color: var(--blue-deep);
   font-weight: 900;
 }
 

@@ -20,11 +20,11 @@
 }
 
 .earnings :global(.eyebrow) {
-  color: var(--green-lip);
+  color: var(--green-deep);
 }
 
 .total {
-  color: var(--green-lip);
+  color: var(--green-deep);
   font-size: 40px;
   font-weight: 900;
   letter-spacing: -0.02em;
@@ -68,12 +68,12 @@
 .amount {
   display: grid;
   justify-items: end;
-  color: var(--green-lip);
+  color: var(--green-deep);
   font-weight: 900;
 }
 
 .when {
-  color: var(--subtle);
+  color: var(--muted);
   font-size: 12px;
   font-weight: 800;
 }

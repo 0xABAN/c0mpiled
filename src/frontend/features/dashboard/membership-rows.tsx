@@ -33,16 +33,18 @@ export function RequestRow({ membership, busy, onAccept, onReject }: { membershi
 
   return (
     <li className={`${styles.row} ${styles.request}`}>
-      <Identity membership={membership} />
+      <div className={styles.requestInfo}>
+        <Identity membership={membership} />
 
-      <div className={styles.details}>
-        <Tag hue={seekingHue(profile.seeking)}>{seekingLabel(profile.seeking)}</Tag>
-        {profile.skills.slice(0, 3).map((skill) => (
-          <Chip key={skill} small>
-            {skill}
-          </Chip>
-        ))}
-        <span className={styles.when}>{timeAgo(membership.requestedAt)}</span>
+        <div className={styles.details}>
+          <Tag hue={seekingHue(profile.seeking)}>{seekingLabel(profile.seeking)}</Tag>
+          {profile.skills.slice(0, 3).map((skill) => (
+            <Chip key={skill} small>
+              {skill}
+            </Chip>
+          ))}
+          <span className={styles.requested}>Requested {timeAgo(membership.requestedAt)}</span>
+        </div>
       </div>
 
       <div className={styles.actions}>

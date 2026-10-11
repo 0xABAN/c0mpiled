@@ -148,7 +148,7 @@
 }
 
 .shareHint {
-  color: var(--subtle);
+  color: var(--muted);
   font-size: 14px;
   font-weight: 700;
 }

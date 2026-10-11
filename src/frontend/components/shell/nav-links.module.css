@@ -21,7 +21,7 @@
 }
 
 .link[aria-current="page"] {
-  color: var(--blue);
+  color: var(--blue-deep);
 }
 
 /* Sits on top of the header's bottom rule. */

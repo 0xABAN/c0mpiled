@@ -18,7 +18,7 @@
   /* Neutrals */
   --ink: #4b4b4b;
   --ink-body: #3c3c3c;
-  --muted: #737373;
+  --muted: #6b6b6b; /* ≥ 4.5:1 on white, gray, and tinted surfaces */
   --subtle: #afafaf;
   --line: #e5e5e5;
   --line-strong: #d6d6d6;
@@ -26,59 +26,72 @@
   --surface: #ffffff;
   --scrim: rgb(0 0 0 / 0.5);
 
-  /* Hues: face, lip (≈ face × 0.8), tint (selected fills), wash (large surfaces), soft (borders on tint) */
+  /*
+   * Hues: face, lip (≈ face × 0.8), tint (selected fills), wash (large surfaces),
+   * deep (small text and small labels: ≥ 4.5:1 against white and the tint), soft (borders on tint).
+   * Bright faces with white labels are reserved for large buttons and art.
+   */
   --green: #58cc02;
   --green-lip: #58a700;
   --green-tint: #d7ffb8;
   --green-wash: #f1fce8;
+  --green-deep: #3a7300;
   --green-soft: #a5ed6e;
 
   --blue: #1cb0f6;
   --blue-lip: #1899d6;
   --blue-tint: #ddf4ff;
   --blue-wash: #f0faff;
+  --blue-deep: #0a6aa1;
   --blue-soft: #84d8ff;
 
   --indigo: #3c4dff;
   --indigo-lip: #2b35c9;
   --indigo-tint: #e3e6ff;
   --indigo-wash: #f4f5ff;
+  --indigo-deep: #3341e6;
   --indigo-soft: #b3baff;
 
   --purple: #ce82ff;
   --purple-lip: #a568cc;
   --purple-tint: #f1dcff;
   --purple-wash: #fbf5ff;
+  --purple-deep: #7d3db0;
   --purple-soft: #e7c1ff;
 
   --orange: #ff9600;
   --orange-lip: #cc7800;
   --orange-tint: #ffe3b8;
   --orange-wash: #fff8ee;
+  --orange-deep: #9e5000;
   --orange-soft: #ffcc80;
 
   --teal: #00cd9c;
   --teal-lip: #00a47d;
   --teal-tint: #c6f5e9;
   --teal-wash: #effcf8;
+  --teal-deep: #00705a;
   --teal-soft: #8ce8d1;
 
   --pink: #ff86d0;
   --pink-lip: #cc6ba6;
   --pink-tint: #ffdcf1;
   --pink-wash: #fff5fb;
+  --pink-deep: #a8317a;
   --pink-soft: #ffb8e3;
 
   --red: #ff4b4b;
   --red-lip: #d93a3a;
   --red-tint: #ffdbdb;
   --red-wash: #fff4f4;
+  --red-deep: #b52424;
   --red-soft: #ffadad;
 
   --yellow: #ffc800;
   --yellow-lip: #d9a400;
   --yellow-tint: #fff1b8;
   --yellow-wash: #fffbeb;
+  --yellow-deep: #735600;
   --yellow-soft: #ffe066;
 
   /* Shape */
@@ -106,15 +119,15 @@
  * Hue scopes. Components set `data-hue` and read the generic --face / --lip / --tint
  * variables, so one stylesheet serves every category color.
  */
-[data-hue="green"] { --face: var(--green); --lip: var(--green-lip); --tint: var(--green-tint); --wash: var(--green-wash); --soft: var(--green-soft); --on-face: #fff; }
-[data-hue="blue"] { --face: var(--blue); --lip: var(--blue-lip); --tint: var(--blue-tint); --wash: var(--blue-wash); --soft: var(--blue-soft); --on-face: #fff; }
-[data-hue="indigo"] { --face: var(--indigo); --lip: var(--indigo-lip); --tint: var(--indigo-tint); --wash: var(--indigo-wash); --soft: var(--indigo-soft); --on-face: #fff; }
-[data-hue="purple"] { --face: var(--purple); --lip: var(--purple-lip); --tint: var(--purple-tint); --wash: var(--purple-wash); --soft: var(--purple-soft); --on-face: #fff; }
-[data-hue="orange"] { --face: var(--orange); --lip: var(--orange-lip); --tint: var(--orange-tint); --wash: var(--orange-wash); --soft: var(--orange-soft); --on-face: #fff; }
-[data-hue="teal"] { --face: var(--teal); --lip: var(--teal-lip); --tint: var(--teal-tint); --wash: var(--teal-wash); --soft: var(--teal-soft); --on-face: #fff; }
-[data-hue="pink"] { --face: var(--pink); --lip: var(--pink-lip); --tint: var(--pink-tint); --wash: var(--pink-wash); --soft: var(--pink-soft); --on-face: #fff; }
-[data-hue="red"] { --face: var(--red); --lip: var(--red-lip); --tint: var(--red-tint); --wash: var(--red-wash); --soft: var(--red-soft); --on-face: #fff; }
-[data-hue="yellow"] { --face: var(--yellow); --lip: var(--yellow-lip); --tint: var(--yellow-tint); --wash: var(--yellow-wash); --soft: var(--yellow-soft); --on-face: #4b3a00; }
+[data-hue="green"] { --face: var(--green); --lip: var(--green-lip); --deep: var(--green-deep); --tint: var(--green-tint); --wash: var(--green-wash); --soft: var(--green-soft); --on-face: #fff; }
+[data-hue="blue"] { --face: var(--blue); --lip: var(--blue-lip); --deep: var(--blue-deep); --tint: var(--blue-tint); --wash: var(--blue-wash); --soft: var(--blue-soft); --on-face: #fff; }
+[data-hue="indigo"] { --face: var(--indigo); --lip: var(--indigo-lip); --deep: var(--indigo-deep); --tint: var(--indigo-tint); --wash: var(--indigo-wash); --soft: var(--indigo-soft); --on-face: #fff; }
+[data-hue="purple"] { --face: var(--purple); --lip: var(--purple-lip); --deep: var(--purple-deep); --tint: var(--purple-tint); --wash: var(--purple-wash); --soft: var(--purple-soft); --on-face: #fff; }
+[data-hue="orange"] { --face: var(--orange); --lip: var(--orange-lip); --deep: var(--orange-deep); --tint: var(--orange-tint); --wash: var(--orange-wash); --soft: var(--orange-soft); --on-face: #fff; }
+[data-hue="teal"] { --face: var(--teal); --lip: var(--teal-lip); --deep: var(--teal-deep); --tint: var(--teal-tint); --wash: var(--teal-wash); --soft: var(--teal-soft); --on-face: #fff; }
+[data-hue="pink"] { --face: var(--pink); --lip: var(--pink-lip); --deep: var(--pink-deep); --tint: var(--pink-tint); --wash: var(--pink-wash); --soft: var(--pink-soft); --on-face: #fff; }
+[data-hue="red"] { --face: var(--red); --lip: var(--red-lip); --deep: var(--red-deep); --tint: var(--red-tint); --wash: var(--red-wash); --soft: var(--red-soft); --on-face: #fff; }
+[data-hue="yellow"] { --face: var(--yellow); --lip: var(--yellow-lip); --deep: var(--yellow-deep); --tint: var(--yellow-tint); --wash: var(--yellow-wash); --soft: var(--yellow-soft); --on-face: #4b3a00; }
 
 /* Reset */
 *,

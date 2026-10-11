@@ -9,8 +9,23 @@
   animation: row-in var(--dur-slow) var(--ease-out) both;
 }
 
+/* Requests: who they are and what they bring on the left, the decision on the right. */
 .request {
+  flex-wrap: nowrap;
   border-bottom-width: 5px;
+}
+
+.requestInfo {
+  display: grid;
+  flex: 1;
+  gap: 10px;
+  min-width: 0;
+}
+
+.requested {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
 }
 
 @keyframes row-in {
@@ -41,7 +56,7 @@
 
 .email {
   overflow: hidden;
-  color: var(--blue-lip);
+  color: var(--blue-deep);
   font-size: 14px;
   font-weight: 800;
   text-overflow: ellipsis;
@@ -56,15 +71,15 @@
 
 .details {
   display: flex;
-  flex: 1 1 220px;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
+  padding-left: 58px; /* aligns under the name, past the avatar */
 }
 
 .when {
   margin-left: auto;
-  color: var(--subtle);
+  color: var(--muted);
   font-size: 13px;
   font-weight: 800;
   white-space: nowrap;
@@ -72,5 +87,24 @@
 
 .actions {
   display: flex;
+  flex-shrink: 0;
   gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .request {
+    flex-wrap: wrap;
+  }
+
+  .details {
+    padding-left: 0;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .actions > * {
+    flex: 1;
+  }
 }

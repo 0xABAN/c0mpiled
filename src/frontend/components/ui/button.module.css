@@ -121,7 +121,7 @@
   --lip-size: 0px;
   --face: transparent;
   --lip: transparent;
-  --on-face: var(--blue);
+  --on-face: var(--blue-deep);
 
   height: auto;
   padding: 6px 4px;
@@ -129,7 +129,7 @@
 
 .ghost:hover:not(:disabled) {
   filter: none;
-  color: var(--blue-lip);
+  color: var(--blue-deep);
 }
 
 .ghost:disabled {

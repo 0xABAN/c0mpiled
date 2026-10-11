@@ -72,7 +72,7 @@
 
 .badge {
   margin-top: 6px;
-  color: var(--subtle);
+  color: var(--muted);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.08em;

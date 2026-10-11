@@ -42,7 +42,7 @@
 }
 
 .hint {
-  color: var(--subtle);
+  color: var(--muted);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.06em;

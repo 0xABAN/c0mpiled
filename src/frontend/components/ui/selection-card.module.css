@@ -87,7 +87,7 @@
 }
 
 .card:has(input:checked) .title {
-  color: var(--blue-lip);
+  color: var(--blue-deep);
 }
 
 .description {

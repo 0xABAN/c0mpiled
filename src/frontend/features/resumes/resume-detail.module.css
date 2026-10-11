@@ -126,7 +126,7 @@
 
 .viewTab[aria-selected="true"] {
   background: var(--tint);
-  color: var(--lip);
+  color: var(--deep);
 }
 
 /* ---------- Panel ---------- */
@@ -191,7 +191,7 @@
 .sectionTitle {
   padding-bottom: 8px;
   border-bottom: var(--border) solid var(--line);
-  color: var(--subtle);
+  color: var(--muted);
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 0.1em;

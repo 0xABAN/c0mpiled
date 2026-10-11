@@ -16,7 +16,7 @@
 }
 
 .count {
-  color: var(--subtle);
+  color: var(--muted);
   font-size: 13px;
   font-weight: 800;
 }
@@ -111,5 +111,5 @@
   border-style: solid;
   border-color: var(--blue-soft);
   background: var(--blue-wash);
-  color: var(--blue-lip);
+  color: var(--blue-deep);
 }

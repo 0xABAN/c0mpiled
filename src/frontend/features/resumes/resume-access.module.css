@@ -33,7 +33,7 @@
 }
 
 .contactCard :global(.eyebrow) {
-  color: var(--green-lip);
+  color: var(--green-deep);
 }
 
 .email {
@@ -53,7 +53,7 @@
 }
 
 .email:hover {
-  color: var(--blue);
+  color: var(--blue-deep);
 }
 
 .contactActions {

@@ -11,7 +11,7 @@
 
 .optional {
   margin-left: 6px;
-  color: var(--subtle);
+  color: var(--muted);
   font-weight: 700;
 }
 
@@ -97,7 +97,7 @@
 }
 
 .action:hover {
-  color: var(--blue);
+  color: var(--blue-deep);
 }
 
 .hint {
@@ -110,7 +110,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--red-lip);
+  color: var(--red-deep);
   font-size: 14px;
   font-weight: 700;
 }
@@ -156,7 +156,7 @@
 }
 
 .check input:checked + .box {
-  border-color: var(--blue-lip);
+  border-color: var(--blue-deep);
   background: var(--blue);
   color: #fff;
   transform: scale(1.06);
@@ -174,7 +174,7 @@
 
 .count {
   margin-left: auto;
-  color: var(--subtle);
+  color: var(--muted);
   font-size: 13px;
   font-weight: 700;
 }

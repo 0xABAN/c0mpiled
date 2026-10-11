@@ -107,7 +107,7 @@
 
 .theme :global(.amplify-field__show-password:hover) {
   background: var(--sunken);
-  color: var(--blue);
+  color: var(--blue-deep);
 }
 
 .theme :global(.amplify-field-group:focus-within .amplify-field__show-password) {
@@ -122,7 +122,7 @@
 
 .theme :global(.amplify-text--error),
 .theme :global([data-amplify-sign-up-errors]) {
-  color: var(--red-lip);
+  color: var(--red-deep);
   font-size: 14px;
   font-weight: 700;
 }
@@ -173,7 +173,7 @@
   padding: 8px;
   border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--blue);
+  color: var(--blue-deep);
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -182,7 +182,7 @@
 
 .theme :global(.amplify-button--link:hover) {
   background: var(--blue-wash);
-  color: var(--blue-lip);
+  color: var(--blue-deep);
 }
 
 /* Secondary actions such as "Resend code". */
@@ -208,12 +208,12 @@
 
 .theme :global(.amplify-alert--error) {
   background: var(--red-tint);
-  color: var(--red-lip);
+  color: var(--red-deep);
 }
 
 .theme :global(.amplify-alert--info) {
   background: var(--blue-tint);
-  color: var(--blue-lip);
+  color: var(--blue-deep);
 }
 
 /* ---------- Our pieces ---------- */

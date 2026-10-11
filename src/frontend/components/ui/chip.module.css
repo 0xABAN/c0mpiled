@@ -48,7 +48,7 @@
 .toggle[aria-pressed="true"] {
   border-color: var(--blue-soft);
   background: var(--blue-tint);
-  color: var(--blue-lip);
+  color: var(--blue-deep);
 }
 
 .remove {
@@ -73,5 +73,5 @@
 .active {
   border-color: var(--blue-soft);
   background: var(--blue-tint);
-  color: var(--blue-lip);
+  color: var(--blue-deep);
 }

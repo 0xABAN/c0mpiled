@@ -159,7 +159,7 @@
 }
 
 .count {
-  color: var(--subtle);
+  color: var(--muted);
   font-weight: 900;
 }
 
@@ -185,7 +185,7 @@
 }
 
 .sideNote {
-  color: var(--subtle);
+  color: var(--muted);
   font-size: 13px;
   font-weight: 700;
   text-align: center;

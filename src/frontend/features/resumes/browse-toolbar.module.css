@@ -93,7 +93,7 @@
 .segmented button[aria-pressed="true"] {
   background: var(--surface);
   box-shadow: inset 0 0 0 2px var(--line), inset 0 -3px 0 var(--line);
-  color: var(--blue);
+  color: var(--blue-deep);
 }
 
 .applied {

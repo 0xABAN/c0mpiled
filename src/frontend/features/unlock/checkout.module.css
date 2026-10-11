@@ -27,7 +27,7 @@
 }
 
 .back:hover {
-  color: var(--blue);
+  color: var(--blue-deep);
 }
 
 .layout {
@@ -254,7 +254,7 @@
 }
 
 .toClub {
-  color: var(--green-lip);
+  color: var(--green-deep);
 }
 
 .fee {
@@ -271,7 +271,7 @@
   padding: 12px 14px;
   border-radius: var(--radius-md);
   background: var(--red-tint);
-  color: var(--red-lip);
+  color: var(--red-deep);
   font-weight: 800;
 }
 
