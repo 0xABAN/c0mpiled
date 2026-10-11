@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:generate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs generate",
-    "db:migrate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs migrate"
+    "db:migrate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs migrate",
+    "db:seed": "tsx --conditions=react-server --env-file=.env.local src/backend/db/seed.ts"
   },
   "dependencies": {
     "@aws-amplify/adapter-nextjs": "^1.8.0",
