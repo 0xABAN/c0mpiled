@@ -7,10 +7,12 @@
  * The two logins (see `./accounts`) are real Cognito users with the public demo password. Everyone
  * else here is invented, with ids starting "demo:", separate from the "seed:" data:
  *
- * - Demo Club, run by the demo officer: accepted members, pending requests, and two sales.
+ * - The demo student, Riley: a real PDF with redacted previews, accepted into Demo Club and
+ *   pending at Demo Robotics. Riley also runs Demo Club, which has members, pending requests, and
+ *   three sales.
+ * - The demo company, Demo Co: a recruiter who bought Demo Club's book, so its resumes (Riley's
+ *   included) show unlocked on browse.
  * - Demo Robotics, run by an invented officer.
- * - The demo student: a real PDF with redacted previews, accepted into Demo Club and pending at
- *   Demo Robotics.
  */
 
 import { randomUUID } from "node:crypto";
@@ -137,8 +139,16 @@ async function insertDemoData(db: Database, logins: Record<DemoRole, string>) {
   const onboardedAt = hoursAgo(48);
 
   const userRows: (typeof users.$inferInsert)[] = [
-    { id: logins.officer, email: DEMO_ACCOUNTS.officer, accountType: "school", schoolDomain: SCHOOL_DOMAIN, onboardedAt },
     { id: logins.student, email: DEMO_ACCOUNTS.student, accountType: "school", schoolDomain: SCHOOL_DOMAIN, onboardedAt },
+    {
+      id: logins.company,
+      email: DEMO_ACCOUNTS.company,
+      accountType: "recruiter",
+      company: "Demo Co",
+      jobTitle: "University Recruiter",
+      hiring: { seeking: ["internship"], gradYears: [2027, 2028], majors: [] },
+      onboardedAt,
+    },
     { id: `${DEMO_PREFIX}robotics-officer`, email: "robotics.officer.demo@psu.edu", accountType: "school", schoolDomain: SCHOOL_DOMAIN, onboardedAt },
   ];
 
@@ -146,7 +156,7 @@ async function insertDemoData(db: Database, logins: Record<DemoRole, string>) {
   const robotics = { id: randomUUID(), bookId: randomUUID(), priceCents: 25000 };
 
   const clubRows: (typeof clubs.$inferInsert)[] = [
-    { id: demoClub.id, slug: "psu-demo-club", schoolDomain: SCHOOL_DOMAIN, name: "Demo Club", tagline: "A sample club for trying Roster as an officer", hue: "green", payoutEmail: DEMO_ACCOUNTS.officer, ownerId: logins.officer },
+    { id: demoClub.id, slug: "psu-demo-club", schoolDomain: SCHOOL_DOMAIN, name: "Demo Club", tagline: "A sample club for trying Roster as an officer", hue: "green", payoutEmail: DEMO_ACCOUNTS.student, ownerId: logins.student },
     { id: robotics.id, slug: "psu-demo-robotics", schoolDomain: SCHOOL_DOMAIN, name: "Demo Robotics", tagline: "A second sample club", hue: "orange", payoutEmail: "robotics.officer.demo@psu.edu", ownerId: `${DEMO_PREFIX}robotics-officer` },
   ];
   const bookRows: (typeof books.$inferInsert)[] = [
@@ -187,12 +197,14 @@ async function insertDemoData(db: Database, logins: Record<DemoRole, string>) {
     { bookId: robotics.bookId, resumeId: studentResumeId, status: "pending", consentedAt: hoursAgo(1), requestedAt: hoursAgo(1), decidedAt: null },
   );
 
-  // Two companies already bought Demo Club's book, so the officer sees earnings.
+  // Two invented companies and Demo Co bought Demo Club's book: Riley sees earnings, and Demo Co
+  // sees the unlocked side of browse.
   const unlockRows: (typeof unlocks.$inferInsert)[] = ["Lutron", "Vanguard"].map((company, index) => {
     const recruiterId = `${DEMO_PREFIX}recruiter-${index + 1}`;
     userRows.push({ id: recruiterId, email: `recruiter${index + 1}@${company.toLowerCase()}.example.com`, accountType: "recruiter", company, onboardedAt });
     return { bookId: demoClub.bookId, recruiterId, priceCents: demoClub.priceCents, createdAt: hoursAgo(5 - index * 3) };
   });
+  unlockRows.push({ bookId: demoClub.bookId, recruiterId: logins.company, priceCents: demoClub.priceCents, createdAt: hoursAgo(1) });
 
   await db.transaction(async (tx) => {
     await tx.insert(users).values(userRows);
@@ -213,8 +225,8 @@ async function main() {
 
   try {
     const logins = {
-      officer: await ensureCognitoUser(cognito, userPoolId, DEMO_ACCOUNTS.officer),
       student: await ensureCognitoUser(cognito, userPoolId, DEMO_ACCOUNTS.student),
+      company: await ensureCognitoUser(cognito, userPoolId, DEMO_ACCOUNTS.company),
     };
 
     await removeDemoData(db, Object.values(logins));
@@ -225,7 +237,7 @@ async function main() {
 
     const counts = await insertDemoData(db, logins);
     console.log(`Demo ready: ${counts.resumes} resumes, ${counts.memberships} memberships, ${counts.purchases} purchases.`);
-    console.log(`Log in as ${DEMO_ACCOUNTS.officer} or ${DEMO_ACCOUNTS.student} with NEXT_PUBLIC_DEMO_PASSWORD.`);
+    console.log(`Log in as ${DEMO_ACCOUNTS.student} or ${DEMO_ACCOUNTS.company} with NEXT_PUBLIC_DEMO_PASSWORD.`);
   } finally {
     await pool.end();
   }
