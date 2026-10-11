@@ -14,7 +14,7 @@ next-env.d.ts
 
 # never commit real resumes
 *.pdf
-resumes/
+/resumes/
 
 # misc
 .DS_Store
