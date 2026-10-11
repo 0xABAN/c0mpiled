@@ -13,7 +13,8 @@ import type { ParsedResume } from "@/frontend/lib/api/types";
 import type { StepFrame } from "../step";
 import styles from "./resume-steps.module.css";
 
-const MAX_BYTES = 5 * 1024 * 1024;
+/** Matches the server's limit, which sits below Amplify's ~4.4 MB request cap (AGENTS.md). */
+const MAX_BYTES = 4 * 1024 * 1024;
 
 /** Shown while the parser runs, which takes 5–10 seconds. */
 const READING_MESSAGES = ["Reading your resume…", "Finding your majors…", "Picking out your skills…", "Spotting your experience…", "Almost done…"];
@@ -34,13 +35,17 @@ export function ResumeUploadStep({ frame, onUploaded }: ResumeUploadStepProps) {
     setError(null);
 
     if (file.type !== "application/pdf") return setError("That file isn't a PDF. Export your resume as a PDF and try again.");
-    if (file.size > MAX_BYTES) return setError("PDFs must be 5 MB or smaller.");
+    if (file.size > MAX_BYTES) return setError("PDFs must be 4 MB or smaller. Try exporting it again, without images.");
 
     setFileName(file.name);
     const body = new FormData();
     body.set("file", file);
 
-    const result = await uploadResume(body);
+    // A request the platform rejects (e.g. Amplify's 413) throws instead of returning an error result.
+    const result = await uploadResume(body).catch(() => ({
+      status: "error" as const,
+      message: "The upload didn't go through. Check your connection and try again.",
+    }));
     if (result.status === "error") {
       setFileName(null);
       setError(result.message);
@@ -77,7 +82,7 @@ export function ResumeUploadStep({ frame, onUploaded }: ResumeUploadStepProps) {
             <FileUp size={34} strokeWidth={2.5} />
           </span>
           <p className={styles.dropTitle}>Drag your resume here</p>
-          <p className={styles.dropHint}>PDF, up to 5 MB</p>
+          <p className={styles.dropHint}>PDF, up to 4 MB</p>
           <Button variant="secondary" onClick={() => input.current?.click()}>
             Choose file
           </Button>

@@ -31,7 +31,10 @@ export function useRedactionPreview(uploadId: string | null, name: string): Reda
     setPreview({ status: "loading" });
 
     const timer = setTimeout(async () => {
-      const result = await previewRedaction(uploadId, trimmed);
+      const result = await previewRedaction(uploadId, trimmed).catch(() => ({
+        status: "error" as const,
+        message: "We couldn't load the preview. Edit your name to try again.",
+      }));
       if (cancelled) return;
       setPreview(result.status === "ok" ? { status: "ready", pages: result.data.pages } : { status: "error", message: result.message });
     }, DEBOUNCE_MS);
