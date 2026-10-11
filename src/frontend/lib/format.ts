@@ -1,4 +1,5 @@
 import type { Degree, Seeking } from "@/frontend/lib/api/types";
+import type { Tone } from "@/frontend/lib/tone";
 
 const DEGREE_NAMES: Record<Degree, string> = { BS: "B.S.", MS: "M.S.", PhD: "Ph.D." };
 
@@ -63,6 +64,12 @@ export function initials(name: string): string {
   if (significant.length === 0) return "?";
   if (significant.length === 1) return significant[0][0].toUpperCase();
   return (significant[0][0] + significant[1][0]).toUpperCase();
+}
+
+/** Employment badges share the same colors on cards, details, and purchase screens. */
+export function seekingTone(seeking: Seeking[]): Tone {
+  if (seeking.length > 1) return "neutral";
+  return seeking[0] === "full-time" ? "yellow" : "accent";
 }
 
 export function seekingLabel(seeking: Seeking[]): string {

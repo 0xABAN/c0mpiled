@@ -1,6 +1,6 @@
 /*
  * Big pressable answer cards (onboarding choices, purchase options).
- * Unselected: white with a gray outline and lip. Selected: blue tint with a blue outline.
+ * Unselected: white with a gray outline and lip. Selected: solid accent with a darker lip.
  */
 
 .card {
@@ -32,8 +32,8 @@
 }
 
 .card:has(input:checked) {
-  border-color: var(--accent-soft);
-  background: var(--accent-tint);
+  border-color: var(--accent-lip);
+  background: var(--accent);
 }
 
 .card:has(input:focus-visible) {
@@ -86,8 +86,9 @@
   line-height: 1.25;
 }
 
-.card:has(input:checked) .title {
-  color: var(--accent-deep);
+/* Dark text stays readable on the bright selected face, including small descriptions. */
+.card:has(input:checked) :is(.title, .description) {
+  color: var(--ink);
 }
 
 .description {
@@ -138,8 +139,8 @@
 }
 
 .card:has(input:checked) .indicator {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #fff;
+  border-color: var(--surface);
+  background: var(--surface);
+  color: var(--accent);
   transform: scale(1.08);
 }

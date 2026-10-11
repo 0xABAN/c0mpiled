@@ -9,7 +9,7 @@ import { Tag } from "@/frontend/components/ui/tag";
 import { useToast } from "@/frontend/components/ui/toast";
 import { resumePdfUrl, resumePreviewUrl } from "@/frontend/lib/api/routes";
 import type { ResumeView } from "@/frontend/lib/api/types";
-import { formatDegree, seekingLabel } from "@/frontend/lib/format";
+import { formatDegree, seekingLabel, seekingTone } from "@/frontend/lib/format";
 
 import { RedactedPages } from "./redacted-pages";
 import styles from "./resume-detail.module.css";
@@ -128,7 +128,7 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
             </span>
             <div className={styles.nameRow}>
               <h2 className={styles.name}>{contact?.name ?? "Name hidden"}</h2>
-              <Tag tone="accent" className={styles.seeking}>{seekingLabel(profile.seeking)}</Tag>
+              <Tag tone={seekingTone(profile.seeking)}>{seekingLabel(profile.seeking)}</Tag>
             </div>
           </div>
 

@@ -98,21 +98,24 @@ the systems, never any brand's logo, mascot, illustrations, fonts, or copy.
   `--deep`, `--tint`, `--wash`, and `--soft`. Neutral is the default.
 - **Surfaces:** 2px `--line` outlines, 16px radius, no drop shadows. Anything pressable sits on a solid lip (a
   thicker bottom border in a darker shade) and presses down onto it. Reuse `Button`, `SelectionCard`,
-  `ToggleChip`, and `Monogram` from `src/frontend/components/ui` instead of restyling.
+  `ToggleChip`, and `Monogram` from `src/frontend/components/ui` instead of restyling. Selected choice
+  cards use a solid accent face, darker lip, and dark text, not a pale tint.
 - **Type:** Nunito. Buttons, nav, tabs, and eyebrows are 800 weight, uppercase, and tracked. Body is 16px/500.
 - **Palette (Firecrawl):** red-orange, yellow, gray, and white, with pure black on rare occasions. The page is
   an off-white `--canvas` with white cards, `#262626` ink, and hairline grays.
   - Red-orange `--accent` is every primary action (Continue, Accept, Unlock), selection, focus, the active nav
     item, links, money (earnings), one key phrase in big headlines, and also `--success` and `--danger`.
   - Yellow `--warning` marks things worth noticing that aren't actions: pending, waiting, BEST VALUE, coins.
-  - Clubs, companies, schools, and resume paper stay gray and white. Seeking badges are red-orange with
-    white labels; every seeking type uses the same color. Clubs still store a `hue`, but nothing renders it.
+  - Clubs, companies, schools, and resume paper stay gray and white. Seeking badges use red-orange for
+    internships, yellow for full-time, and gray for both. `seekingTone` keeps this consistent everywhere.
+    Clubs still store a `hue`, but nothing renders it.
   - Ink (near-black on a black lip) is for `--secondary` buttons and rare heavy art: choice screens, the
     officer's own club tile, the account avatar.
-- **Restraint:** orange never floods a large surface. Decorative fields use the `.grid-field` utility (Firecrawl's
-  faint grid); the landing's closing band is the one solid accent block.
-- **Contrast:** action buttons and seeking badges use the requested white-on-bright-orange treatment
-  (3.3:1). Other small colored text uses the `-deep` shades (at least 4.5:1 on white and on their tint).
+- **Restraint:** solid orange is reserved for actions, selected choice cards, and the landing's closing band.
+  Decorative fields use the `.grid-field` utility (Firecrawl's faint grid).
+- **Contrast:** action buttons and internship badges keep the requested white-on-bright-orange treatment
+  (3.3:1). Yellow/gray badges and selected cards use dark text. Other small colored text uses the `-deep`
+  shades (at least 4.5:1 on white and on their tint).
   `--subtle` is for icons, borders, and placeholders; text uses `--muted` or darker.
 - **Redaction is visible:** small cards use profile-drawn `RedactedResume` thumbnails with hatched identity
   bars. Expanded views show the actual redacted source pages, or the original PDF after purchase, inside

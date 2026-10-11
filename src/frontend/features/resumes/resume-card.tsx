@@ -5,7 +5,7 @@ import type { MouseEvent } from "react";
 import { Monogram } from "@/frontend/components/ui/monogram";
 import { Tag } from "@/frontend/components/ui/tag";
 import type { ResumeView } from "@/frontend/lib/api/types";
-import { formatDegree, seekingLabel } from "@/frontend/lib/format";
+import { formatDegree, seekingLabel, seekingTone } from "@/frontend/lib/format";
 
 import { RedactedResume } from "./redacted-resume";
 import styles from "./resume-card.module.css";
@@ -28,7 +28,7 @@ export function ResumeCard({ resume, href, onOpen }: ResumeCardProps) {
     <div className={styles.wrap}>
       <Link href={href} scroll={false} className={styles.card} onClick={onOpen}>
         <div className={styles.preview}>
-          <Tag className={styles.tag}>
+          <Tag tone={seekingTone(profile.seeking)} className={styles.tag}>
             {seekingLabel(profile.seeking)}
           </Tag>
           <div className={styles.paper}>

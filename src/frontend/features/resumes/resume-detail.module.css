@@ -157,11 +157,6 @@
   min-width: 0;
 }
 
-.nameRow .seeking {
-  background: var(--face);
-  color: #fff;
-}
-
 .name {
   font-size: 24px;
 }

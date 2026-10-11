@@ -80,12 +80,13 @@ try {
   assert.equal(await sidebar.getByRole("heading", { name: /Experience|Skills/ }).count(), 0);
   const buy = sidebar.getByRole("link", { name: "Buy resume book", exact: true });
   assert.ok((await buy.getAttribute("href")).startsWith("/unlock/"), "Company lost checkout controls.");
-  for (const element of [buy, sidebar.locator('[data-tone="accent"]')]) {
-    assert.deepEqual(await element.evaluate((node) => ({ background: getComputedStyle(node).backgroundColor, color: getComputedStyle(node).color })), {
-      background: "rgb(255, 77, 0)", color: "rgb(255, 255, 255)",
-    }, "Purchase control and employment badge must be orange and white.");
-  }
-  console.log("PASS company: minimal sidebar, orange/white badge, and purchase button.");
+  assert.deepEqual(await buy.evaluate((node) => ({ background: getComputedStyle(node).backgroundColor, color: getComputedStyle(node).color })), {
+    background: "rgb(255, 77, 0)", color: "rgb(255, 255, 255)",
+  }, "Purchase control must be orange and white.");
+  const badge = sidebar.getByText(/^(Internship|Full-time|Intern \+ Full-time)$/);
+  const seekingTones = { Internship: "accent", "Full-time": "yellow", "Intern + Full-time": "neutral" };
+  assert.equal(await badge.getAttribute("data-tone"), seekingTones[await badge.textContent()], "Employment badge must reflect the candidate’s seeking type.");
+  console.log("PASS company: minimal sidebar, seeking-type badge, and purchase button.");
 
   await companyPage.goto(`${base}/browse?r=${PURCHASED_RESUME_ID}`, { waitUntil: "networkidle" });
   await companyDialog.waitFor();

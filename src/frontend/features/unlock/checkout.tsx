@@ -12,7 +12,7 @@ import { Tag } from "@/frontend/components/ui/tag";
 import { RedactedResume } from "@/frontend/features/resumes/redacted-resume";
 import { unlockBook } from "@/frontend/lib/api/actions";
 import type { UnlockOffer, UnlockQuote, UnlockResult } from "@/frontend/lib/api/types";
-import { formatMoney, pluralize, seekingLabel } from "@/frontend/lib/format";
+import { formatMoney, pluralize, seekingLabel, seekingTone } from "@/frontend/lib/format";
 
 import styles from "./checkout.module.css";
 import { UnlockSuccess } from "./unlock-success";
@@ -75,7 +75,7 @@ export function Checkout({ quote, resumeHref }: { quote: UnlockQuote; resumeHref
               <RedactedResume resume={resume} />
             </div>
             <div className={styles.previewText}>
-              <Tag>{seekingLabel(resume.profile.seeking)}</Tag>
+              <Tag tone={seekingTone(resume.profile.seeking)}>{seekingLabel(resume.profile.seeking)}</Tag>
               <h2 className={styles.previewTitle}>{resume.profile.majors.join(" & ")}</h2>
               <p className={styles.previewMeta}>
                 {resume.school.name} · Class of {resume.profile.gradYear}
