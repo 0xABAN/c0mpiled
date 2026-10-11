@@ -41,7 +41,6 @@
   left: 24px;
   z-index: 1;
   background: var(--accent);
-  color: var(--ink);
 }
 
 .paper {
