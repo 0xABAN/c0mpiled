@@ -80,21 +80,24 @@ export async function updateBookPrice(priceCents: number): Promise<ActionResult>
   });
 }
 
-/*
- * Not built yet. Uploads need S3 and the parser (the teammate's `@/backend/parsing`), and
- * purchases need billing (`@/backend/billing`). Each says so instead of pretending to work.
+/**
+ * Stores one resume PDF (form field `file`, at most 5 MB) for a school account. `parsed` is
+ * `null` until the parser exists, so the student fills in the profile by hand.
  */
-
 export async function uploadResume(formData: FormData): Promise<UploadResult> {
-  void formData;
-  return { status: "error", message: "Resume uploads aren't open yet." };
+  const result = await runAction(() => resumes.uploadResume(formData));
+  return result.status === "ok" ? { status: "ok", ...result.data } : result;
 }
 
+/** Saves the student's resume and requests to join the chosen books at their school. */
 export async function submitResume(submission: ResumeSubmission): Promise<ActionResult> {
-  void submission;
-  return { status: "error", message: "Resume uploads aren't open yet." };
+  return runAction(async () => {
+    await resumes.submitResume(submission);
+    return null;
+  });
 }
 
+/** Not built yet: purchases need billing (`@/backend/billing`), so this says so instead of pretending. */
 export async function unlockBook(bookId: string, resumeId: string): Promise<UnlockResult> {
   void bookId;
   void resumeId;
