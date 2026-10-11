@@ -1,0 +1,36 @@
+/*
+ * Colored initials tile with a lip. Stands in for company and club logos, which we
+ * don't have, and gives the catalog its color.
+ */
+
+.monogram {
+  --size: 40px;
+
+  display: inline-grid;
+  place-items: center;
+  width: var(--size);
+  height: var(--size);
+  border-radius: calc(var(--size) * 0.3);
+  background: var(--face);
+  box-shadow: inset 0 calc(var(--size) * -0.08) 0 var(--lip);
+  color: var(--on-face);
+  font-size: calc(var(--size) * 0.38);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Lift the glyph so it sits optically centered on the face, above the lip. */
+.monogram > * {
+  transform: translateY(calc(var(--size) * -0.03));
+}
+
+.circle {
+  border-radius: 50%;
+}
+
+/* White ring, like logos stamped on paper. */
+.ringed {
+  outline: 3px solid var(--surface);
+}

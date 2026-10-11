@@ -1,0 +1,157 @@
+/*
+ * The paper. All internal sizes are in `em`, so the `card` and `full` sizes only
+ * change the root font size.
+ */
+
+.paper {
+  display: grid;
+  gap: 1.1em;
+  padding: 1.5em 1.5em 1.7em;
+  border-radius: 0.8em;
+  background: var(--surface);
+  color: var(--ink-body);
+  font-size: var(--doc-size);
+  line-height: 1.35;
+  text-align: left;
+}
+
+.card {
+  --doc-size: 10.5px;
+}
+
+.full {
+  --doc-size: 15px;
+
+  padding: 2.6em 2.8em 3em;
+  gap: 1.5em;
+}
+
+/* ---------- Header ---------- */
+
+.header {
+  display: grid;
+  gap: 0.55em;
+  padding-bottom: 0.2em;
+}
+
+.name {
+  min-height: 1.4em;
+  color: var(--ink);
+  font-size: 1.55em;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.contactLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45em;
+  min-height: 1em;
+  color: var(--muted);
+  font-size: 0.95em;
+  font-weight: 600;
+}
+
+/* ---------- Redaction ---------- */
+
+.redaction {
+  display: inline-block;
+  width: var(--w);
+  height: 0.95em;
+  border-radius: 0.3em;
+  background:
+    repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.06) 0 0.25em, transparent 0.25em 0.5em),
+    var(--ink-body);
+  vertical-align: middle;
+}
+
+.thin {
+  height: 0.75em;
+  background: var(--line-strong);
+}
+
+/*
+ * Reveal after purchase: the text is rendered under a bar that slides off to the right.
+ */
+.revealing {
+  position: relative;
+  display: inline-block;
+}
+
+.peel {
+  position: absolute;
+  inset: -0.08em -0.2em;
+  border-radius: 0.3em;
+  background: var(--ink-body);
+  transform-origin: right center;
+  animation: peel 700ms var(--ease-out) 350ms both;
+}
+
+@keyframes peel {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* ---------- Sections ---------- */
+
+.section {
+  display: grid;
+  gap: 0.7em;
+}
+
+.sectionTitle {
+  padding-bottom: 0.35em;
+  border-bottom: 0.15em solid var(--line);
+  color: var(--subtle);
+  font-size: 0.8em;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75em;
+}
+
+.entryText {
+  display: grid;
+  flex: 1;
+  gap: 0.15em;
+  min-width: 0;
+}
+
+.entryTitle {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 1.05em;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entryMeta {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.placeholder {
+  display: grid;
+  gap: 0.45em;
+  margin-top: 0.45em;
+}
+
+.placeholder span {
+  height: 0.55em;
+  border-radius: 1em;
+  background: var(--line);
+}
+
+.skills {
+  color: var(--ink-body);
+  font-weight: 700;
+}

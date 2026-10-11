@@ -1,0 +1,59 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: var(--header-h);
+  border-bottom: var(--border) solid var(--line);
+  background: rgb(255 255 255 / 0.96);
+  backdrop-filter: saturate(1.4) blur(8px);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  width: min(100%, var(--container));
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 var(--page-x);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+}
+
+.auth {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Unlock counter, styled like a game stat. */
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: var(--radius-md);
+  color: var(--indigo);
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.stat:hover {
+  background: var(--indigo-wash);
+}
+
+@media (max-width: 720px) {
+  .inner {
+    gap: 12px;
+  }
+
+  .signup {
+    display: none;
+  }
+}

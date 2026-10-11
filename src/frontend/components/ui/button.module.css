@@ -1,0 +1,182 @@
+/*
+ * Pressable buttons. The face sits on a solid "lip": a thicker bottom border in a darker
+ * shade, included in the button's height. Pressing collapses the lip and moves the face
+ * down by the same amount; the extra bottom margin keeps the layout box the same size,
+ * so neighbors never jump.
+ */
+
+.button {
+  --lip-size: var(--lip-h);
+  --edge: 0px;
+  --edge-color: transparent;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 20px;
+  border: var(--edge) solid var(--edge-color);
+  border-bottom: calc(var(--edge) + var(--lip-size)) solid var(--lip);
+  border-radius: var(--radius);
+  background: var(--face);
+  color: var(--on-face);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    filter var(--dur) ease,
+    background-color var(--dur) ease,
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.button:hover:not(:disabled, [aria-disabled="true"]) {
+  filter: brightness(1.06);
+}
+
+.button:active:not(:disabled, [aria-disabled="true"]) {
+  border-bottom-width: var(--edge);
+  margin-bottom: var(--lip-size);
+  transform: translateY(var(--lip-size));
+}
+
+.button:disabled,
+.button[aria-disabled="true"] {
+  --face: var(--line);
+  --lip: var(--line);
+  --edge-color: var(--line);
+  --on-face: var(--subtle);
+
+  filter: none;
+}
+
+/* Variants choose the hue. */
+.primary {
+  --face: var(--green);
+  --lip: var(--green-lip);
+  --on-face: #fff;
+}
+
+.secondary {
+  --face: var(--blue);
+  --lip: var(--blue-lip);
+  --on-face: #fff;
+}
+
+.premium {
+  --face: var(--indigo);
+  --lip: var(--indigo-lip);
+  --on-face: #fff;
+}
+
+.danger {
+  --face: var(--red);
+  --lip: var(--red-lip);
+  --on-face: #fff;
+}
+
+/* White face, gray outline and lip; the label carries the color. */
+.outline,
+.quiet {
+  --lip-size: 2px;
+  --edge: var(--border);
+  --edge-color: var(--line);
+  --face: var(--surface);
+  --lip: var(--line);
+  --on-face: var(--blue);
+}
+
+.quiet {
+  --on-face: var(--muted);
+}
+
+.outline:hover:not(:disabled),
+.quiet:hover:not(:disabled) {
+  filter: none;
+  background-color: var(--sunken);
+}
+
+/* Disabled outline buttons stay white and just fade, instead of turning into a gray block. */
+.outline:disabled,
+.quiet:disabled {
+  --face: var(--surface);
+  --on-face: var(--line-strong);
+}
+
+/* White button on a colored field. */
+.inverse {
+  --face: var(--surface);
+  --lip: rgb(0 0 0 / 0.16);
+  --on-face: var(--ink);
+}
+
+/* Text-only, for "Clear all", "Skip", and inline actions. */
+.ghost {
+  --lip-size: 0px;
+  --face: transparent;
+  --lip: transparent;
+  --on-face: var(--blue);
+
+  height: auto;
+  padding: 6px 4px;
+}
+
+.ghost:hover:not(:disabled) {
+  filter: none;
+  color: var(--blue-lip);
+}
+
+.ghost:disabled {
+  --face: transparent;
+  --lip: transparent;
+}
+
+/* Sizes */
+.sm {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+}
+
+.lg {
+  height: 54px;
+  padding: 0 28px;
+  font-size: 16px;
+}
+
+.block {
+  display: flex;
+  width: 100%;
+}
+
+/* Square, icon-only. */
+.icon {
+  width: 48px;
+  padding: 0;
+}
+
+.icon.sm {
+  width: 40px;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

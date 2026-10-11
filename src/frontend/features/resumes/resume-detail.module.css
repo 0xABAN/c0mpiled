@@ -1,0 +1,278 @@
+.dialog {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--surface);
+  color: var(--ink-body);
+  animation: open var(--dur-slow) var(--ease-out) both;
+}
+
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog:focus {
+  outline: none;
+}
+
+.dialog::backdrop {
+  background: var(--scrim);
+}
+
+@keyframes open {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+/* ---------- Top bar ---------- */
+
+.topbar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+  padding: 0 20px;
+  border-bottom: var(--border) solid var(--line);
+}
+
+.stepper,
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.position {
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* ---------- Body ---------- */
+
+.body {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) 460px;
+  min-height: 0;
+}
+
+.canvas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 32px 56px;
+  overflow-y: auto;
+  background: var(--wash);
+}
+
+.sheet {
+  width: min(100%, 680px);
+  overflow: hidden;
+  border: var(--border) solid var(--soft);
+  border-bottom-width: 6px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  animation: sheet-in var(--dur-slow) var(--ease-spring) both;
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+}
+
+.pdf {
+  width: min(100%, 820px);
+  flex: 1;
+  min-height: 70vh;
+  border: var(--border) solid var(--soft);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+/* Segmented control: Summary / Original PDF. */
+.viewTabs {
+  display: inline-flex;
+  padding: 4px;
+  border: var(--border) solid var(--soft);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.viewTab {
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.viewTab[aria-selected="true"] {
+  background: var(--tint);
+  color: var(--lip);
+}
+
+/* ---------- Panel ---------- */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding: 32px 32px 40px;
+  overflow-y: auto;
+  border-left: var(--border) solid var(--line);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--face);
+  box-shadow: inset 0 -5px 0 var(--lip);
+  color: var(--on-face);
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.identityText {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.name {
+  font-size: 24px;
+}
+
+.headline {
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.section {
+  display: grid;
+  gap: 12px;
+}
+
+.sectionTitle {
+  padding-bottom: 8px;
+  border-bottom: var(--border) solid var(--line);
+  color: var(--subtle);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.rows {
+  display: grid;
+  gap: 10px;
+}
+
+.orgRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.orgText {
+  display: grid;
+  min-width: 0;
+}
+
+.orgName {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orgDetail {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------- Calls to action ---------- */
+
+/* The call to action stays in view while the panel scrolls. */
+.cta {
+  position: sticky;
+  bottom: -40px;
+  margin: auto -32px -40px;
+  padding: 20px 32px 32px;
+  background: linear-gradient(rgb(255 255 255 / 0), var(--surface) 20px);
+}
+
+/* ---------- Small screens: document on top, details below ---------- */
+
+@media (max-width: 900px) {
+  .body {
+    display: block;
+    overflow-y: auto;
+  }
+
+  .canvas {
+    overflow: visible;
+    padding: 24px 16px 32px;
+  }
+
+  .panel {
+    overflow: visible;
+    padding: 24px 20px 40px;
+    border-top: var(--border) solid var(--line);
+    border-left: 0;
+  }
+
+  .cta {
+    position: static;
+    margin: 0;
+    padding: 0;
+  }
+
+  .position {
+    display: none;
+  }
+}

@@ -1,0 +1,77 @@
+/* Static pill for skills and other lists. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.small {
+  height: 24px;
+  padding: 0 9px;
+  font-size: 12px;
+}
+
+/* Pressable toggle pill with a lip, for filters and multi-select answers. */
+.toggle {
+  height: 40px;
+  padding: 0 16px;
+  border-bottom-width: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease,
+    color var(--dur-fast) ease,
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.toggle:hover {
+  background: var(--sunken);
+}
+
+.toggle:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+  margin-bottom: 2px;
+}
+
+.toggle[aria-pressed="true"] {
+  border-color: var(--blue-soft);
+  background: var(--blue-tint);
+  color: var(--blue-lip);
+}
+
+.remove {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-right: -6px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.remove:hover {
+  opacity: 1;
+  background: rgb(0 0 0 / 0.06);
+}
+
+/* Applied filters above the grid: blue, removable. */
+.active {
+  border-color: var(--blue-soft);
+  background: var(--blue-tint);
+  color: var(--blue-lip);
+}

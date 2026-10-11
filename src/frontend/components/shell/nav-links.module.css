@@ -1,0 +1,43 @@
+.nav {
+  display: flex;
+  align-self: stretch;
+  gap: 28px;
+}
+
+.link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color var(--dur) ease;
+}
+
+.link:hover {
+  color: var(--ink);
+}
+
+.link[aria-current="page"] {
+  color: var(--blue);
+}
+
+/* Sits on top of the header's bottom rule. */
+.link[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -2px;
+  left: 0;
+  height: 4px;
+  border-radius: 4px 4px 0 0;
+  background: var(--blue);
+}
+
+@media (max-width: 720px) {
+  .nav {
+    display: none;
+  }
+}

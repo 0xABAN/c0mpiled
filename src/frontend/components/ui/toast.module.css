@@ -1,0 +1,36 @@
+.region {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  z-index: 100;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px 16px;
+  border-radius: var(--radius);
+  background: var(--ink);
+  box-shadow: inset 0 -4px 0 rgb(0 0 0 / 0.25);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: rise var(--dur-slow) var(--ease-spring) both;
+}
+
+.toast svg {
+  color: var(--green);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+}

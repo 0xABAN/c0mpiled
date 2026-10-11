@@ -1,0 +1,109 @@
+.toolbar {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  min-height: 44px;
+}
+
+.count {
+  color: var(--muted);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.count strong {
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sortLabel {
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.sort {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sort select {
+  height: 40px;
+  padding: 0 38px 0 14px;
+  border: var(--border) solid var(--line);
+  border-bottom-width: 4px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  appearance: none;
+}
+
+.sort select:hover {
+  background: var(--sunken);
+}
+
+.sort svg {
+  position: absolute;
+  right: 12px;
+  color: var(--subtle);
+  pointer-events: none;
+}
+
+/* All / Unlocked switch. */
+.segmented {
+  display: inline-flex;
+  margin-right: 8px;
+  padding: 3px;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--sunken);
+}
+
+.segmented button {
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--line), inset 0 -3px 0 var(--line);
+  color: var(--blue);
+}
+
+.applied {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .sortLabel {
+    display: none;
+  }
+}

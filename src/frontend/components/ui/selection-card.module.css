@@ -1,0 +1,145 @@
+/*
+ * Big pressable answer cards (onboarding choices, purchase options).
+ * Unselected: white with a gray outline and lip. Selected: blue tint with a blue outline.
+ */
+
+.card {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  padding: 18px 20px;
+  border: var(--border) solid var(--line);
+  border-bottom-width: 6px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease,
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.card:hover {
+  background: var(--sunken);
+}
+
+.card:active {
+  transform: translateY(2px);
+  border-bottom-width: 4px;
+  margin-bottom: 2px;
+}
+
+.card:has(input:checked) {
+  border-color: var(--blue-soft);
+  background: var(--blue-tint);
+}
+
+.card:has(input:focus-visible) {
+  outline: 3px solid var(--blue-soft);
+  outline-offset: 2px;
+}
+
+.card:has(input:disabled) {
+  cursor: not-allowed;
+  border-bottom-width: var(--border);
+  background: var(--sunken);
+  opacity: 0.7;
+  transform: none;
+}
+
+.card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Vertical layout: centered art above the title (role picker). */
+.tile {
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 20px 24px;
+  text-align: center;
+}
+
+/* Horizontal layout: art at the left, text, then trailing content (club list, offers). */
+.row {
+  align-items: center;
+}
+
+.art {
+  flex-shrink: 0;
+}
+
+.body {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+}
+
+.title {
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.card:has(input:checked) .title {
+  color: var(--blue-lip);
+}
+
+.description {
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.trailing {
+  flex-shrink: 0;
+}
+
+/* Corner ribbon, e.g. BEST VALUE. */
+.badge {
+  position: absolute;
+  top: -12px;
+  right: 16px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--yellow);
+  box-shadow: inset 0 -3px 0 var(--yellow-lip);
+  color: #4b3a00;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Radio/check indicator for row cards. */
+.indicator {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: var(--border) solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: transparent;
+  transition:
+    background-color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease,
+    transform var(--dur-fast) var(--ease-spring);
+}
+
+.checkbox .indicator {
+  border-radius: var(--radius-sm);
+}
+
+.card:has(input:checked) .indicator {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+  transform: scale(1.08);
+}

@@ -1,0 +1,31 @@
+.track {
+  --height: 16px;
+
+  position: relative;
+  width: 100%;
+  height: var(--height);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+}
+
+.fill {
+  position: relative;
+  height: 100%;
+  min-width: var(--height);
+  border-radius: inherit;
+  background: var(--face);
+  transition: width var(--dur-slow) var(--ease-spring);
+}
+
+/* The light stripe along the top of the fill. */
+.fill::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--height) * 0.22);
+  right: calc(var(--height) * 0.5);
+  left: calc(var(--height) * 0.5);
+  height: calc(var(--height) * 0.22);
+  border-radius: var(--radius-pill);
+  background: rgb(255 255 255 / 0.32);
+}

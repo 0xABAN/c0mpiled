@@ -1,0 +1,62 @@
+.unlockCard,
+.contactCard {
+  display: grid;
+  gap: 10px;
+  padding: 22px;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius);
+}
+
+.unlockCard {
+  border-color: var(--indigo-soft);
+  background: var(--indigo-wash);
+}
+
+.unlockCard :global(.eyebrow) {
+  color: var(--indigo);
+}
+
+.unlockTitle {
+  font-size: 20px;
+}
+
+.unlockBody {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.contactCard {
+  border-color: var(--green-soft);
+  background: var(--green-wash);
+}
+
+.contactCard :global(.eyebrow) {
+  color: var(--green-lip);
+}
+
+.email {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 800;
+  text-align: left;
+  word-break: break-all;
+}
+
+.email:hover {
+  color: var(--blue);
+}
+
+.contactActions {
+  display: flex;
+  gap: 10px;
+}

@@ -1,0 +1,125 @@
+.wrap {
+  display: grid;
+  gap: 10px;
+}
+
+.card {
+  display: block;
+  overflow: hidden;
+  border: var(--border) solid var(--line);
+  border-bottom-width: 5px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color var(--dur) ease,
+    transform var(--dur) var(--ease-out);
+}
+
+.card:hover {
+  border-color: var(--soft);
+  transform: translateY(-3px);
+}
+
+.card:active {
+  transform: translateY(2px);
+  border-bottom-width: 3px;
+  margin-bottom: 2px;
+  transition-duration: var(--dur-fast);
+}
+
+/* Tinted area holding the paper. The tag breaks the paper's top edge. */
+.preview {
+  position: relative;
+  padding: 22px 14px 0;
+  background: var(--wash);
+}
+
+.tag {
+  position: absolute;
+  top: 10px;
+  left: 24px;
+  z-index: 1;
+}
+
+.paper {
+  overflow: hidden;
+  border: var(--border) solid var(--soft);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: var(--surface);
+}
+
+.paper > article {
+  border-radius: 0;
+}
+
+.body {
+  display: grid;
+  gap: 2px;
+  padding: 14px 16px 15px;
+  border-top: var(--border) solid var(--soft);
+}
+
+.title {
+  overflow: hidden;
+  font-size: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Sits outside the card, as on resumes.fyi. */
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px;
+}
+
+.club {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.clubName {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.moreClubs {
+  flex-shrink: 0;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--sunken);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.locked {
+  color: var(--subtle);
+}
+
+.unlocked {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--green-lip);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

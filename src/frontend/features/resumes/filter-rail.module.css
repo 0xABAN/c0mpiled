@@ -1,0 +1,131 @@
+.rail {
+  display: grid;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+}
+
+.heading {
+  font-size: 22px;
+}
+
+.section {
+  border-top: var(--border) solid var(--line);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0;
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--radius-sm);
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.hint {
+  color: var(--subtle);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.chevron {
+  color: var(--subtle);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.section[open] .chevron {
+  transform: rotate(180deg);
+}
+
+.sectionBody {
+  padding-bottom: 18px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.facet {
+  display: grid;
+  gap: 12px;
+}
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--subtle);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px 0 36px;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--sunken);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.searchInput::placeholder {
+  color: var(--subtle);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--blue-soft);
+  background: var(--surface);
+}
+
+.options {
+  display: grid;
+  gap: 11px;
+}
+
+.clubOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.more {
+  justify-self: start;
+  margin-left: -4px;
+}
