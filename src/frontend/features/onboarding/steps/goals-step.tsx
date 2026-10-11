@@ -49,8 +49,8 @@ export function GoalsStep({ frame, goals, onChange, onNext }: { frame: StepFrame
               <BookOpenCheck size={40} strokeWidth={2.5} />
             </Monogram>
           }
-          title="List my club's book"
-          description="I'm an officer. Companies pay our club to unlock it."
+          title="Sell my club's book"
+          description="I run a club or org. Companies pay us to unlock its resumes."
         />
       </div>
     </OnboardingShell>

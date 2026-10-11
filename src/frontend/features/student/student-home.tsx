@@ -15,6 +15,7 @@ import { resumePdfUrl } from "@/frontend/lib/api/routes";
 import type { BookSummary, MembershipStatus, ResumeView, SchoolRef, StudentHome as Home } from "@/frontend/lib/api/types";
 import { pluralize, timeAgo } from "@/frontend/lib/format";
 
+import { ClubCard, type ClubAtAGlance } from "./club-card";
 import { ConfirmButton } from "./confirm-button";
 import styles from "./student-home.module.css";
 
@@ -26,13 +27,15 @@ const STATUS_LABELS: Record<MembershipStatus, string> = {
 
 type StudentHomeProps = {
   home: Home;
+  /** The club this student runs, or `null` if they don't run one. */
+  club: ClubAtAGlance | null;
   school: SchoolRef;
   /** Every book at the student's school. */
   books: BookSummary[];
 };
 
 /** A student's one resume and where it stands in each club's book. */
-export function StudentHome({ home, school, books }: StudentHomeProps) {
+export function StudentHome({ home, club, school, books }: StudentHomeProps) {
   const router = useRouter();
   const toast = useToast();
   const { resume, memberships } = home;
@@ -113,6 +116,8 @@ export function StudentHome({ home, school, books }: StudentHomeProps) {
         </aside>
 
         <div className={styles.main}>
+          {club && <ClubCard glance={club} />}
+
           <section aria-labelledby="books-heading">
             <h2 id="books-heading" className={styles.sectionTitle}>
               Your books
@@ -197,6 +202,8 @@ export function StudentHome({ home, school, books }: StudentHomeProps) {
               )}
             </section>
           )}
+
+          {!club && <ClubCard glance={null} />}
         </div>
       </div>
     </div>

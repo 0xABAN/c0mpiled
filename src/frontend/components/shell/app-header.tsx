@@ -18,8 +18,8 @@ export function AppHeader({ viewer }: { viewer: Viewer | null }) {
   // Each account type gets its own pages. Visitors get none: the landing's doors cover signup.
   const links = [
     ...(isRecruiter ? [{ href: "/browse", label: "Browse" }] : []),
-    ...(viewer?.ownedClub ? [{ href: "/dashboard", label: "My club" }] : []),
     ...(viewer?.accountType === "school" ? [{ href: "/resume", label: "My resume" }] : []),
+    ...(viewer?.ownedClub ? [{ href: "/dashboard", label: "My club" }] : []),
   ];
 
   return (

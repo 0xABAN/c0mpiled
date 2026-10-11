@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { AppHeader } from "@/frontend/components/shell/app-header";
 import { StudentHome } from "@/frontend/features/student/student-home";
-import { getStudentHome, getViewer, listOpenBooks } from "@/frontend/lib/api";
+import { getClubDashboard, getStudentHome, getViewer, listOpenBooks } from "@/frontend/lib/api";
 
 export const metadata: Metadata = { title: "Your resume · Roster" };
 
@@ -12,14 +12,21 @@ export default async function ResumePage() {
   if (!viewer) redirect("/login?next=/resume");
   if (viewer.accountType !== "school" || !viewer.school) redirect("/");
 
-  const [home, books] = await Promise.all([getStudentHome(), listOpenBooks()]);
+  const [home, books, dashboard] = await Promise.all([getStudentHome(), listOpenBooks(), viewer.ownedClub ? getClubDashboard() : null]);
   if (!home) redirect("/");
+
+  const club = dashboard && {
+    club: dashboard.club,
+    pendingCount: dashboard.memberships.filter((membership) => membership.status === "pending").length,
+    memberCount: dashboard.memberships.filter((membership) => membership.status === "accepted").length,
+    earnedCents: dashboard.earnedCents,
+  };
 
   return (
     <>
       <AppHeader viewer={viewer} />
       <main>
-        <StudentHome home={home} school={{ name: viewer.school.name, domain: viewer.school.domains[0] }} books={books} />
+        <StudentHome home={home} club={club} school={{ name: viewer.school.name, domain: viewer.school.domains[0] }} books={books} />
       </main>
     </>
   );

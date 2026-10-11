@@ -12,7 +12,8 @@ export default async function Home() {
     if (!viewer.accountType) redirect("/signup");
     if (!viewer.onboarded) redirect("/setup");
     if (viewer.accountType === "recruiter") redirect("/browse");
-    if (viewer.ownedClub) redirect("/dashboard");
+
+    // Students land on their own page; running a club shows up there too.
     redirect("/resume");
   }
 

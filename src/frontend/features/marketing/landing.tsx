@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpenCheck, Briefcase } from "lucide-react";
+import { ArrowRight, Briefcase, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -9,7 +9,7 @@ import { DemoLogin } from "@/frontend/features/auth/demo-login";
 import { CardStack } from "./card-stack";
 import styles from "./landing.module.css";
 
-/** Public home page: one line of pitch, then a door for each audience. */
+/** Public home page: one line of pitch, then a door for each kind of account. */
 export function Landing() {
   return (
     <>
@@ -21,7 +21,7 @@ export function Landing() {
         </h1>
 
         <nav className={styles.doors} aria-label="Get started">
-          <Door href="/signup?as=school" icon={<BookOpenCheck size={30} strokeWidth={2.5} />} who="I run a club" action="Sell our book" />
+          <Door href="/signup?as=school" icon={<GraduationCap size={30} strokeWidth={2.5} />} who="I'm a student" action="Join my club's book" />
           <Door href="/signup?as=recruiter" icon={<Briefcase size={30} strokeWidth={2.5} />} who="I'm hiring" action="Search them all" />
         </nav>
 
