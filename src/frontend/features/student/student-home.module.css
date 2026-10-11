@@ -164,6 +164,32 @@
   text-align: center;
 }
 
+.clubSearch {
+  margin-bottom: 16px;
+}
+
+.selectedClubs {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.selectedClubs > li,
+.selectedClub {
+  max-width: 100%;
+}
+
+.selectedClub > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectedClub > svg {
+  flex-shrink: 0;
+}
+
 .joinFooter {
   display: flex;
   flex-wrap: wrap;

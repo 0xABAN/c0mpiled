@@ -1,11 +1,11 @@
 "use client";
 
-import { ExternalLink, FileUser, LogOut, Trash2 } from "lucide-react";
+import { ExternalLink, FileUser, LogOut, Search, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { AnchorButton, Button, LinkButton } from "@/frontend/components/ui/button";
-import { Checkbox } from "@/frontend/components/ui/field";
+import { Checkbox, TextField } from "@/frontend/components/ui/field";
 import { Monogram } from "@/frontend/components/ui/monogram";
 import { SelectionCard } from "@/frontend/components/ui/selection-card";
 import { useToast } from "@/frontend/components/ui/toast";
@@ -43,9 +43,22 @@ export function StudentHome({ home, club, school, books }: StudentHomeProps) {
   const requested = new Set(memberships.map((membership) => membership.book.id));
   const joinable = books.filter((book) => !requested.has(book.id));
 
+  const [query, setQuery] = useState("");
   const [chosen, setChosen] = useState<string[]>([]);
   const [consent, setConsent] = useState(false);
   const [sending, setSending] = useState(false);
+
+  const search = query.trim().toLowerCase();
+  const visibleBooks = search
+    ? joinable.filter((book) => `${book.club.name} ${book.club.tagline ?? ""}`.toLowerCase().includes(search))
+    : joinable.slice(0, 3);
+  const selectedBooks = joinable.filter((book) => chosen.includes(book.id));
+
+  function chooseBook(id: string, checked: boolean) {
+    setChosen((previous) => checked ? [...previous, id] : previous.filter((bookId) => bookId !== id));
+    // Searching keeps consent; changing which books receive the resume requires it again.
+    setConsent(false);
+  }
 
   async function run(action: () => Promise<{ status: "ok" } | { status: "error"; message: string }>, success: string) {
     const result = await action();
@@ -157,15 +170,38 @@ export function StudentHome({ home, club, school, books }: StudentHomeProps) {
                 {memberships.length > 0 ? "Join another club" : "Join a club"}
               </h2>
 
+              <TextField
+                className={styles.clubSearch}
+                label={`Search clubs at ${school.name}`}
+                hideLabel
+                type="search"
+                placeholder="Search clubs by name or description"
+                icon={<Search size={18} strokeWidth={2.5} aria-hidden />}
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                hint={
+                  <span role="status">
+                    {search
+                      ? pluralize(visibleBooks.length, "matching club")
+                      : `Showing ${visibleBooks.length} of ${joinable.length} clubs.${joinable.length > 3 ? " Search to find more." : ""}`}
+                  </span>
+                }
+              />
+
+              {visibleBooks.length === 0 && (
+                <p className={styles.empty}>No clubs match your search. Try another name or description.</p>
+              )}
+
               {resume ? (
                 <>
-                  <div className={styles.joinList}>
-                    {joinable.map((book) => (
+                  <div className={styles.joinList} role="group" aria-label="Clubs you can join">
+                    {visibleBooks.map((book) => (
                       <SelectionCard
                         key={book.id}
                         type="checkbox"
                         checked={chosen.includes(book.id)}
-                        onChange={(checked) => setChosen(checked ? [...chosen, book.id] : chosen.filter((id) => id !== book.id))}
+                        onChange={(checked) => chooseBook(book.id, checked)}
+                        disabled={sending}
                         art={<Monogram name={book.club.name} size={44} />}
                         title={book.club.name}
                         description={[book.club.tagline, pluralize(book.resumeCount, "member")].filter(Boolean).join(" · ")}
@@ -175,6 +211,23 @@ export function StudentHome({ home, club, school, books }: StudentHomeProps) {
 
                   {chosen.length > 0 && (
                     <div className={styles.joinFooter}>
+                      <ul className={styles.selectedClubs} aria-label="Selected clubs">
+                        {selectedBooks.map((book) => (
+                          <li key={book.id}>
+                            <Button
+                              className={styles.selectedClub}
+                              variant="quiet"
+                              size="sm"
+                              disabled={sending}
+                              aria-label={`Remove ${book.club.name}`}
+                              onClick={() => chooseBook(book.id, false)}
+                            >
+                              <span>{book.club.name}</span>
+                              <X size={14} strokeWidth={2.75} aria-hidden />
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
                       <Checkbox checked={consent} onChange={(event) => setConsent(event.target.checked)}>
                         Share my resume with companies that unlock {chosen.length > 1 ? "these books" : "this book"}. I can leave any time.
                       </Checkbox>
@@ -186,7 +239,7 @@ export function StudentHome({ home, club, school, books }: StudentHomeProps) {
                 </>
               ) : (
                 <ul className={styles.rows}>
-                  {joinable.map((book) => (
+                  {visibleBooks.map((book) => (
                     <li key={book.id} className={styles.row}>
                       <Monogram name={book.club.name} size={44} />
                       <div className={styles.rowText}>
