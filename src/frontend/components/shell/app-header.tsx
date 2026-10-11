@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { LinkButton } from "@/frontend/components/ui/button";
 import { Logo } from "@/frontend/components/ui/logo";
+import { isDemoAccount } from "@/frontend/features/auth/demo";
 import type { Viewer } from "@/frontend/lib/api/types";
 
 import styles from "./app-header.module.css";
@@ -42,6 +43,12 @@ export function AppHeader({ viewer }: { viewer: Viewer | null }) {
               <span className="tabular">{viewer.unlockedCount}</span>
               <span className="visually-hidden">unlocked resumes</span>
             </Link>
+          )}
+
+          {viewer && isDemoAccount(viewer.email) && (
+            <span className={styles.demoBadge} title="Shared demo login. Anyone can change this data, and it resets.">
+              Demo account
+            </span>
           )}
 
           {viewer ? (

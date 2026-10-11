@@ -28,6 +28,12 @@
   padding: 48px 0;
 }
 
+.demo {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: var(--border) solid var(--line);
+}
+
 .fineprint {
   color: var(--muted);
   font-size: 13px;

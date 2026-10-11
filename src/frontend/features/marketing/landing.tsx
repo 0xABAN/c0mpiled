@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { LinkButton } from "@/frontend/components/ui/button";
 import { Monogram } from "@/frontend/components/ui/monogram";
 
+import { DemoLogin } from "@/frontend/features/auth/demo-login";
+
 import { CardStack } from "./card-stack";
 import styles from "./landing.module.css";
 
@@ -29,6 +31,7 @@ export function Landing() {
               Find candidates
             </LinkButton>
           </div>
+          <DemoLogin label="Look around first:" />
         </div>
 
         <div className={`${styles.heroArt} grid-field`}>

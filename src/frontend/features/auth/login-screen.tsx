@@ -8,6 +8,7 @@ import { Logo } from "@/frontend/components/ui/logo";
 import { CardStack } from "@/frontend/features/marketing/card-stack";
 
 import { ConfigureAmplify } from "./configure-amplify";
+import { DemoLogin } from "./demo-login";
 import styles from "./login-screen.module.css";
 import { ThemedAuthenticator } from "./themed-authenticator";
 
@@ -35,6 +36,9 @@ export function LoginScreen({ next }: { next: string | null }) {
 
         <div className={styles.form}>
           <ThemedAuthenticator mode="signIn" onAuthenticated={onAuthenticated} />
+          <div className={styles.demo}>
+            <DemoLogin label="Just looking? Try a demo account" stacked />
+          </div>
         </div>
 
         <p className={styles.fineprint}>Roster connects companies with student clubs&apos; resume books.</p>
