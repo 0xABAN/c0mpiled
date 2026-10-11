@@ -31,23 +31,6 @@
   gap: 10px;
 }
 
-/* Unlock counter, styled like a game stat. */
-.stat {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 40px;
-  padding: 0 10px;
-  border-radius: var(--radius-md);
-  color: var(--accent-deep);
-  font-size: 17px;
-  font-weight: 900;
-}
-
-.stat:hover {
-  background: var(--accent-wash);
-}
-
 /* Shared demo logins say so, so nobody mistakes them for their own account. */
 .demoBadge {
   padding: 5px 10px 7px;

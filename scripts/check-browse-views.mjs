@@ -16,6 +16,7 @@ try {
   await page.goto(base);
   await page.getByRole("button", { name: "Company", exact: true }).click();
   await page.waitForURL(`${base}/browse`);
+  assert.equal(await page.getByRole("banner").getByRole("link", { name: /unlocked resumes/ }).count(), 0, "The redundant header key shortcut must stay removed.");
   await page.goto(`${base}/browse?q=Python&sort=newest`, { waitUntil: "networkidle" });
 
   const views = page.getByRole("group", { name: "Resume view", exact: true });

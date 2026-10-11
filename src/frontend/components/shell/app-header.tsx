@@ -1,6 +1,3 @@
-import { KeyRound } from "lucide-react";
-import Link from "next/link";
-
 import { LinkButton } from "@/frontend/components/ui/button";
 import { Logo } from "@/frontend/components/ui/logo";
 import { isDemoAccount } from "@/frontend/features/auth/demo";
@@ -13,7 +10,6 @@ import { UserMenu } from "./user-menu";
 
 /** Top bar for app pages: logo, navigation, global search, and the account area. */
 export function AppHeader({ viewer }: { viewer: Viewer | null }) {
-  const isRecruiter = viewer?.accountType === "recruiter";
   const canBrowse = !!viewer?.accountType;
 
   // Every account can browse; students also get their own pages. Visitors get none: the
@@ -32,14 +28,6 @@ export function AppHeader({ viewer }: { viewer: Viewer | null }) {
 
         <div className={styles.right}>
           {canBrowse && <HeaderSearch />}
-
-          {isRecruiter && (
-            <Link href="/browse?unlocked=1" className={styles.stat} title="Resumes you've unlocked">
-              <KeyRound size={20} strokeWidth={2.75} aria-hidden />
-              <span className="tabular">{viewer.unlockedCount}</span>
-              <span className="visually-hidden">unlocked resumes</span>
-            </Link>
-          )}
 
           {viewer && isDemoAccount(viewer.email) && (
             <span className={styles.demoBadge} title="Shared demo login. Anyone can change this data, and it resets.">
