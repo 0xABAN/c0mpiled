@@ -51,8 +51,10 @@
   font-weight: 700;
 }
 
-.side > button {
-  justify-self: start;
+.resumeActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .noResume {

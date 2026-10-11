@@ -1,14 +1,37 @@
-import { Check, X } from "lucide-react";
+import { Check, ExternalLink, X } from "lucide-react";
 
-import { Button } from "@/frontend/components/ui/button";
+import { AnchorButton, Button } from "@/frontend/components/ui/button";
 import { Chip } from "@/frontend/components/ui/chip";
 import { Monogram } from "@/frontend/components/ui/monogram";
 import { Tag } from "@/frontend/components/ui/tag";
+import { resumePdfUrl } from "@/frontend/lib/api/routes";
 import type { Membership } from "@/frontend/lib/api/types";
 import { formatDegree, timeAgo } from "@/frontend/lib/format";
 import { seekingHue, seekingLabel } from "@/frontend/lib/hue";
 
 import styles from "./membership-rows.module.css";
+
+/**
+ * Opens the student's original PDF so the officer can check it's really a member.
+ * Seeded resumes have no PDF; anything uploaded has redacted pages, so that's the signal.
+ */
+function PdfLink({ membership }: { membership: Membership }) {
+  if (membership.previewPageCount === 0) return null;
+
+  return (
+    <AnchorButton
+      href={resumePdfUrl(membership.resumeId)}
+      target="_blank"
+      rel="noreferrer"
+      variant="quiet"
+      size="sm"
+      aria-label={`Open ${membership.name}'s resume PDF in a new tab`}
+    >
+      <ExternalLink size={15} strokeWidth={2.75} aria-hidden />
+      PDF
+    </AnchorButton>
+  );
+}
 
 function Identity({ membership }: { membership: Membership }) {
   const { profile } = membership;
@@ -48,6 +71,7 @@ export function RequestRow({ membership, busy, onAccept, onReject }: { membershi
       </div>
 
       <div className={styles.actions}>
+        <PdfLink membership={membership} />
         <Button variant="quiet" size="sm" disabled={busy} onClick={onReject} aria-label={`Decline ${membership.name}`}>
           <X size={16} strokeWidth={3} aria-hidden />
           Decline
@@ -67,6 +91,7 @@ export function MemberRow({ membership }: { membership: Membership }) {
     <li className={styles.row}>
       <Identity membership={membership} />
       <span className={styles.when}>Joined {timeAgo(membership.requestedAt)}</span>
+      <PdfLink membership={membership} />
     </li>
   );
 }

@@ -1,16 +1,17 @@
 "use client";
 
-import { FileUser, LogOut, Trash2 } from "lucide-react";
+import { ExternalLink, FileUser, LogOut, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { Button, LinkButton } from "@/frontend/components/ui/button";
+import { AnchorButton, Button, LinkButton } from "@/frontend/components/ui/button";
 import { Checkbox } from "@/frontend/components/ui/field";
 import { Monogram } from "@/frontend/components/ui/monogram";
 import { SelectionCard } from "@/frontend/components/ui/selection-card";
 import { useToast } from "@/frontend/components/ui/toast";
 import { ResumeCard } from "@/frontend/features/resumes/resume-card";
 import { deleteResume, leaveBook, requestBooks } from "@/frontend/lib/api/actions";
+import { resumePdfUrl } from "@/frontend/lib/api/routes";
 import type { BookSummary, MembershipStatus, ResumeView, SchoolRef, StudentHome as Home } from "@/frontend/lib/api/types";
 import { pluralize, timeAgo } from "@/frontend/lib/format";
 
@@ -85,12 +86,20 @@ export function StudentHome({ home, school, books }: StudentHomeProps) {
                 <ResumeCard resume={preview} href="#" />
               </div>
               <p className={styles.updated}>Updated {timeAgo(resume!.updatedAt)}</p>
-              <ConfirmButton
-                label="Delete resume"
-                confirmLabel="Delete everywhere?"
-                icon={<Trash2 size={16} strokeWidth={2.75} aria-hidden />}
-                onConfirm={() => run(deleteResume, "Resume deleted")}
-              />
+              <div className={styles.resumeActions}>
+                {resume!.previewPageCount > 0 && (
+                  <AnchorButton href={resumePdfUrl(resume!.id)} target="_blank" rel="noreferrer" variant="quiet" size="sm">
+                    <ExternalLink size={15} strokeWidth={2.75} aria-hidden />
+                    My PDF
+                  </AnchorButton>
+                )}
+                <ConfirmButton
+                  label="Delete resume"
+                  confirmLabel="Delete everywhere?"
+                  icon={<Trash2 size={16} strokeWidth={2.75} aria-hidden />}
+                  onConfirm={() => run(deleteResume, "Resume deleted")}
+                />
+              </div>
             </>
           ) : (
             <div className={styles.noResume}>
