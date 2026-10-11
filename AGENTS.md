@@ -24,9 +24,9 @@ at the club's price (mock payments), recruiter downloads PDFs, student withdraws
 **Out:** ranking, officer bulk upload, Stripe Connect payouts (clubs are paid by hand after the event),
 messaging, ATS export, resume feedback, email notifications, zip downloads.
 
-**v1 (built, local only):** auth, signup and setup, clubs and join requests, PDF upload to S3 with redacted
-previews (the student types the profile), the student home, and search with filters. Parsing, payments,
-and the Amplify deploy come next.
+**v1 (built and deployed):** auth, signup and setup, clubs and join requests, PDF upload to S3 with redacted
+previews (the student types the profile), the student home, search with filters, and demo accounts. Live at
+https://main.d2sgexxgcmts1q.amplifyapp.com (every push to `main` deploys). Parsing and payments come next.
 
 ## Team split
 
@@ -80,6 +80,7 @@ src/backend/    server-only feature modules, each with an index.ts as its public
   parsing/      parseResume (teammate)
   redaction/    redactResume (Contract 3)
   storage/      resume PDFs and preview pages in S3, presigned links
+  demo/         shared demo logins and `npm run demo:reset`
   billing/      Contract 2 (teammate)
   api/          the view models and functions the UI calls
 ```
@@ -235,7 +236,7 @@ primary email domain ("psu.edu").
 
 ## Flows
 
-**Join** (server actions): the student uploads a PDF ≤ 5 MB → put `resumes/{userId}/{uuid}.pdf` →
+**Join** (server actions): the student uploads a PDF ≤ 4 MB → put `resumes/{userId}/{uuid}.pdf` →
 `await parseResume()` (~5–10 s) → the student reviews the profile and the redacted preview, ticks consent,
 and picks books at their school → redact, save the resume, and add `pending` memberships. The officer
 accepts or rejects on `/dashboard`. Re-uploading replaces the one resume in every book.
@@ -258,15 +259,17 @@ and its preview pages), the row, and every membership.
   Switch the pool to SES before real launch.
 - Amplify SSR only sees server env vars written at build time: in `amplify.yml`, append them to
   `.env.production` before `npm run build`.
-- Raise the server action body limit to `'5mb'` (`serverActions.bodySizeLimit` in `next.config.ts`) for
-  PDF uploads; the default is 1 MB.
+- Amplify Hosting rejects request bodies over about 4.4 MB with a 413 before the app runs, so resume PDFs
+  are capped at 4 MB. The server action body limit is `'5mb'` (`serverActions.bodySizeLimit` in
+  `next.config.ts`); the default is 1 MB.
 - mupdf is ESM with top-level await. Load it with `await import("mupdf")`, never a static import (tsx runs
   this repo's `.ts` as CommonJS), and keep it in `serverExternalPackages` so the build traces its `.wasm`.
 - Attach an IAM compute role to the Amplify app with read/write on the bucket and `bedrock:InvokeModel`.
 - Never commit `.npmrc` (it holds the beta token) or real resumes. Use fake resumes when running `/monetize`.
 
 Env vars: `DATABASE_URL`, `APP_REGION`, `RESUME_BUCKET`, `BEDROCK_MODEL_ID`,
-`NEXT_PUBLIC_COGNITO_USER_POOL_ID`, `NEXT_PUBLIC_COGNITO_CLIENT_ID`.
+`NEXT_PUBLIC_COGNITO_USER_POOL_ID`, `NEXT_PUBLIC_COGNITO_CLIENT_ID`, `NEXT_PUBLIC_DEMO_PASSWORD` (public on
+purpose: anyone may use the demo logins).
 
 Setting up an environment (each script prints env lines to append to `.env.local`, and refuses to
 overwrite what exists):
@@ -277,6 +280,11 @@ overwrite what exists):
 - `infra/s3.sh [stage]`: the private, encrypted resume bucket.
 - `npm run db:seed`: invented clubs, students, and purchases (every seed account id starts with `seed:`).
   `npm run db:seed -- --remove` deletes them; do that before real launch.
+- `npm run demo:reset`: the shared demo logins `demo.officer@psu.edu` (runs Demo Club, with members, requests,
+  and sales) and `demo.student@psu.edu` (a resume with redacted previews in two books), with
+  `NEXT_PUBLIC_DEMO_PASSWORD`. Run it again to undo whatever visitors did; `-- --remove` deletes the data.
+- `infra/amplify.sh <env-file> [stage]`: the Amplify app (GitHub `main`, auto-deploy) and its compute role.
+  `infra/amplify-env.sh <app-id> <env-file>` replaces the app's env vars and redeploys.
 
 Test accounts: create them with `aws cognito-idp admin-create-user --message-action SUPPRESS` and
 `admin-set-user-password --permanent`, so they don't spend the 50-emails-a-day Cognito quota.
