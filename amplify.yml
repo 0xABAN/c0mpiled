@@ -1,0 +1,21 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - nvm install 22
+        - npm ci
+    build:
+      commands:
+        # Amplify SSR only sees server env vars that are written to .env.production at build
+        # time. The app's environment holds them (see infra/amplify.sh).
+        - env | grep -E '^(DATABASE_URL|APP_REGION|RESUME_BUCKET|BEDROCK_MODEL_ID|NEXT_PUBLIC_[A-Z_]+)=' >> .env.production
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - .next/cache/**/*
+      - node_modules/**/*
