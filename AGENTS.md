@@ -181,8 +181,9 @@ redactResume(pdf: Uint8Array, student: { name: string }): Promise<Uint8Array[]>
 ```
 
 It blacks out each part of the name (whole words, ignoring case and accents), emails, phone numbers, web
-addresses, street addresses, state + ZIP, every link, and every image (headshots). Patterns run over whole
-paragraphs, so a wrapped address still matches, and they lean toward hiding too much. No model is involved.
+addresses, street addresses, state + ZIP, and all linked text. Images (headshots) are deleted without a box,
+so a background image doesn't take the page's text with it. Patterns run over whole paragraphs, so a wrapped
+address still matches, and they lean toward hiding too much. No model is involved.
 Pages are images, so no text layer, metadata, or link target survives. After redacting, it reads each page
 back and throws if anything still matches.
 

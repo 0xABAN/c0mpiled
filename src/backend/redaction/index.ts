@@ -7,7 +7,8 @@ import { redactPdf } from "./pdf";
  * Contract 3 (AGENTS.md): the redacted resume recruiters see before they buy a book.
  *
  * Returns one PNG per page with the student's identity blacked out: every part of `name`,
- * emails, phone numbers, web addresses, street addresses, links, and images (headshots).
+ * emails, phone numbers, web addresses, street addresses, and linked text. Images (headshots)
+ * are deleted.
  * Pages are images so nothing hidden survives: no text layer, metadata, or link targets.
  *
  * Pure: bytes in, bytes out. Callers own storage and access checks.
