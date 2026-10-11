@@ -169,9 +169,11 @@ export type ResumePage = {
  */
 export type UnlockOffer = {
   book: BookSummary;
-  /** `book.priceCents`, or `0` if covered by the recruiter's plan. */
+  /** Gross listed book price. The buyer is not surcharged for Roster's fee. */
   priceCents: number;
-  /** The club's share of `priceCents`. The split is not decided yet; mocked for now. */
+  /** Roster's 5% share, rounded to the nearest cent (halves up). */
+  platformFeeCents: number;
+  /** Gross minus the platform fee, before any payment-processor costs. */
   clubPayoutCents: number;
 };
 
@@ -286,7 +288,12 @@ export type Membership = {
 
 export type BookUnlock = {
   company: string;
-  amountCents: number;
+  /** Gross amount paid at purchase time, unaffected by later book repricing. */
+  priceCents: number;
+  /** Fee recorded at purchase time; historical purchases have a zero fee. */
+  platformFeeCents: number;
+  /** Stored gross minus stored fee, not recalculated from today's fee rate. */
+  clubPayoutCents: number;
   unlockedAt: string; // ISO 8601
 };
 
@@ -298,6 +305,6 @@ export type ClubDashboard = {
   /** Pending first, oldest first; then accepted, newest first. Rejected requests are omitted. */
   memberships: Membership[];
   unlocks: BookUnlock[];
-  /** Sum of what companies paid for the book. */
+  /** Sum of the club's recorded shares after platform fees, before processor costs. */
   earnedCents: number;
 };

@@ -26,6 +26,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { inArray, like, or } from "drizzle-orm";
 
+import { splitBookPrice } from "@/backend/billing";
 import { createDatabase, type Database } from "@/backend/db/client";
 import { makeTextPdf } from "@/backend/db/fake/pdf";
 import { fakePeople } from "@/backend/db/fake/people";
@@ -212,9 +213,21 @@ async function insertDemoData(db: Database, logins: Record<DemoRole, string>) {
   const unlockRows: (typeof unlocks.$inferInsert)[] = ["Lutron", "Vanguard"].map((company, index) => {
     const recruiterId = `${DEMO_PREFIX}recruiter-${index + 1}`;
     userRows.push({ id: recruiterId, email: `recruiter${index + 1}@${company.toLowerCase()}.example.com`, accountType: "recruiter", company, onboardedAt });
-    return { bookId: demoClub.bookId, recruiterId, priceCents: demoClub.priceCents, createdAt: hoursAgo(5 - index * 3) };
+    return {
+      bookId: demoClub.bookId,
+      recruiterId,
+      priceCents: demoClub.priceCents,
+      platformFeeCents: splitBookPrice(demoClub.priceCents).platformFeeCents,
+      createdAt: hoursAgo(5 - index * 3),
+    };
   });
-  unlockRows.push({ bookId: demoClub.bookId, recruiterId: logins.company, priceCents: demoClub.priceCents, createdAt: hoursAgo(1) });
+  unlockRows.push({
+    bookId: demoClub.bookId,
+    recruiterId: logins.company,
+    priceCents: demoClub.priceCents,
+    platformFeeCents: splitBookPrice(demoClub.priceCents).platformFeeCents,
+    createdAt: hoursAgo(1),
+  });
 
   await db.transaction(async (tx) => {
     await tx.insert(users).values(userRows);

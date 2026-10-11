@@ -14,6 +14,7 @@ import { randomUUID } from "node:crypto";
 import { inArray, like, or } from "drizzle-orm";
 
 import type { Hue } from "@/backend/api/types";
+import { splitBookPrice } from "@/backend/billing";
 import { resumeColumns } from "@/backend/resumes/columns";
 import { findSchool } from "@/backend/schools";
 import { deleteFiles } from "@/backend/storage";
@@ -143,7 +144,13 @@ async function insertSeedData(db: ReturnType<typeof createDatabase>["db"]) {
     const club = CLUBS.find((candidate) => candidate.key === purchase.club)!;
 
     userRows.push({ id: recruiterId, email: `recruiter${userNumber}@${purchase.company.toLowerCase()}.example.com`, accountType: "recruiter", company: purchase.company, onboardedAt: hoursAgo(48) });
-    unlockRows.push({ bookId: bookIdByClub.get(club.key)!, recruiterId, priceCents: club.priceCents, createdAt: hoursAgo(purchase.hoursAgo) });
+    unlockRows.push({
+      bookId: bookIdByClub.get(club.key)!,
+      recruiterId,
+      priceCents: club.priceCents,
+      platformFeeCents: splitBookPrice(club.priceCents).platformFeeCents,
+      createdAt: hoursAgo(purchase.hoursAgo),
+    });
   }
 
   await db.transaction(async (tx) => {

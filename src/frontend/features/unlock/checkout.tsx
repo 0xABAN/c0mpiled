@@ -205,7 +205,6 @@ function CheckItem({ children }: { children: ReactNode }) {
 /** Line items plus a bar showing how much of the price reaches the club. */
 function OrderSummary({ offer }: { offer: UnlockOffer }) {
   const { club } = offer.book;
-  const feeCents = offer.priceCents - offer.clubPayoutCents;
   const clubShare = offer.priceCents > 0 ? offer.clubPayoutCents / offer.priceCents : 0;
 
   return (
@@ -229,15 +228,11 @@ function OrderSummary({ offer }: { offer: UnlockOffer }) {
           <span className="tabular">{formatMoney(offer.clubPayoutCents)}</span>
         </div>
 
-        {/* No fee is decided yet; show the row only once there is one. */}
-        {feeCents > 0 ? (
-          <div className={`${styles.lineItem} ${styles.fee}`}>
-            <span>Roster fee</span>
-            <span className="tabular">{formatMoney(feeCents)}</span>
-          </div>
-        ) : (
-          <p className={styles.fee}>All of it goes to the club.</p>
-        )}
+        <div className={`${styles.lineItem} ${styles.fee}`}>
+          <span>Roster fee (5%)</span>
+          <span className="tabular">{formatMoney(offer.platformFeeCents)}</span>
+        </div>
+        <p className={styles.fee}>Included in the book price.</p>
       </div>
 
       <div className={`${styles.lineItem} ${styles.total}`}>

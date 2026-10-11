@@ -82,6 +82,7 @@ export function PriceCard({ priceCents, memberCount }: { priceCents: number; mem
           {perMember && <p className={styles.caption}>About {perMember} per member resume</p>}
         </>
       )}
+      <p className={styles.caption}>Your club keeps 95% of each new sale, before processing costs.</p>
     </section>
   );
 }

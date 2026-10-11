@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import type { ResumeView, UnlockQuote } from "@/backend/api/types";
 import { requireAccount } from "@/backend/accounts";
+import { splitBookPrice } from "@/backend/billing";
 import { toBookSummaries } from "@/backend/clubs";
 import { bookMembers, books, clubs, db, resumes, unlocks, users } from "@/backend/db";
 
@@ -52,8 +53,8 @@ export async function getResume(rawId: unknown): Promise<ResumeView | null> {
 
 /**
  * The books a recruiter can buy to reveal a resume: one offer per book it was accepted into.
- * The club earns what the recruiter pays (no platform fee is decided), and the book with
- * the most resumes is preselected.
+ * Roster's 5% fee is deducted from the listed price, and the book with the most resumes
+ * is preselected. The quote is not payment authorization.
  */
 export async function getUnlockQuote(rawResumeId: unknown): Promise<UnlockQuote | null> {
   // Anyone signed in can browse, but only companies buy books.
@@ -72,8 +73,7 @@ export async function getUnlockQuote(rawResumeId: unknown): Promise<UnlockQuote 
 
   const offers = (await toBookSummaries(rows)).map((book) => ({
     book,
-    priceCents: book.priceCents,
-    clubPayoutCents: book.priceCents,
+    ...splitBookPrice(book.priceCents),
   }));
 
   const largest = offers.reduce((best, offer) => (offer.book.resumeCount > best.book.resumeCount ? offer : best));

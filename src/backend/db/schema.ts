@@ -178,11 +178,18 @@ export const unlocks = pgTable(
     recruiterId: text("recruiter_id")
       .notNull()
       .references(() => users.id),
-    /** What the recruiter paid; the book's price can change later. */
+    /** Gross paid at purchase time; independent of later book repricing. */
     priceCents: integer("price_cents").notNull(),
+    /** Fee snapshot. Required on new purchases; the migration preserves historical fees as zero. */
+    platformFeeCents: integer("platform_fee_cents").notNull(),
+    /** Stored by Postgres from the purchase snapshots; callers cannot supply an inconsistent net. */
+    clubPayoutCents: integer("club_payout_cents")
+      .notNull()
+      .generatedAlwaysAs(sql`"price_cents" - "platform_fee_cents"`),
     createdAt: createdAt(),
   },
   (table) => [
+    check("unlocks_fee_within_price", sql`${table.platformFeeCents} between 0 and ${table.priceCents}`),
     unique("unlocks_book_recruiter_unique").on(table.bookId, table.recruiterId),
     index("unlocks_recruiter_id_idx").on(table.recruiterId),
   ],

@@ -4,7 +4,7 @@ import { formatMoney, pluralize, timeAgo } from "@/frontend/lib/format";
 
 import styles from "./side-cards.module.css";
 
-/** Total earned and the companies that bought the book. */
+/** Recorded club proceeds after Roster fees, not gross sales or completed payouts. */
 export function EarningsCard({ unlocks, earnedCents }: { unlocks: BookUnlock[]; earnedCents: number }) {
   return (
     <section className={`${styles.card} ${styles.earnings}`} aria-labelledby="earnings-heading">
@@ -12,7 +12,7 @@ export function EarningsCard({ unlocks, earnedCents }: { unlocks: BookUnlock[]; 
         Earnings
       </p>
       <p className={`${styles.total} tabular`}>{formatMoney(earnedCents)}</p>
-      <p className={styles.caption}>{unlocks.length > 0 ? `From ${pluralize(unlocks.length, "company", "companies")}` : "No sales yet. Your first company is coming."}</p>
+      <p className={styles.caption}>{unlocks.length > 0 ? `From ${pluralize(unlocks.length, "company", "companies")} · after Roster fees` : "No sales yet. Your first company is coming."}</p>
 
       {unlocks.length > 0 && (
         <ul className={styles.unlocks}>
@@ -21,7 +21,7 @@ export function EarningsCard({ unlocks, earnedCents }: { unlocks: BookUnlock[]; 
               <Monogram name={unlock.company} size={32} />
               <span className={styles.company}>{unlock.company}</span>
               <span className={styles.amount}>
-                <span className="tabular">+{formatMoney(unlock.amountCents)}</span>
+                <span className="tabular">+{formatMoney(unlock.clubPayoutCents)}</span>
                 <span className={styles.when}>{timeAgo(unlock.unlockedAt)}</span>
               </span>
             </li>

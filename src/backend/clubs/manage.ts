@@ -179,7 +179,13 @@ export async function getClubDashboard(origin: string): Promise<ClubDashboard | 
       .innerJoin(users, eq(users.id, resumes.userId))
       .where(eq(bookMembers.bookId, owned.book.id)),
     db
-      .select({ company: users.company, amountCents: unlocks.priceCents, unlockedAt: unlocks.createdAt })
+      .select({
+        company: users.company,
+        priceCents: unlocks.priceCents,
+        platformFeeCents: unlocks.platformFeeCents,
+        clubPayoutCents: unlocks.clubPayoutCents,
+        unlockedAt: unlocks.createdAt,
+      })
       .from(unlocks)
       .innerJoin(users, eq(users.id, unlocks.recruiterId))
       .where(eq(unlocks.bookId, owned.book.id))
@@ -207,7 +213,7 @@ export async function getClubDashboard(origin: string): Promise<ClubDashboard | 
   const bookUnlocks = unlockRows.map((row) => {
     // Recruiters can only buy after setup, which records their company.
     if (!row.company) throw new Error("A book purchase belongs to a recruiter without a company.");
-    return { company: row.company, amountCents: row.amountCents, unlockedAt: row.unlockedAt.toISOString() };
+    return { ...row, company: row.company, unlockedAt: row.unlockedAt.toISOString() };
   });
 
   return {
@@ -216,6 +222,6 @@ export async function getClubDashboard(origin: string): Promise<ClubDashboard | 
     joinUrl: joinUrl(origin, owned.club.slug),
     memberships,
     unlocks: bookUnlocks,
-    earnedCents: bookUnlocks.reduce((sum, unlock) => sum + unlock.amountCents, 0),
+    earnedCents: bookUnlocks.reduce((sum, unlock) => sum + unlock.clubPayoutCents, 0),
   };
 }

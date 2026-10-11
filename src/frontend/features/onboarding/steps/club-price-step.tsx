@@ -70,7 +70,7 @@ export function ClubPriceStep({ frame, value, onChange, onSubmit, submitting, er
           </div>
           <p id={`${priceId}-hint`} className={`${shared.note} ${styles.priceNote}`}>
             <HandCoins size={22} strokeWidth={2.5} aria-hidden />
-            Clubs at Penn State charge $250 to $650 for their books today. Selling here doesn&apos;t replace your sponsorship packages.
+            Your club keeps 95% of each sale. Roster keeps 5%. Processing costs are not included.
           </p>
         </div>
 

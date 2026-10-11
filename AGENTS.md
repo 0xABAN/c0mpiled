@@ -181,13 +181,17 @@ canUnlock(userId: string, bookId: string): Promise<boolean>
 recordUnlock(userId: string, bookId: string): Promise<void>
 ```
 
-Until the PR lands, a stub where `canUnlock` returns `true` unblocks the UI. Delete the stub when the PR
-merges.
+Purchases remain disabled until payment authorization is integrated. Fee calculation alone never
+unlocks a book; do not substitute an unconditional `canUnlock` stub for confirmed payment.
 
 **Pricing (decided by Adam):** a recruiter buys a club's entire book, once, at a price the club sets
 (`books.price_cents`; clubs charge $250–$650 today). There are no single-resume purchases and no plan tiers.
-The club earns what the recruiter paid; any platform fee is undecided. Open for the teammate: how a
-club-set, per-book price maps onto App Monetization. Confirm with the AWS team before running `/monetize`.
+Roster deducts 5% from the listed price, rounded to the nearest cent (half cents round up); the buyer
+is not surcharged. A $250 book records $12.50 for Roster and $237.50 for the club, before processor costs.
+`splitBookPrice` in `src/backend/billing` calculates the quote. Purchases snapshot gross and fee;
+Postgres stores the club share as gross minus fee. Historical purchases retain a zero fee, and club
+earnings sum their recorded club shares, never today's rate or book price. This accounting is not a payout
+transfer; payment authorization and payout integration remain separate.
 
 ## Contract 3: redaction
 
@@ -246,8 +250,8 @@ resumes       id, user_id → users unique (one per student), contact_name, link
               created_at, updated_at
 book_members  book_id → books, resume_id → resumes, status 'pending' | 'accepted' | 'rejected',
               consented_at, requested_at, decided_at null, PK (book_id, resume_id)
-unlocks       id, book_id → books, recruiter_id → users, price_cents (what was paid), created_at,
-              unique (book_id, recruiter_id)
+unlocks       id, book_id → books, recruiter_id → users, price_cents (gross paid), platform_fee_cents,
+              club_payout_cents (stored generated gross − fee), created_at, unique (book_id, recruiter_id)
 ```
 
 Browse only ever shows resumes with an `accepted` membership. `majors` and `skills` are stored
