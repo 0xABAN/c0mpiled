@@ -6,4 +6,5 @@ export { resumeColumns } from "./columns";
 export { getResumeFacets } from "./facets";
 export { countUnlockedResumes, getResume, getUnlockQuote, hasSubmittedResume } from "./read";
 export { listResumes } from "./search";
+export { deleteResume, getStudentHome, leaveBook, requestBooks } from "./student";
 export { submitResume, uploadResume } from "./submit";

@@ -11,7 +11,7 @@ import type { ClubDashboard } from "./types";
  */
 
 export { getClubBySlug, listOpenBooks } from "@/backend/clubs";
-export { getResume, getResumeFacets, getUnlockQuote, listResumes } from "@/backend/resumes";
+export { getResume, getResumeFacets, getStudentHome, getUnlockQuote, listResumes } from "@/backend/resumes";
 export { getViewer } from "./viewer";
 
 /** The viewer's club with requests, members, and sales, or `null` if they don't run one. */

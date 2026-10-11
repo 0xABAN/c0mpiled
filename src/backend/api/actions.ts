@@ -97,6 +97,30 @@ export async function submitResume(submission: ResumeSubmission): Promise<Action
   });
 }
 
+/** Adds the student's existing resume to more books at their school. */
+export async function requestBooks(input: { bookIds: string[]; consent: true }): Promise<ActionResult> {
+  return runAction(async () => {
+    await resumes.requestBooks(input);
+    return null;
+  });
+}
+
+/** Takes the student's resume out of one book, or withdraws a pending request. */
+export async function leaveBook(bookId: string): Promise<ActionResult> {
+  return runAction(async () => {
+    await resumes.leaveBook(bookId);
+    return null;
+  });
+}
+
+/** Deletes the student's resume, its PDF, and every book membership. */
+export async function deleteResume(): Promise<ActionResult> {
+  return runAction(async () => {
+    await resumes.deleteResume();
+    return null;
+  });
+}
+
 /** Not built yet: purchases need billing (`@/backend/billing`), so this says so instead of pretending. */
 export async function unlockBook(bookId: string, resumeId: string): Promise<UnlockResult> {
   void bookId;

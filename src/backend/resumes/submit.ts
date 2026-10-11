@@ -2,18 +2,19 @@ import "server-only";
 
 import { randomUUID } from "node:crypto";
 
-import { and, eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import type { ParsedResume } from "@/backend/api/types";
 import { requireAccount } from "@/backend/accounts";
 import { schoolName } from "@/backend/clubs";
-import { bookMembers, books, clubs, db, resumes } from "@/backend/db";
+import { db, resumes } from "@/backend/db";
 import { UserError } from "@/backend/errors";
 import { deleteResumePdf, putResumePdf, resumePdfExists, resumePdfKey } from "@/backend/storage";
 import { parseInput } from "@/backend/validation";
 
 import { resumeColumns } from "./columns";
+import { requestMemberships, requireBooksAtSchool } from "./membership";
 
 const MAX_PDF_BYTES = 5 * 1024 * 1024;
 
@@ -66,10 +67,8 @@ const submissionInput = z.object({
 
 /**
  * Saves the student's one resume (replacing any earlier one everywhere) and requests to
- * join the chosen books, which must belong to clubs at the student's school.
- *
- * Requests start `pending` for the officer to decide. An officer joining their own club's
- * book is accepted right away. Books the student already requested keep their status.
+ * join the chosen books, which must belong to clubs at the student's school. See
+ * `requestMemberships` for how each request starts.
  */
 export async function submitResume(rawSubmission: unknown): Promise<void> {
   const submission = parseInput(submissionInput, rawSubmission);
@@ -79,14 +78,7 @@ export async function submitResume(rawSubmission: unknown): Promise<void> {
   const pdfKey = resumePdfKey(account.id, submission.uploadId);
   if (!(await resumePdfExists(pdfKey))) throw new UserError("Upload your resume again.");
 
-  const bookIds = [...new Set(submission.bookIds)];
-  const bookRows = await db
-    .select({ id: books.id, ownerId: clubs.ownerId })
-    .from(books)
-    .innerJoin(clubs, eq(clubs.id, books.clubId))
-    .where(and(inArray(books.id, bookIds), eq(clubs.schoolDomain, schoolDomain)));
-
-  if (bookRows.length !== bookIds.length) throw new UserError("You can only join books at your school.");
+  const requested = await requireBooksAtSchool(submission.bookIds, schoolDomain);
 
   const columns = { contactName: submission.name, pdfKey, ...resumeColumns(submission.profile, schoolName(schoolDomain)) };
   const now = new Date();
@@ -100,21 +92,7 @@ export async function submitResume(rawSubmission: unknown): Promise<void> {
       .onConflictDoUpdate({ target: resumes.userId, set: { ...columns, updatedAt: now } })
       .returning({ id: resumes.id });
 
-    await tx
-      .insert(bookMembers)
-      .values(
-        bookRows.map((book) => {
-          const ownBook = book.ownerId === account.id;
-          return {
-            bookId: book.id,
-            resumeId: resume.id,
-            status: ownBook ? ("accepted" as const) : ("pending" as const),
-            consentedAt: now,
-            decidedAt: ownBook ? now : null,
-          };
-        }),
-      )
-      .onConflictDoNothing();
+    await requestMemberships(tx, { resumeId: resume.id, accountId: account.id, books: requested, consentedAt: now });
 
     return previous?.pdfKey ?? null;
   });
