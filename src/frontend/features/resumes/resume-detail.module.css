@@ -57,6 +57,12 @@
   font-weight: 800;
 }
 
+.body,
+.canvas,
+.panel {
+  overscroll-behavior: contain;
+}
+
 /* ---------- Body ---------- */
 
 .body {
@@ -129,7 +135,7 @@
   text-transform: uppercase;
 }
 
-.viewTab[aria-selected="true"] {
+.viewTab[aria-pressed="true"] {
   background: var(--tint);
   color: var(--deep);
 }

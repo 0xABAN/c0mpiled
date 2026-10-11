@@ -25,7 +25,7 @@ export default async function UnlockPage({ params, searchParams }: {
   return (
     <>
       <AppHeader viewer={viewer} />
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <Checkout quote={quote} resumeHref={browseHref(filters, resumeId)} />
       </main>
     </>

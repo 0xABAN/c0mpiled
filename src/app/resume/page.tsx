@@ -25,7 +25,7 @@ export default async function ResumePage() {
   return (
     <>
       <AppHeader viewer={viewer} />
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <StudentHome home={home} club={club} school={{ name: viewer.school.name, domain: viewer.school.domains[0] }} books={books} />
       </main>
     </>

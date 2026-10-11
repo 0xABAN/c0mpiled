@@ -41,8 +41,15 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
 
   // Focus the dialog itself rather than its first button, so no control looks pre-selected.
   useEffect(() => {
-    dialog.current?.showModal();
-    dialog.current?.focus();
+    const element = dialog.current;
+    const previous = document.activeElement;
+    element?.showModal();
+    element?.focus();
+
+    return () => {
+      element?.close();
+      if (previous instanceof HTMLElement && previous.isConnected) previous.focus({ preventScroll: true });
+    };
   }, []);
 
   // Each resume starts on its summary.
@@ -79,10 +86,10 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
       <header className={styles.topbar}>
         <div className={styles.stepper}>
           <Button variant="quiet" size="sm" icon aria-label="Previous resume" disabled={!onPrevious} onClick={() => onPrevious?.()}>
-            <ArrowLeft size={18} strokeWidth={3} />
+            <ArrowLeft size={18} strokeWidth={3} aria-hidden />
           </Button>
           <Button variant="quiet" size="sm" icon aria-label="Next resume" disabled={!onNext} onClick={() => onNext?.()}>
-            <ArrowRight size={18} strokeWidth={3} />
+            <ArrowRight size={18} strokeWidth={3} aria-hidden />
           </Button>
           {position && (
             <span className={`${styles.position} tabular`}>
@@ -93,10 +100,10 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
 
         <div className={styles.topActions}>
           <Button variant="quiet" size="sm" icon aria-label="Copy link to this resume" onClick={copyLink}>
-            <Link2 size={18} strokeWidth={2.75} />
+            <Link2 size={18} strokeWidth={2.75} aria-hidden />
           </Button>
           <Button variant="quiet" size="sm" icon aria-label="Close" onClick={onClose}>
-            <X size={20} strokeWidth={3} />
+            <X size={20} strokeWidth={3} aria-hidden />
           </Button>
         </div>
       </header>
@@ -104,11 +111,11 @@ export function ResumeDetail({ resume, action, mobileAction, position, onPreviou
       <div className={styles.body}>
         <div className={styles.canvas}>
           {contact && (
-            <div className={styles.viewTabs} role="tablist" aria-label="Resume view">
-              <button type="button" role="tab" aria-selected={view === "summary"} className={styles.viewTab} onClick={() => setView("summary")}>
+            <div className={styles.viewTabs} role="group" aria-label="Resume view">
+              <button type="button" aria-pressed={view === "summary"} className={styles.viewTab} onClick={() => setView("summary")}>
                 Summary
               </button>
-              <button type="button" role="tab" aria-selected={view === "pdf"} className={styles.viewTab} onClick={() => setView("pdf")}>
+              <button type="button" aria-pressed={view === "pdf"} className={styles.viewTab} onClick={() => setView("pdf")}>
                 Original PDF
               </button>
             </div>

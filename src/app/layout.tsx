@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Nunito } from "next/font/google";
 import { ToastProvider } from "@/frontend/components/ui/toast";
 import "@/frontend/styles/globals.css";
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={nunito.variable}>
       <body>
+        <Link href="#main-content" className="skip-link">Skip to content</Link>
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

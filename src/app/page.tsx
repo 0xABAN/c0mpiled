@@ -9,7 +9,7 @@ export default async function Home() {
   return (
     <>
       <AppHeader viewer={viewer} />
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <Landing />
       </main>
     </>

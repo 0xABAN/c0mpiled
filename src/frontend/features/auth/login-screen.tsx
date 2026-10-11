@@ -26,7 +26,7 @@ export function LoginScreen({ next }: { next: string | null }) {
     <div className={styles.screen}>
       <ConfigureAmplify />
 
-      <section className={styles.formSide}>
+      <main id="main-content" tabIndex={-1} className={styles.formSide}>
         <header className={styles.top}>
           <Logo href="/" />
           <LinkButton href="/signup" variant="outline" size="sm">
@@ -42,7 +42,7 @@ export function LoginScreen({ next }: { next: string | null }) {
         </div>
 
         <p className={styles.fineprint}>Roster connects companies with student clubs&apos; resume books.</p>
-      </section>
+      </main>
 
       <section className={`${styles.artSide} grid-field`} aria-hidden>
         <div className={styles.artCopy}>

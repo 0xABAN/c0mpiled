@@ -44,7 +44,7 @@ export function OnboardingShell({ progress, exitHref, onBack, aside, footer, wid
         <div className={styles.aside}>{aside}</div>
       </header>
 
-      <main className={wide ? `${styles.content} ${styles.wide}` : styles.content}>{children}</main>
+      <main id="main-content" tabIndex={-1} className={wide ? `${styles.content} ${styles.wide}` : styles.content}>{children}</main>
 
       {footer && (
         <footer className={styles.footer}>

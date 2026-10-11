@@ -14,12 +14,16 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 page.setDefaultTimeout(15000);
 
 async function expectHome() {
-  await page.waitForURL(`${base}/`);
+  await page.waitForURL(url => url.pathname === "/");
   await page.getByRole("heading", { name: /Every club's resume book/ }).waitFor();
 }
 
 try {
   await page.goto(base);
+  await page.keyboard.press("Tab");
+  assert.equal(await page.locator(":focus").textContent(), "Skip to content");
+  await page.keyboard.press("Enter");
+  await page.waitForFunction(() => document.activeElement?.id === "main-content");
   await page.getByRole("button", { name: "Company", exact: true }).click();
   await page.waitForURL(`${base}/browse`);
   await page.goBack();
@@ -46,6 +50,15 @@ try {
   await page.waitForURL(`${base}/browse?year=2028`);
   console.log("PASS checkout return: candidate and filters survive; close returns to filtered results.");
 
+  const card = page.getByRole("region", { name: "Resumes", exact: true }).locator('a[href*="r="]').first();
+  await card.focus();
+  await page.keyboard.press("Enter");
+  await page.getByRole("dialog").waitFor();
+  await page.keyboard.press("Escape");
+  await page.getByRole("dialog").waitFor({ state: "hidden" });
+  await page.waitForFunction(() => document.activeElement?.matches('a[href*="r="]'));
+  console.log("PASS keyboard: skip link and resume dialog restore useful focus.");
+
   for (const width of [320, 390]) {
     await page.setViewportSize({ width, height: 844 });
     await page.waitForFunction(() => document.documentElement.scrollWidth <= innerWidth);
@@ -68,9 +81,13 @@ try {
     }
   }
   await page.getByRole("button", { name: "Account menu", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Browse", exact: true }).click();
+  await page.getByRole("navigation", { name: "Account", exact: true }).getByRole("link", { name: "Browse", exact: true }).click();
   await page.waitForURL(`${base}/browse`);
   console.log("PASS mobile: student pages and company header fit 320/390px; account menu exposes Browse.");
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Escape");
+  assert.equal(await page.locator(":focus").getAttribute("aria-label"), "Account menu");
 
   await page.goto(`${base}/dashboard`);
   const price = page.getByRole("region", { name: "Book price", exact: true });

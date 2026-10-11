@@ -18,7 +18,7 @@ export default async function DashboardPage() {
   return (
     <>
       <AppHeader viewer={viewer} />
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <ClubDashboard dashboard={dashboard} />
       </main>
     </>

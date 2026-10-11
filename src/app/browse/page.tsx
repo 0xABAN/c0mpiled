@@ -26,7 +26,8 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
   return (
     <>
       <AppHeader viewer={viewer} />
-      <main>
+      <main id="main-content" tabIndex={-1}>
+        <h1 className="visually-hidden">Browse resumes</h1>
         <Browser
           filters={filters}
           facets={facets}

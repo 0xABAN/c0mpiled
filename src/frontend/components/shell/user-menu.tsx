@@ -4,7 +4,7 @@ import { signOut } from "aws-amplify/auth";
 import { FileUser, KeyRound, LayoutDashboard, LogOut, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import { ConfigureAmplify } from "@/frontend/features/auth/configure-amplify";
 import type { Viewer } from "@/frontend/lib/api/types";
@@ -17,6 +17,7 @@ export function UserMenu({ viewer }: { viewer: Viewer }) {
   const [open, setOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const root = useRef<HTMLDivElement>(null);
+  const menuId = useId();
 
   // Sign-out must run in the browser: only it can clear Amplify's token cookies.
   async function logOut() {
@@ -34,7 +35,11 @@ export function UserMenu({ viewer }: { viewer: Viewer }) {
     if (!open) return;
 
     const onPointerDown = (event: PointerEvent) => !root.current?.contains(event.target as Node) && setOpen(false);
-    const onKeyDown = (event: KeyboardEvent) => event.key === "Escape" && setOpen(false);
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      root.current?.querySelector("button")?.focus();
+    };
 
     document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);
@@ -45,7 +50,13 @@ export function UserMenu({ viewer }: { viewer: Viewer }) {
   }, [open]);
 
   return (
-    <div ref={root} className={styles.root}>
+    <div
+      ref={root}
+      className={styles.root}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+      }}
+    >
       <ConfigureAmplify />
       <button
         type="button"
@@ -53,14 +64,14 @@ export function UserMenu({ viewer }: { viewer: Viewer }) {
         data-tone="ink"
         aria-label="Account menu"
         aria-expanded={open}
-        aria-haspopup="menu"
+        aria-controls={menuId}
         onClick={() => setOpen(!open)}
       >
         {name[0].toUpperCase()}
       </button>
 
       {open && (
-        <div className={styles.menu} role="menu">
+        <nav id={menuId} className={styles.menu} aria-label="Account">
           <div className={styles.identity}>
             <p className={styles.name}>{name}</p>
             <p className={styles.email}>{viewer.email}</p>
@@ -68,40 +79,40 @@ export function UserMenu({ viewer }: { viewer: Viewer }) {
           </div>
 
           {viewer.accountType && (
-            <Link href="/browse" className={styles.item} role="menuitem" onClick={() => setOpen(false)}>
+            <Link href="/browse" className={styles.item} onClick={() => setOpen(false)}>
               <Search size={18} strokeWidth={2.5} aria-hidden />
               Browse
             </Link>
           )}
 
           {viewer.accountType === "recruiter" && (
-            <Link href="/browse?unlocked=1" className={styles.item} role="menuitem" onClick={() => setOpen(false)}>
+            <Link href="/browse?unlocked=1" className={styles.item} onClick={() => setOpen(false)}>
               <KeyRound size={18} strokeWidth={2.5} aria-hidden />
               My unlocks
             </Link>
           )}
 
           {viewer.ownedClub && (
-            <Link href="/dashboard" className={styles.item} role="menuitem" onClick={() => setOpen(false)}>
+            <Link href="/dashboard" className={styles.item} onClick={() => setOpen(false)}>
               <LayoutDashboard size={18} strokeWidth={2.5} aria-hidden />
               Club dashboard
             </Link>
           )}
 
           {viewer.accountType === "school" && (
-            <Link href="/resume" className={styles.item} role="menuitem" onClick={() => setOpen(false)}>
+            <Link href="/resume" className={styles.item} onClick={() => setOpen(false)}>
               <FileUser size={18} strokeWidth={2.5} aria-hidden />
               My resume
             </Link>
           )}
 
           <div className={styles.signOut}>
-            <button type="button" className={styles.item} role="menuitem" onClick={logOut} disabled={signingOut}>
+            <button type="button" className={styles.item} onClick={logOut} disabled={signingOut}>
               <LogOut size={18} strokeWidth={2.5} aria-hidden />
               {signingOut ? "Logging out…" : "Log out"}
             </button>
           </div>
-        </div>
+        </nav>
       )}
     </div>
   );

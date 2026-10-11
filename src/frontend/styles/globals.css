@@ -137,6 +137,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 64px);
 }
 
 body {
@@ -232,6 +233,25 @@ ol {
   clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* The first keyboard stop bypasses repeated navigation. */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  padding: 10px 16px;
+  border: var(--border) solid var(--accent-deep);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--accent-deep);
+  font-weight: 800;
+  transform: translateY(calc(-100% - 16px));
+}
+
+.skip-link:focus {
+  transform: none;
 }
 
 /* Firecrawl's faint technical grid, for decorative fields (login art, landing hero). */

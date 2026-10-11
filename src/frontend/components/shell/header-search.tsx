@@ -66,8 +66,10 @@ export function HeaderSearch() {
       <input
         ref={input}
         type="search"
+        name="q"
+        autoComplete="off"
         className={styles.input}
-        placeholder="Search skills, majors, companies"
+        placeholder="Search skills, majors, companies…"
         aria-label="Search resumes"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
