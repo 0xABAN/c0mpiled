@@ -18,6 +18,16 @@ export type Degree = ResumeProfile["degree"];
 export type Contact = ParsedResume["contact"];
 
 /* ------------------------------------------------------------------ */
+/* Mutations                                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * What a server action returns. `message` is safe to show the user. Actions return errors
+ * instead of throwing because Next.js hides thrown messages in production builds.
+ */
+export type ActionResult<T = null> = { status: "ok"; data: T } | { status: "error"; message: string };
+
+/* ------------------------------------------------------------------ */
 /* Identity                                                            */
 /* ------------------------------------------------------------------ */
 
