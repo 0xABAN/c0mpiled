@@ -17,11 +17,12 @@ export function LogoMark({ size = 36 }: { size?: number }) {
   );
 }
 
-export function Logo({ href = "/resumes" }: { href?: string }) {
+/** `compact` drops the wordmark on narrow screens, for tight headers. */
+export function Logo({ href = "/", compact }: { href?: string; compact?: boolean }) {
   return (
     <Link href={href} className={styles.logo} aria-label="Roster home">
       <LogoMark />
-      <span className={styles.wordmark}>roster</span>
+      <span className={compact ? `${styles.wordmark} ${styles.compact}` : styles.wordmark}>roster</span>
     </Link>
   );
 }

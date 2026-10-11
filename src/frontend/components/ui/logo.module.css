@@ -13,3 +13,9 @@
   line-height: 1;
   transform: translateY(-2px);
 }
+
+@media (max-width: 720px) {
+  .compact {
+    display: none;
+  }
+}

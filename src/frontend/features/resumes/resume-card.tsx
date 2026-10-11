@@ -25,7 +25,8 @@ type ResumeCardProps = {
  */
 export function ResumeCard({ resume, href, onOpen }: ResumeCardProps) {
   const { profile, books, contact } = resume;
-  const [firstBook, ...otherBooks] = books;
+  // Empty only in a student's own preview, before any club accepts them.
+  const [firstBook, ...otherBooks] = books as [ResumeView["books"][number] | undefined, ...ResumeView["books"]];
   const hue = seekingHue(profile.seeking);
 
   return (
@@ -50,8 +51,14 @@ export function ResumeCard({ resume, href, onOpen }: ResumeCardProps) {
 
       <div className={styles.meta}>
         <span className={styles.club}>
-          <Monogram name={firstBook.club.name} hue={firstBook.club.hue} size={22} />
-          <span className={styles.clubName}>{firstBook.club.name}</span>
+          {firstBook ? (
+            <>
+              <Monogram name={firstBook.club.name} hue={firstBook.club.hue} size={22} />
+              <span className={styles.clubName}>{firstBook.club.name}</span>
+            </>
+          ) : (
+            <span className={styles.clubName}>Not in a book yet</span>
+          )}
           {otherBooks.length > 0 && (
             <span className={styles.moreClubs} title={otherBooks.map((book) => book.club.name).join(", ")}>
               +{otherBooks.length}

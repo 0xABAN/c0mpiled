@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "aws-amplify/auth";
-import { KeyRound, LayoutDashboard, LogOut } from "lucide-react";
+import { FileUser, KeyRound, LayoutDashboard, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -79,6 +79,13 @@ export function UserMenu({ viewer }: { viewer: Viewer }) {
             <Link href="/dashboard" className={styles.item} role="menuitem" onClick={() => setOpen(false)}>
               <LayoutDashboard size={18} strokeWidth={2.5} aria-hidden />
               Club dashboard
+            </Link>
+          )}
+
+          {viewer.accountType === "school" && (
+            <Link href="/resume" className={styles.item} role="menuitem" onClick={() => setOpen(false)}>
+              <FileUser size={18} strokeWidth={2.5} aria-hidden />
+              My resume
             </Link>
           )}
 

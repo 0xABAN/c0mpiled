@@ -9,6 +9,7 @@ export {
   getClubDashboard,
   getResume,
   getResumeFacets,
+  getStudentHome,
   getUnlockQuote,
   getViewer,
   listOpenBooks,

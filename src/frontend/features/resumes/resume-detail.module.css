@@ -93,6 +93,11 @@
   }
 }
 
+.pages {
+  width: min(100%, 720px);
+  animation: sheet-in var(--dur-slow) var(--ease-spring) both;
+}
+
 .pdf {
   width: min(100%, 820px);
   flex: 1;
@@ -246,6 +251,10 @@
   background: linear-gradient(rgb(255 255 255 / 0), var(--surface) 20px);
 }
 
+.mobileBar {
+  display: none;
+}
+
 /* ---------- Small screens: document on top, details below ---------- */
 
 @media (max-width: 900px) {
@@ -274,5 +283,13 @@
 
   .position {
     display: none;
+  }
+
+  .mobileBar {
+    display: block;
+    flex-shrink: 0;
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+    border-top: var(--border) solid var(--line);
+    background: var(--surface);
   }
 }

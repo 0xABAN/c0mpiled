@@ -14,7 +14,7 @@ export default async function SetupPage() {
 
   if (viewer.accountType === "school") {
     // School accounts always have a school; signup won't create one without it.
-    return <SetupFlow accountType="school" email={viewer.email} school={viewer.school!} books={await listOpenBooks()} />;
+    return <SetupFlow accountType="school" email={viewer.email} school={viewer.school!} ownsClub={!!viewer.ownedClub} books={await listOpenBooks()} />;
   }
 
   const facets = await getResumeFacets();

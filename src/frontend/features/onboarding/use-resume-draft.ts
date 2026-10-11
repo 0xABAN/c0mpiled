@@ -6,6 +6,7 @@ import { submitResume } from "@/frontend/lib/api/actions";
 import type { ParsedResume } from "@/frontend/lib/api/types";
 
 import { EMPTY_PROFILE, type ResumeDraft } from "./steps/resume-review-step";
+import { useRedactionPreview } from "./use-redaction-preview";
 
 /**
  * State for the "add my resume" path, shared by /setup and /join/[slug]:
@@ -19,6 +20,7 @@ export function useResumeDraft(initialBookIds: string[]) {
   const [consent, setConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const redaction = useRedactionPreview(uploadId, draft.name);
 
   function acceptUpload(upload: { uploadId: string; parsed: ParsedResume | null }) {
     setUploadId(upload.uploadId);
@@ -47,5 +49,5 @@ export function useResumeDraft(initialBookIds: string[]) {
     return result.status === "ok";
   }
 
-  return { bookIds, setBookIds, parseFailed, draft, setDraft, consent, setConsent, submitting, error, acceptUpload, submit };
+  return { bookIds, setBookIds, parseFailed, draft, setDraft, redaction, consent, setConsent, submitting, error, acceptUpload, submit };
 }

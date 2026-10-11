@@ -130,6 +130,43 @@
   justify-self: start;
 }
 
+/* ---------- Redaction preview ---------- */
+
+.redaction {
+  display: grid;
+  gap: 10px;
+}
+
+.redactionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.redactionHeader p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+}
+
+.redactionNote {
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--sunken);
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* Thumbnails side by side by default; one column when enlarged. */
+.redactionPages > div {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+
+.redactionPagesBig > div {
+  grid-template-columns: 1fr;
+}
+
 /* ---------- Books ---------- */
 
 .consent {

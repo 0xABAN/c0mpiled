@@ -4,7 +4,7 @@ import { AppHeader } from "@/frontend/components/shell/app-header";
 import { Landing } from "@/frontend/features/marketing/landing";
 import { getViewer } from "@/frontend/lib/api";
 
-/** The landing page, and the one place that sends each signed-in account to its home. */
+/** The landing page for visitors, and the one place that sends each signed-in account to its home. */
 export default async function Home() {
   const viewer = await getViewer();
 
@@ -13,6 +13,7 @@ export default async function Home() {
     if (!viewer.onboarded) redirect("/setup");
     if (viewer.accountType === "recruiter") redirect("/browse");
     if (viewer.ownedClub) redirect("/dashboard");
+    redirect("/resume");
   }
 
   return (

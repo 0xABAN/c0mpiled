@@ -18,6 +18,7 @@ export function AppHeader({ viewer }: { viewer: Viewer | null }) {
   const links = [
     ...(isRecruiter ? [{ href: "/browse", label: "Browse" }] : []),
     ...(viewer?.ownedClub ? [{ href: "/dashboard", label: "My club" }] : []),
+    ...(viewer?.accountType === "school" ? [{ href: "/resume", label: "My resume" }] : []),
     ...(viewer
       ? []
       : [
@@ -29,7 +30,7 @@ export function AppHeader({ viewer }: { viewer: Viewer | null }) {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <Logo />
+        <Logo compact={isRecruiter} />
         <NavLinks links={links} />
 
         <div className={styles.right}>

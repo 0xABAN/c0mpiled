@@ -4,8 +4,9 @@ import { SlidersHorizontal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition, type MouseEvent } from "react";
 
-import { Button } from "@/frontend/components/ui/button";
+import { AnchorButton, Button, LinkButton } from "@/frontend/components/ui/button";
 import { loadMoreResumes } from "@/frontend/lib/api/actions";
+import { resumePdfUrl } from "@/frontend/lib/api/routes";
 import type { ResumeFacets, ResumeFilters, ResumePage, ResumeView } from "@/frontend/lib/api/types";
 
 import { BrowseEmpty } from "./browse-states";
@@ -173,6 +174,17 @@ export function Browser({ filters, facets, initialPage, unlockedCount, linkedRes
         <ResumeDetail
           resume={selected}
           action={selected.contact ? <ContactCard resumeId={selected.id} email={selected.contact.email} /> : <UnlockCard resume={selected} />}
+          mobileAction={
+            selected.contact ? (
+              <AnchorButton href={resumePdfUrl(selected.id, { download: true })} variant="primary" block>
+                Download PDF
+              </AnchorButton>
+            ) : (
+              <LinkButton href={`/unlock/${selected.id}`} variant="premium" block>
+                Unlock resume
+              </LinkButton>
+            )
+          }
           position={selectedIndex >= 0 ? { index: selectedIndex, total: initialPage.total } : null}
           onPrevious={selectedIndex >= 0 ? step(-1) : null}
           onNext={selectedIndex >= 0 ? step(1) : null}

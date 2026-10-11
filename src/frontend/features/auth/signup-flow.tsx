@@ -24,6 +24,8 @@ type Step = "type" | "school" | "account";
 type SignupFlowProps = {
   /** From `?as=`: skip the first question. */
   initialType: AccountType | null;
+  /** From a club's join link: the club's school, so the school step is skipped. */
+  initialSchool: School | null;
   /** From a club's join link: where to go once the account exists. */
   joinSlug: string | null;
 };
@@ -32,11 +34,11 @@ type SignupFlowProps = {
  * Signup: school or recruiter → (school) which school → Cognito signup with the right
  * email domain → `createAccount` → setup (or the club's join page).
  */
-export function SignupFlow({ initialType, joinSlug }: SignupFlowProps) {
+export function SignupFlow({ initialType, initialSchool, joinSlug }: SignupFlowProps) {
   const router = useRouter();
   const [accountType, setAccountType] = useState<AccountType | null>(initialType);
-  const [school, setSchool] = useState<School | null>(null);
-  const [step, setStep] = useState<Step>(initialType === "recruiter" ? "account" : initialType === "school" ? "school" : "type");
+  const [school, setSchool] = useState<School | null>(initialSchool);
+  const [step, setStep] = useState<Step>(initialType === "recruiter" || initialSchool ? "account" : initialType === "school" ? "school" : "type");
   const [accountError, setAccountError] = useState<string | null>(null);
 
   const steps: Step[] = accountType === "recruiter" ? ["type", "account"] : ["type", "school", "account"];

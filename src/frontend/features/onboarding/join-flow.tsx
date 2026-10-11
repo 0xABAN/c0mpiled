@@ -78,6 +78,7 @@ export function JoinFlow({ club, blocker, school, finishesSetup }: JoinFlowProps
         school={school}
         books={books}
         parseFailed={resume.parseFailed}
+        redaction={resume.redaction}
         consent={resume.consent}
         onConsent={resume.setConsent}
         onSubmit={async () => (await resume.submit()) && setStep("done")}

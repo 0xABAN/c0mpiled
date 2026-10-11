@@ -8,11 +8,12 @@ import { Chip } from "@/frontend/components/ui/chip";
 import { Monogram } from "@/frontend/components/ui/monogram";
 import { Tag } from "@/frontend/components/ui/tag";
 import { useToast } from "@/frontend/components/ui/toast";
-import { resumePdfUrl } from "@/frontend/lib/api/routes";
+import { resumePdfUrl, resumePreviewUrl } from "@/frontend/lib/api/routes";
 import type { ResumeView } from "@/frontend/lib/api/types";
 import { formatDegree } from "@/frontend/lib/format";
 import { seekingHue, seekingLabel } from "@/frontend/lib/hue";
 
+import { RedactedPages } from "./redacted-pages";
 import { RedactedResume } from "./redacted-resume";
 import styles from "./resume-detail.module.css";
 
@@ -20,6 +21,8 @@ type ResumeDetailProps = {
   resume: ResumeView;
   /** Pinned to the bottom of the panel: unlock on browse, accept/reject on the club dashboard. */
   action: ReactNode;
+  /** One compact button for the fixed bar on small screens, where the panel sits below the document. */
+  mobileAction?: ReactNode;
   /** "4 of 128", when the resume was opened from the grid. */
   position: { index: number; total: number } | null;
   onPrevious: (() => void) | null;
@@ -30,7 +33,7 @@ type ResumeDetailProps = {
 };
 
 /** Full-screen view of one resume: the document on the left, details and actions on the right. */
-export function ResumeDetail({ resume, action, position, onPrevious, onNext, onClose, revealing }: ResumeDetailProps) {
+export function ResumeDetail({ resume, action, mobileAction, position, onPrevious, onNext, onClose, revealing }: ResumeDetailProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const toast = useToast();
   const [view, setView] = useState<"summary" | "pdf">("summary");
@@ -115,7 +118,16 @@ export function ResumeDetail({ resume, action, position, onPrevious, onNext, onC
 
           {view === "pdf" && contact ? (
             <iframe className={styles.pdf} src={resumePdfUrl(resume.id)} title={`${contact.name}'s resume PDF`} />
+          ) : !contact && resume.previewPageCount > 0 ? (
+            // Before unlock: the real resume with identity blacked out (Contract 3).
+            <div key={resume.id} className={styles.pages}>
+              <RedactedPages
+                pages={Array.from({ length: resume.previewPageCount }, (_, index) => resumePreviewUrl(resume.id, index + 1))}
+                label="Redacted resume"
+              />
+            </div>
           ) : (
+            // Seed resumes have no rendered pages, so draw the document from the profile.
             <div key={resume.id} className={styles.sheet}>
               <RedactedResume resume={resume} size="full" revealing={revealing} />
             </div>
@@ -171,6 +183,8 @@ export function ResumeDetail({ resume, action, position, onPrevious, onNext, onC
           <div className={styles.cta}>{action}</div>
         </aside>
       </div>
+
+      {mobileAction && <div className={styles.mobileBar}>{mobileAction}</div>}
     </dialog>
   );
 }

@@ -38,6 +38,8 @@ type SetupFlowProps =
       accountType: "school";
       email: string;
       school: School;
+      /** Officers who already run a club (e.g. left setup halfway) only get the resume path. */
+      ownsClub: boolean;
       /** Books at the viewer's school. */
       books: BookSummary[];
     }
@@ -55,11 +57,11 @@ export function SetupFlow(props: SetupFlowProps) {
   return props.accountType === "school" ? <SchoolSetup {...props} /> : <RecruiterSetup {...props} />;
 }
 
-function SchoolSetup({ email, school, books }: Extract<SetupFlowProps, { accountType: "school" }>) {
+function SchoolSetup({ email, school, books, ownsClub }: Extract<SetupFlowProps, { accountType: "school" }>) {
   const router = useRouter();
   const toast = useToast();
-  const [goals, setGoals] = useState<Goals>({ resume: false, club: false });
-  const [step, setStep] = useState<Step>("goals");
+  const [goals, setGoals] = useState<Goals>({ resume: ownsClub, club: false });
+  const [step, setStep] = useState<Step>(ownsClub ? "resume-books" : "goals");
 
   const [club, setClub] = useState<ClubDetails>({ name: "", tagline: "", hue: "purple" });
   const [pricing, setPricing] = useState<ClubPricing>({ dollars: "300", payoutEmail: email });
@@ -71,7 +73,7 @@ function SchoolSetup({ email, school, books }: Extract<SetupFlowProps, { account
   const resume = useResumeDraft([]);
 
   const steps: Step[] = [
-    "goals",
+    ...(ownsClub ? [] : (["goals"] as const)),
     ...(goals.club ? (["club-details", "club-price", "club-done"] as const) : []),
     ...(goals.resume ? (["resume-books", "resume-upload", "resume-review", "resume-done"] as const) : []),
   ];
@@ -158,6 +160,7 @@ function SchoolSetup({ email, school, books }: Extract<SetupFlowProps, { account
           school={{ name: school.name, domain: school.domains[0] }}
           books={chosenBooks}
           parseFailed={resume.parseFailed}
+          redaction={resume.redaction}
           consent={resume.consent}
           onConsent={resume.setConsent}
           onSubmit={async () => (await resume.submit()) && next()}

@@ -1,6 +1,7 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import { EyeOff, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 import { OnboardingShell } from "@/frontend/components/onboarding/onboarding-shell";
 import { Prompt } from "@/frontend/components/onboarding/prompt";
@@ -11,7 +12,10 @@ import { TagInput } from "@/frontend/components/ui/tag-input";
 import { ResumeCard } from "@/frontend/features/resumes/resume-card";
 import type { BookSummary, Degree, ResumeProfile, SchoolRef, Seeking } from "@/frontend/lib/api/types";
 
+import { RedactedPages } from "@/frontend/features/resumes/redacted-pages";
+
 import type { StepFrame } from "../step";
+import type { RedactionPreview } from "../use-redaction-preview";
 import shared from "./steps.module.css";
 import styles from "./resume-steps.module.css";
 
@@ -33,6 +37,8 @@ type ResumeReviewStepProps = {
   books: BookSummary[];
   /** The parser couldn't read the PDF, so the fields start empty. */
   parseFailed: boolean;
+  /** The uploaded PDF with identity blacked out; submitting needs it to have succeeded. */
+  redaction: RedactionPreview;
   consent: boolean;
   onConsent: (consent: boolean) => void;
   onSubmit: () => void;
@@ -42,7 +48,7 @@ type ResumeReviewStepProps = {
 
 /** Check what the parser found, see the card companies will see, and consent. */
 export function ResumeReviewStep(props: ResumeReviewStepProps) {
-  const { frame, draft, onChange, school, books, parseFailed, consent, onConsent, onSubmit, submitting, error } = props;
+  const { frame, draft, onChange, school, books, parseFailed, redaction, consent, onConsent, onSubmit, submitting, error } = props;
   const { profile } = draft;
 
   const setProfile = (patch: Partial<ResumeProfile>) => onChange({ ...draft, profile: { ...profile, ...patch } });
@@ -57,6 +63,7 @@ export function ResumeReviewStep(props: ResumeReviewStepProps) {
     school,
     books: books.map((book) => ({ id: book.id, club: book.club })),
     profile: { ...profile, majors: profile.majors.length ? profile.majors : ["Your major"], seeking: profile.seeking.length ? profile.seeking : (["internship"] as Seeking[]) },
+    previewPageCount: 0,
     contact: null,
     createdAt: new Date(0).toISOString(),
   };
@@ -66,7 +73,7 @@ export function ResumeReviewStep(props: ResumeReviewStepProps) {
       {...frame}
       wide
       footer={
-        <Button variant="primary" size="lg" disabled={!complete || !consent} loading={submitting} onClick={onSubmit}>
+        <Button variant="primary" size="lg" disabled={!complete || !consent || redaction.status !== "ready"} loading={submitting} onClick={onSubmit}>
           {books.length > 1 ? "Send requests" : "Send request"}
         </Button>
       }
@@ -157,6 +164,8 @@ export function ResumeReviewStep(props: ResumeReviewStepProps) {
             )}
           </div>
 
+          <RedactionSection redaction={redaction} />
+
           <div className={styles.consent}>
             <Checkbox checked={consent} onChange={(event) => onConsent(event.target.checked)}>
               Share my resume with companies that unlock {clubNames}&apos;s book. I can leave a book any time.
@@ -179,5 +188,38 @@ export function ResumeReviewStep(props: ResumeReviewStepProps) {
         </div>
       </div>
     </OnboardingShell>
+  );
+}
+
+/** "Here's your resume as companies see it", with the redaction status. */
+function RedactionSection({ redaction }: { redaction: RedactionPreview }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <section className={styles.redaction} aria-labelledby="redaction-heading" aria-busy={redaction.status === "loading"}>
+      <div className={styles.redactionHeader}>
+        <p id="redaction-heading" className={shared.fieldLabel}>
+          <EyeOff size={16} strokeWidth={2.75} aria-hidden /> Your resume, as companies see it
+        </p>
+        {redaction.status === "ready" && (
+          <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)}>
+            {expanded ? "Smaller" : "Bigger"}
+          </Button>
+        )}
+      </div>
+
+      {redaction.status === "waiting" && <p className={styles.redactionNote}>Enter your name above. We black out your name, contact info, links, and photos.</p>}
+      {redaction.status === "loading" && <p className={styles.redactionNote}>Blacking out your details…</p>}
+      {redaction.status === "error" && (
+        <p className={shared.error} role="alert">
+          {redaction.message}
+        </p>
+      )}
+      {redaction.status === "ready" && (
+        <div className={expanded ? styles.redactionPagesBig : styles.redactionPages}>
+          <RedactedPages pages={redaction.pages} label="Your redacted resume" />
+        </div>
+      )}
+    </section>
   );
 }

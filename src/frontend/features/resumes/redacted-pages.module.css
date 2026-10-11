@@ -1,0 +1,38 @@
+.pages {
+  display: grid;
+  gap: 16px;
+  width: 100%;
+}
+
+.page {
+  position: relative;
+  overflow: hidden;
+  border: var(--border) solid var(--soft, var(--line));
+  border-bottom-width: 6px;
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+/* US Letter proportions hold the space while the image loads. */
+.loading {
+  aspect-ratio: 8.5 / 11;
+  background: linear-gradient(100deg, var(--sunken) 40%, var(--surface) 50%, var(--sunken) 60%) 0 0 / 300% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+.loading .image {
+  opacity: 0;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -150% 0;
+  }
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: opacity var(--dur-slow) ease;
+}
