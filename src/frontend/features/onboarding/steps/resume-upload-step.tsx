@@ -119,7 +119,7 @@ function Reading({ fileName }: { fileName: string }) {
   return (
     <div className={styles.reading} role="status" aria-live="polite">
       <p className={styles.fileName}>{fileName}</p>
-      <ProgressBar value={Math.max(0.08, progress)} label="Reading your resume" hue="blue" height={20} />
+      <ProgressBar value={Math.max(0.08, progress)} label="Reading your resume" height={20} />
       <p key={tick} className={styles.readingMessage}>
         {READING_MESSAGES[Math.min(tick, READING_MESSAGES.length - 1)]}
       </p>

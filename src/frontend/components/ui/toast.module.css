@@ -25,7 +25,7 @@
 }
 
 .toast svg {
-  color: var(--green);
+  color: var(--success);
 }
 
 @keyframes rise {

@@ -40,9 +40,11 @@ export function LoginScreen({ next }: { next: string | null }) {
         <p className={styles.fineprint}>Roster connects companies with student clubs&apos; resume books.</p>
       </section>
 
-      <section className={styles.artSide} aria-hidden>
+      <section className={`${styles.artSide} grid-field`} aria-hidden>
         <div className={styles.artCopy}>
-          <p className={styles.artTitle}>Every club&apos;s resume book, in one place.</p>
+          <p className={styles.artTitle}>
+            Every club&apos;s resume book, <em>in one place.</em>
+          </p>
           <p className={styles.artLead}>Companies unlock whole books. Clubs get paid. Students get hired.</p>
         </div>
         <CardStack sticker="+$300 to HKN" />

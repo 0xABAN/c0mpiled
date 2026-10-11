@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-import type { Hue } from "@/frontend/lib/api/types";
+import type { Tone } from "@/frontend/lib/hue";
 
 import styles from "./progress.module.css";
 
@@ -8,12 +8,12 @@ type ProgressBarProps = {
   /** 0 to 1. */
   value: number;
   label: string;
-  hue?: Hue;
+  hue?: Tone;
   height?: number;
 };
 
 /** Pill progress bar with a glossy highlight on the fill. */
-export function ProgressBar({ value, label, hue = "green", height = 16 }: ProgressBarProps) {
+export function ProgressBar({ value, label, hue = "accent", height = 16 }: ProgressBarProps) {
   const clamped = Math.min(1, Math.max(0, value));
 
   return (

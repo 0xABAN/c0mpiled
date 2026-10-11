@@ -1,10 +1,10 @@
 import type { Hue, Seeking } from "@/frontend/lib/api/types";
 
 /**
- * Any color scope from the design tokens: category hues plus indigo, which is reserved
- * for money (unlock and purchase) and so isn't offered to clubs.
+ * Any color scope from the design tokens: the category hues clubs can pick, plus "accent",
+ * which follows the theme's action color and isn't offered to clubs.
  */
-export type Tone = Hue | "indigo";
+export type Tone = Hue | "accent";
 
 /** Every category hue, in the order shown by the club color picker. */
 export const HUES: Hue[] = ["green", "blue", "purple", "orange", "teal", "pink", "red", "yellow"];
@@ -43,10 +43,11 @@ export function initials(name: string): string {
 /**
  * Resume cards are color-coded by what the candidate is looking for, the way
  * resumes.fyi codes by level: a solid tag plus a light wash of the same hue.
+ * Orange is the accent, so it stays out of the coding and cards never compete with actions.
  */
 export function seekingHue(seeking: Seeking[]): Hue {
   if (seeking.length > 1) return "purple";
-  return seeking[0] === "full-time" ? "orange" : "blue";
+  return seeking[0] === "full-time" ? "green" : "blue";
 }
 
 export function seekingLabel(seeking: Seeking[]): string {

@@ -139,7 +139,7 @@ export function Checkout({ quote }: { quote: UnlockQuote }) {
         <aside className={styles.summary} aria-label="Order summary">
           <OrderSummary offer={selected} />
 
-          <Button variant="premium" size="lg" block loading={isUnlocking} onClick={unlock}>
+          <Button variant="primary" size="lg" block loading={isUnlocking} onClick={unlock}>
             <LockKeyhole size={18} strokeWidth={3} aria-hidden />
             {selected.priceCents === 0 ? "Unlock with my plan" : `Unlock for ${formatMoney(selected.priceCents)}`}
           </Button>

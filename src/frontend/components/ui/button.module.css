@@ -56,32 +56,26 @@
   filter: none;
 }
 
-/* Variants choose the hue. */
+/* Variants choose the role. */
 .primary {
-  --face: var(--green);
-  --lip: var(--green-lip);
+  --face: var(--accent);
+  --lip: var(--accent-lip);
   --on-face: #fff;
 }
 
 .secondary {
-  --face: var(--blue);
-  --lip: var(--blue-lip);
-  --on-face: #fff;
-}
-
-.premium {
-  --face: var(--indigo);
-  --lip: var(--indigo-lip);
+  --face: var(--secondary);
+  --lip: var(--secondary-lip);
   --on-face: #fff;
 }
 
 .danger {
-  --face: var(--red);
-  --lip: var(--red-lip);
+  --face: var(--danger);
+  --lip: var(--danger-lip);
   --on-face: #fff;
 }
 
-/* White face, gray outline and lip; the label carries the color. */
+/* White face with a gray outline and lip. Outline has an ink label; quiet is muted. */
 .outline,
 .quiet {
   --lip-size: 2px;
@@ -89,7 +83,7 @@
   --edge-color: var(--line);
   --face: var(--surface);
   --lip: var(--line);
-  --on-face: var(--blue);
+  --on-face: var(--ink);
 }
 
 .quiet {
@@ -121,7 +115,7 @@
   --lip-size: 0px;
   --face: transparent;
   --lip: transparent;
-  --on-face: var(--blue-deep);
+  --on-face: var(--accent-deep);
 
   height: auto;
   padding: 6px 4px;
@@ -129,7 +123,7 @@
 
 .ghost:hover:not(:disabled) {
   filter: none;
-  color: var(--blue-deep);
+  color: var(--accent-deep);
 }
 
 .ghost:disabled {

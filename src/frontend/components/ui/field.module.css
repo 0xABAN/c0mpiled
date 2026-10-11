@@ -47,13 +47,13 @@
 
 .input:focus {
   outline: none;
-  border-color: var(--blue-soft);
+  border-color: var(--accent-soft);
   background: var(--surface);
 }
 
 .input[aria-invalid="true"] {
-  border-color: var(--red);
-  background: var(--red-wash);
+  border-color: var(--danger);
+  background: var(--danger-wash);
 }
 
 .input:read-only {
@@ -97,7 +97,7 @@
 }
 
 .action:hover {
-  color: var(--blue-deep);
+  color: var(--accent-deep);
 }
 
 .hint {
@@ -110,7 +110,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--red-deep);
+  color: var(--danger-deep);
   font-size: 14px;
   font-weight: 700;
 }
@@ -156,14 +156,14 @@
 }
 
 .check input:checked + .box {
-  border-color: var(--blue-deep);
-  background: var(--blue);
+  border-color: var(--accent-deep);
+  background: var(--accent);
   color: #fff;
   transform: scale(1.06);
 }
 
 .check input:focus-visible + .box {
-  outline: 3px solid var(--blue-soft);
+  outline: 3px solid var(--accent-soft);
   outline-offset: 2px;
 }
 

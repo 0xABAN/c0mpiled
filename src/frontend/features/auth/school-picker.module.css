@@ -35,7 +35,7 @@
 
 .input:focus {
   outline: none;
-  border-color: var(--blue-soft);
+  border-color: var(--accent-soft);
   background: var(--surface);
 }
 

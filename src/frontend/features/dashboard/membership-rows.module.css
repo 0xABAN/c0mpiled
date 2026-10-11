@@ -56,7 +56,7 @@
 
 .email {
   overflow: hidden;
-  color: var(--blue-deep);
+  color: var(--accent-deep);
   font-size: 14px;
   font-weight: 800;
   text-overflow: ellipsis;

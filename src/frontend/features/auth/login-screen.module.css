@@ -46,31 +46,7 @@
   gap: 40px;
   padding: 48px;
   overflow: hidden;
-  background: var(--green);
-}
-
-/* Soft rounded strokes in the field, like the app's chunky shapes. */
-.artSide::before,
-.artSide::after {
-  content: "";
-  position: absolute;
-  border: 22px solid rgb(255 255 255 / 0.12);
-  border-radius: 64px;
-  transform: rotate(-18deg);
-}
-
-.artSide::before {
-  top: -120px;
-  left: -80px;
-  width: 360px;
-  height: 260px;
-}
-
-.artSide::after {
-  right: -100px;
-  bottom: -140px;
-  width: 420px;
-  height: 300px;
+  border-left: var(--border) solid var(--line);
 }
 
 .artCopy {
@@ -82,15 +58,21 @@
 }
 
 .artTitle {
-  color: #fff;
+  color: var(--ink);
   font-size: 38px;
   font-weight: 900;
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
 
+/* One key phrase in the accent, Firecrawl's headline move. */
+.artTitle em {
+  color: var(--accent);
+  font-style: normal;
+}
+
 .artLead {
-  color: var(--green-tint);
+  color: var(--muted);
   font-size: 18px;
   font-weight: 700;
 }

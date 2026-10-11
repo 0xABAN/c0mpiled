@@ -15,8 +15,8 @@
 }
 
 .dragging {
-  border-color: var(--blue);
-  background: var(--blue-wash);
+  border-color: var(--accent);
+  background: var(--accent-wash);
 }
 
 .dropIcon {
@@ -26,8 +26,8 @@
   height: 76px;
   margin-bottom: 8px;
   border-radius: 24px;
-  background: var(--blue);
-  box-shadow: inset 0 -6px 0 var(--blue-lip);
+  background: var(--accent);
+  box-shadow: inset 0 -6px 0 var(--accent-lip);
   color: #fff;
 }
 
@@ -47,8 +47,8 @@
   margin-top: 16px;
   padding: 12px 14px;
   border-radius: var(--radius-md);
-  background: var(--red-tint);
-  color: var(--red-deep);
+  background: var(--danger-tint);
+  color: var(--danger-deep);
   font-weight: 800;
 }
 
@@ -56,9 +56,9 @@
   display: grid;
   gap: 16px;
   padding: 36px 28px;
-  border: var(--border) solid var(--blue-soft);
+  border: var(--border) solid var(--accent-soft);
   border-radius: var(--radius);
-  background: var(--blue-wash);
+  background: var(--accent-wash);
 }
 
 .fileName {
@@ -67,7 +67,7 @@
 }
 
 .readingMessage {
-  color: var(--blue-deep);
+  color: var(--accent-deep);
   font-weight: 800;
   animation: fade-in var(--dur-slow) ease both;
 }
@@ -204,9 +204,9 @@
 .pending {
   padding: 4px 10px 6px;
   border-radius: var(--radius-sm);
-  background: var(--yellow-tint);
-  box-shadow: inset 0 -3px 0 var(--yellow-soft);
-  color: #6b5200;
+  background: var(--warning-tint);
+  box-shadow: inset 0 -3px 0 var(--warning-soft);
+  color: var(--warning-deep);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.08em;

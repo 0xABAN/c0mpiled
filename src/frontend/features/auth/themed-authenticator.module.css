@@ -12,12 +12,12 @@
   --amplify-fonts-default-static: var(--font-ui);
   --amplify-colors-font-primary: var(--ink);
   --amplify-colors-font-secondary: var(--muted);
-  --amplify-colors-font-interactive: var(--blue);
+  --amplify-colors-font-interactive: var(--accent);
   --amplify-colors-border-primary: var(--line);
-  --amplify-colors-border-focus: var(--blue-soft);
-  --amplify-colors-brand-primary-80: var(--blue);
-  --amplify-colors-brand-primary-90: var(--blue);
-  --amplify-colors-brand-primary-100: var(--blue-lip);
+  --amplify-colors-border-focus: var(--accent-soft);
+  --amplify-colors-brand-primary-80: var(--accent);
+  --amplify-colors-brand-primary-90: var(--accent);
+  --amplify-colors-brand-primary-100: var(--accent-lip);
   --amplify-radii-small: var(--radius-md);
   --amplify-radii-medium: var(--radius);
   --amplify-components-fieldcontrol-border-width: var(--border);
@@ -85,7 +85,7 @@
 }
 
 .theme :global(.amplify-input:focus) {
-  border-color: var(--blue-soft);
+  border-color: var(--accent-soft);
   background: var(--surface);
   box-shadow: none;
 }
@@ -107,22 +107,22 @@
 
 .theme :global(.amplify-field__show-password:hover) {
   background: var(--sunken);
-  color: var(--blue-deep);
+  color: var(--accent-deep);
 }
 
 .theme :global(.amplify-field-group:focus-within .amplify-field__show-password) {
-  border-color: var(--blue-soft);
+  border-color: var(--accent-soft);
   background: var(--surface);
 }
 
 .theme :global(.amplify-input[aria-invalid="true"]) {
-  border-color: var(--red);
-  background: var(--red-wash);
+  border-color: var(--danger);
+  background: var(--danger-wash);
 }
 
 .theme :global(.amplify-text--error),
 .theme :global([data-amplify-sign-up-errors]) {
-  color: var(--red-deep);
+  color: var(--danger-deep);
   font-size: 14px;
   font-weight: 700;
 }
@@ -133,9 +133,9 @@
   height: 50px;
   margin-top: 8px;
   border: 0;
-  border-bottom: 4px solid var(--blue-lip);
+  border-bottom: 4px solid var(--accent-lip);
   border-radius: var(--radius);
-  background: var(--blue);
+  background: var(--accent);
   color: #fff;
   font-size: 15px;
   font-weight: 800;
@@ -147,7 +147,7 @@
 }
 
 .theme :global(.amplify-button--primary:hover) {
-  background: var(--blue);
+  background: var(--accent);
   filter: brightness(1.06);
 }
 
@@ -173,7 +173,7 @@
   padding: 8px;
   border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--blue-deep);
+  color: var(--accent-deep);
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -181,8 +181,8 @@
 }
 
 .theme :global(.amplify-button--link:hover) {
-  background: var(--blue-wash);
-  color: var(--blue-deep);
+  background: var(--accent-wash);
+  color: var(--accent-deep);
 }
 
 /* Secondary actions such as "Resend code". */
@@ -192,7 +192,7 @@
   border-bottom-width: 4px;
   border-radius: var(--radius);
   background: var(--surface);
-  color: var(--blue);
+  color: var(--ink);
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -207,13 +207,13 @@
 }
 
 .theme :global(.amplify-alert--error) {
-  background: var(--red-tint);
-  color: var(--red-deep);
+  background: var(--danger-tint);
+  color: var(--danger-deep);
 }
 
 .theme :global(.amplify-alert--info) {
-  background: var(--blue-tint);
-  color: var(--blue-deep);
+  background: var(--accent-tint);
+  color: var(--accent-deep);
 }
 
 /* ---------- Our pieces ---------- */
@@ -250,7 +250,7 @@
   width: 22px;
   height: 22px;
   border: 4px solid var(--line);
-  border-top-color: var(--blue);
+  border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 800ms linear infinite;
 }

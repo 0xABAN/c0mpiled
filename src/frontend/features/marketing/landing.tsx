@@ -14,7 +14,9 @@ export function Landing() {
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
           <p className={styles.eyebrow}>Resume books, sold for your club</p>
-          <h1 className={styles.title}>Your club already has a resume book. Now companies can buy it.</h1>
+          <h1 className={styles.title}>
+            Your club already has a resume book. Now companies can <em>buy it.</em>
+          </h1>
           <p className={styles.lead}>
             Clubs sell resume books by hand today, for $250 to $650. Roster puts every book in one place: members join with their school email, officers
             approve them, and companies unlock whole books.
@@ -29,7 +31,7 @@ export function Landing() {
           </div>
         </div>
 
-        <div className={styles.heroArt}>
+        <div className={`${styles.heroArt} grid-field`}>
           <CardStack sticker="+$300 to HKN" />
         </div>
       </section>
@@ -39,13 +41,13 @@ export function Landing() {
           How it works
         </h2>
         <ol className={styles.stepList}>
-          <Step number={1} hue="green" icon={<BookOpenCheck size={28} strokeWidth={2.5} />} title="Clubs list their book">
+          <Step number={1} icon={<BookOpenCheck size={28} strokeWidth={2.5} />} title="Clubs list their book">
             Set your price and share one link. Keep your sponsorship packages; this reaches companies that would never buy one.
           </Step>
-          <Step number={2} hue="blue" icon={<MailCheck size={28} strokeWidth={2.5} />} title="Members join">
+          <Step number={2} icon={<MailCheck size={28} strokeWidth={2.5} />} title="Members join">
             Students sign up with their school email and request to join. Officers accept real members only.
           </Step>
-          <Step number={3} hue="orange" icon={<BadgeDollarSign size={28} strokeWidth={2.5} />} title="Companies unlock">
+          <Step number={3} icon={<BadgeDollarSign size={28} strokeWidth={2.5} />} title="Companies unlock">
             Recruiters search every book at once, preview anonymous resumes, and buy the books they want. The club gets paid.
           </Step>
         </ol>
@@ -66,14 +68,14 @@ export function Landing() {
   );
 }
 
-function Step({ number, hue, icon, title, children }: { number: number; hue: "green" | "blue" | "orange"; icon: ReactNode; title: string; children: ReactNode }) {
+function Step({ number, icon, title, children }: { number: number; icon: ReactNode; title: string; children: ReactNode }) {
   return (
     <li className={styles.step}>
       <span className={styles.stepArt}>
-        <Monogram name={title} hue={hue} size={64}>
+        <Monogram name={title} hue="accent" size={64}>
           {icon}
         </Monogram>
-        <span className={styles.stepNumber} data-hue={hue}>
+        <span className={styles.stepNumber}>
           {number}
         </span>
       </span>

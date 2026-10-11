@@ -16,7 +16,7 @@
 }
 
 .eyebrow {
-  color: var(--green-deep);
+  color: var(--accent-deep);
   font-size: 14px;
   font-weight: 900;
   letter-spacing: 0.1em;
@@ -28,6 +28,13 @@
   font-weight: 900;
   letter-spacing: -0.025em;
   line-height: 1.05;
+}
+
+/* One key phrase in the accent, Firecrawl's headline move. */
+.title em,
+.closingTitle em {
+  color: var(--accent);
+  font-style: normal;
 }
 
 .lead {
@@ -44,14 +51,14 @@
   margin-top: 8px;
 }
 
-/* The card stack sits on a green field, like the login art. */
+/* The card stack sits in a gridded panel with a lip, like the login art. */
 .heroArt {
   display: grid;
   place-items: center;
   padding: 48px 24px;
+  border: var(--border) solid var(--line);
+  border-bottom-width: 8px;
   border-radius: 32px;
-  background: var(--green);
-  box-shadow: inset 0 -10px 0 var(--green-lip);
 }
 
 /* ---------- Steps ---------- */
@@ -83,6 +90,7 @@
   border: var(--border) solid var(--line);
   border-bottom-width: 5px;
   border-radius: var(--radius);
+  background: var(--surface);
   text-align: center;
 }
 
@@ -131,8 +139,8 @@
   gap: 12px;
   padding: 56px 24px;
   border-radius: 32px;
-  background: var(--blue);
-  box-shadow: inset 0 -10px 0 var(--blue-lip);
+  background: var(--accent);
+  box-shadow: inset 0 -10px 0 var(--accent-lip);
   text-align: center;
 }
 
@@ -151,7 +159,7 @@
 }
 
 .closingBand .closingButton {
-  --on-face: var(--blue);
+  --on-face: var(--accent-deep);
 }
 
 .footer {

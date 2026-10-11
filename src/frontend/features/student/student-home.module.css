@@ -137,15 +137,15 @@
 }
 
 .status[data-status="pending"] {
-  background: var(--yellow-tint);
-  box-shadow: inset 0 -3px 0 var(--yellow-soft);
-  color: var(--yellow-deep);
+  background: var(--warning-tint);
+  box-shadow: inset 0 -3px 0 var(--warning-soft);
+  color: var(--warning-deep);
 }
 
 .status[data-status="accepted"] {
-  background: var(--green-tint);
-  box-shadow: inset 0 -3px 0 var(--green-soft);
-  color: var(--green-deep);
+  background: var(--success-tint);
+  box-shadow: inset 0 -3px 0 var(--success-soft);
+  color: var(--success-deep);
 }
 
 .status[data-status="rejected"] {

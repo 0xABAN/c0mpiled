@@ -35,7 +35,7 @@
 }
 
 .box:focus-within {
-  border-color: var(--blue-soft);
+  border-color: var(--accent-soft);
   background: var(--surface);
 }
 
@@ -67,7 +67,7 @@
 
 .tag button:hover {
   background: var(--sunken);
-  color: var(--red);
+  color: var(--danger);
 }
 
 .input {
@@ -109,7 +109,7 @@
 
 .suggestion:hover {
   border-style: solid;
-  border-color: var(--blue-soft);
-  background: var(--blue-wash);
-  color: var(--blue-deep);
+  border-color: var(--accent-soft);
+  background: var(--accent-wash);
+  color: var(--accent-deep);
 }

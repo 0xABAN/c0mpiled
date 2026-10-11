@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from "react";
 
 import styles from "./button.module.css";
 
-export type ButtonVariant = "primary" | "secondary" | "premium" | "danger" | "outline" | "quiet" | "inverse" | "ghost";
+export type ButtonVariant = "primary" | "secondary" | "danger" | "outline" | "quiet" | "inverse" | "ghost";
 
 type CommonProps = {
   variant?: ButtonVariant;

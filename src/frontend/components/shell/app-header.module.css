@@ -4,7 +4,7 @@
   z-index: 20;
   height: var(--header-h);
   border-bottom: var(--border) solid var(--line);
-  background: rgb(255 255 255 / 0.96);
+  background: rgb(249 249 249 / 0.92); /* --canvas, translucent */
   backdrop-filter: saturate(1.4) blur(8px);
 }
 
@@ -39,13 +39,13 @@
   height: 40px;
   padding: 0 10px;
   border-radius: var(--radius-md);
-  color: var(--indigo);
+  color: var(--accent-deep);
   font-size: 17px;
   font-weight: 900;
 }
 
 .stat:hover {
-  background: var(--indigo-wash);
+  background: var(--accent-wash);
 }
 
 @media (max-width: 720px) {

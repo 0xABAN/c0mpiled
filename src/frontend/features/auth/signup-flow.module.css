@@ -7,7 +7,7 @@
 .logIn {
   padding: 10px 12px;
   border-radius: var(--radius-md);
-  color: var(--blue-deep);
+  color: var(--accent-deep);
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -15,7 +15,7 @@
 }
 
 .logIn:hover {
-  background: var(--blue-wash);
+  background: var(--accent-wash);
 }
 
 .auth {
@@ -32,14 +32,14 @@
   margin: 0 auto 28px;
   padding: 8px 14px 8px 8px;
   border-radius: var(--radius-pill);
-  background: var(--blue-wash);
+  background: var(--accent-wash);
   color: var(--muted);
   font-size: 14px;
   font-weight: 700;
 }
 
 .schoolNote strong {
-  color: var(--blue-deep);
+  color: var(--accent-deep);
   font-weight: 900;
 }
 
@@ -48,9 +48,9 @@
   justify-items: center;
   gap: 12px;
   padding: 32px;
-  border: var(--border) solid var(--red-soft);
+  border: var(--border) solid var(--danger-soft);
   border-radius: var(--radius);
-  background: var(--red-wash);
+  background: var(--danger-wash);
   text-align: center;
 }
 

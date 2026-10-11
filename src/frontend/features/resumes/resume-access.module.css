@@ -8,12 +8,12 @@
 }
 
 .unlockCard {
-  border-color: var(--indigo-soft);
-  background: var(--indigo-wash);
+  border-color: var(--accent-soft);
+  background: var(--accent-wash);
 }
 
 .unlockCard :global(.eyebrow) {
-  color: var(--indigo);
+  color: var(--accent-deep);
 }
 
 .unlockTitle {
@@ -28,12 +28,12 @@
 }
 
 .contactCard {
-  border-color: var(--green-soft);
-  background: var(--green-wash);
+  border-color: var(--success-soft);
+  background: var(--success-wash);
 }
 
 .contactCard :global(.eyebrow) {
-  color: var(--green-deep);
+  color: var(--success-deep);
 }
 
 .email {
@@ -53,7 +53,7 @@
 }
 
 .email:hover {
-  color: var(--blue-deep);
+  color: var(--accent-deep);
 }
 
 .contactActions {

@@ -100,7 +100,7 @@ export function SignupFlow({ initialType, initialSchool, joinSlug }: SignupFlowP
             checked={accountType === "recruiter"}
             onChange={() => setAccountType("recruiter")}
             art={
-              <Monogram name="Recruiter" hue="orange" size={80}>
+              <Monogram name="Recruiter" hue="purple" size={80}>
                 <Briefcase size={38} strokeWidth={2.5} />
               </Monogram>
             }

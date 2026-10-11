@@ -46,9 +46,9 @@
 }
 
 .toggle[aria-pressed="true"] {
-  border-color: var(--blue-soft);
-  background: var(--blue-tint);
-  color: var(--blue-deep);
+  border-color: var(--accent-soft);
+  background: var(--accent-tint);
+  color: var(--accent-deep);
 }
 
 .remove {
@@ -71,7 +71,7 @@
 
 /* Applied filters above the grid: blue, removable. */
 .active {
-  border-color: var(--blue-soft);
-  background: var(--blue-tint);
-  color: var(--blue-deep);
+  border-color: var(--accent-soft);
+  background: var(--accent-tint);
+  color: var(--accent-deep);
 }

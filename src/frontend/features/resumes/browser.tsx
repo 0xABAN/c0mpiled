@@ -180,7 +180,7 @@ export function Browser({ filters, facets, initialPage, unlockedCount, linkedRes
                 Download PDF
               </AnchorButton>
             ) : (
-              <LinkButton href={`/unlock/${selected.id}`} variant="premium" block>
+              <LinkButton href={`/unlock/${selected.id}`} variant="primary" block>
                 Unlock resume
               </LinkButton>
             )

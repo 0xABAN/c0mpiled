@@ -34,7 +34,7 @@
   gap: 12px;
   padding: 16px 18px;
   border-radius: var(--radius);
-  background: var(--blue-wash);
+  background: var(--accent-wash);
   color: var(--muted);
   font-size: 15px;
   font-weight: 700;
@@ -42,14 +42,14 @@
 
 .note svg {
   flex-shrink: 0;
-  color: var(--blue);
+  color: var(--accent);
 }
 
 .error {
   padding: 12px 14px;
   border-radius: var(--radius-md);
-  background: var(--red-tint);
-  color: var(--red-deep);
+  background: var(--danger-tint);
+  color: var(--danger-deep);
   font-weight: 800;
 }
 

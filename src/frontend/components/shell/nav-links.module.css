@@ -21,7 +21,7 @@
 }
 
 .link[aria-current="page"] {
-  color: var(--blue-deep);
+  color: var(--accent-deep);
 }
 
 /* Sits on top of the header's bottom rule. */
@@ -33,7 +33,7 @@
   left: 0;
   height: 4px;
   border-radius: 4px 4px 0 0;
-  background: var(--blue);
+  background: var(--accent);
 }
 
 @media (max-width: 720px) {
