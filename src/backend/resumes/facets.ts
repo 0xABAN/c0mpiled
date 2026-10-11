@@ -15,16 +15,18 @@ const MAX_TERMS = 100;
 const SEEKING_LABELS = { internship: "Internship", "full-time": "Full-time" } as const;
 
 /**
- * Options for a free-form profile list (majors or skills): the lowercased value that the
- * filter matches, labelled with the casing most resumes use, counted once per resume.
+ * Options for a free-form profile list (majors or skills), grouped case-insensitively and
+ * shown with the casing most resumes use, counted once per resume. The value is that same
+ * display text: filters match case-insensitively, so URLs read `?major=Computer+Science`.
  */
 async function termFacet(field: "majors" | "skills"): Promise<FacetOption[]> {
   const term = sql`term`;
+  const displayText = sql<string>`mode() within group (order by ${term})`;
 
   const rows = await db
     .select({
-      value: sql<string>`lower(${term})`,
-      label: sql<string>`mode() within group (order by ${term})`,
+      value: displayText,
+      label: displayText,
       count: countDistinct(resumes.id),
     })
     .from(sql`${resumes}, jsonb_array_elements_text(${resumes.profile} -> ${field}) as ${term}`)
