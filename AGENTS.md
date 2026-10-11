@@ -10,26 +10,32 @@ password-protected PDFs; PSU HKN collects resumes through a Google Form; Penn SW
 Roster replaces the Google Form, the Drive folder, and "email our corporate officer for the password":
 
 - **Student** opts in to their club's book and gets seen by recruiters.
-- **Recruiter** searches resumes across clubs, previews anonymous profiles, and subscribes to unlock books.
+- **Recruiter** searches resumes across clubs, previews anonymous profiles, and buys whole books.
 - **Club** earns money every time a recruiter unlocks its book.
 
 To clubs: "Sell your book to companies that would never buy a full sponsorship. Keep your sponsorship packages."
 
 ## Scope
 
-**In:** club creates a book, students upload with consent, officer bulk-uploads an existing book, recruiter
-browses and filters anonymous teasers, recruiter subscribes (mock payments) and unlocks a book, recruiter
-downloads PDFs, student withdraws, club sees earnings.
+**In:** officer creates a club (its one book comes with it), students sign up with a school email and request
+to join, officer accepts or rejects, recruiter browses and filters anonymous teasers, recruiter buys a book
+at the club's price (mock payments), recruiter downloads PDFs, student withdraws, club sees earnings.
 
-**Out:** ranking, Stripe Connect payouts (clubs are paid by hand after the event), messaging, ATS export,
-resume feedback, email notifications, zip downloads.
+**Out:** ranking, officer bulk upload, Stripe Connect payouts (clubs are paid by hand after the event),
+messaging, ATS export, resume feedback, email notifications, zip downloads.
+
+**v1 (building now):** auth, signup and setup, the Postgres schema, and search with filters over seeded fake
+resumes. Payments, uploads, parsing, and S3 come after.
 
 ## Team split
 
 | Person   | Owns |
 |----------|------|
 | Adam     | Next.js app, AWS hosting, Postgres schema + search, auth, officer/student/recruiter pages |
-| Teammate | `lib/parse.ts` (PDF → profile), `TeaserCard`, `lib/billing.ts` + `/monetize`, **selling from ~4 PM** |
+| Teammate | `src/backend/parsing` (PDF → profile), `src/backend/billing` + `/monetize`, **selling from ~4 PM** |
+
+The teaser card the plan originally gave the teammate already exists as
+`src/frontend/features/resumes/resume-card.tsx`.
 
 The two contracts below are the seams between us. Agree on them at 12:00 and change them only together.
 
@@ -40,8 +46,9 @@ The two contracts below are the seams between us. Agree on them at 12:00 and cha
 - **RDS Postgres** (db.t4g.micro), accessed through Drizzle + `pg`. It must be *publicly accessible* with SSL
   forced and a strong password, because Amplify SSR can't reach a private VPC
   ([amplify-hosting#3362](https://github.com/aws-amplify/amplify-hosting/issues/3362)). Demo-only setup.
-- **Cognito** user pool (email sign-in) with `aws-amplify` + `@aws-amplify/ui-react` `<Authenticator>` on the
-  client and `@aws-amplify/adapter-nextjs` on the server. No Amplify Gen 2 backend; configure from env vars.
+- **Cognito** user pool (email sign-in, emailed verification code) with `aws-amplify` +
+  `@aws-amplify/ui-react` `<Authenticator>` on the client and `@aws-amplify/adapter-nextjs` on the server. No
+  Amplify Gen 2 backend; configure from env vars. `infra/cognito.sh` creates the pool.
 - **S3** private bucket for PDFs. The server uploads, and recruiters download through presigned GET URLs
   that expire after 5 minutes.
 - **Bedrock** Converse API with Claude Haiku 4.5 (`us.anthropic.claude-haiku-4-5-20251001-v1:0`; confirm
@@ -49,6 +56,36 @@ The two contracts below are the seams between us. Agree on them at 12:00 and cha
 - **Billing:** AWS App Monetization private beta, run with `/monetize`. Setup steps and terms are in the
   welcome letter PDF. Don't copy them into this repo: the letter is confidential, and this repo is public.
   Payments are mocks/test cards.
+
+Next.js is pinned to 15: Amplify Hosting SSR supports Next 12–15 only.
+
+## Code layout
+
+One Next app at the repo root. Import with `@/app/*`, `@/frontend/*`, `@/backend/*`.
+
+```
+src/app/        routes only; thin files that render frontend features
+src/frontend/   components, features, styles; reads data only through src/frontend/lib/api
+src/backend/    server-only feature modules, each with an index.ts as its public interface
+  db/           Drizzle client, schema, migrations
+  auth/         Cognito session on the server, requireViewer()
+  schools/      US university list (Hipo dataset), email-domain checks
+  accounts/     users, signup, setup
+  clubs/        clubs, books, join requests
+  resumes/      resumes, search, filter options
+  parsing/      parseResume (teammate)
+  billing/      Contract 2 (teammate)
+  api/          the view models and functions the UI calls
+```
+
+## Accounts
+
+- **School account:** a verified email at a US school's domain. It can upload one resume and request to join
+  books at its own school, and it can create a club. An officer is a school account that owns a club.
+- **Recruiter account:** any email, plus a company. Only signed-in recruiters can browse.
+- Signup: choose school or recruiter → school accounts type their school and must use one of its email
+  domains → Cognito sends a code → setup. The server rechecks the verified email against the school's
+  domains before creating the account.
 
 ## Contract 1: parser output
 
@@ -69,74 +106,86 @@ type ResumeProfile = {
 }
 ```
 
-A parse that fails sets `parse_status = 'failed'` and the officer sees a retry button. Never guess fields.
+A parse that fails sets `parse_status = 'failed'` and the student fills in the profile by hand. Never guess
+fields.
 
 ## Contract 2: billing boundary
 
-Every page calls billing through `lib/billing.ts` and nowhere else, so the `/monetize` PR only touches
+Every page calls billing through `src/backend/billing` and nowhere else, so the `/monetize` PR only touches
 this file, the pricing page, and the billing portal.
 
 ```ts
-type Plan = "recruiter" | "campus"
-
-/** The recruiter's active plan, or null without a subscription. */
-getPlan(userId: string): Promise<Plan | null>
-
-/** Campus: always. Recruiter: while under the monthly unlock quota. */
+/** Whether the recruiter may unlock this book now (e.g. payment went through). */
 canUnlock(userId: string, bookId: string): Promise<boolean>
 
-/** Sends the metered "book unlock" event. Call after inserting the `unlocks` row. */
+/** Reports the book purchase to billing. Call after inserting the `unlocks` row. */
 recordUnlock(userId: string, bookId: string): Promise<void>
 ```
 
-Until the PR lands, a stub that returns `"campus"` unblocks the UI. Delete the stub when the PR merges.
+Until the PR lands, a stub where `canUnlock` returns `true` unblocks the UI. Delete the stub when the PR
+merges.
 
-**Plans (placeholders; let the skill recommend prices from the $250–$650 per book that clubs charge):**
-Recruiter $149/mo with 2 unlocks, then $79 per extra unlock (metered). Campus $399/mo with every book.
-Clubs earn a flat `CLUB_PAYOUT_PER_UNLOCK = 40` dollars, computed from `unlocks`.
+**Pricing (decided by Adam):** a recruiter buys a club's entire book, once, at a price the club sets
+(`books.price_cents`; clubs charge $250–$650 today). There are no single-resume purchases and no plan tiers.
+The club earns what the recruiter paid; any platform fee is undecided. Open for the teammate: how a
+club-set, per-book price maps onto App Monetization. Confirm with the AWS team before running `/monetize`.
 
 ## Data model
 
 ```
-users    id (Cognito sub) PK, role 'officer' | 'recruiter', company text null, created_at
-clubs    id, slug unique, name, owner_id → users
-books    id, club_id → clubs, title ("Fall 2026"), published bool, created_at
-resumes  id, book_id → books, student_name, student_email, pdf_key,
-         grad_year int, majors text[], seeking text[], skills text[], profile jsonb, search_text text,
-         parse_status 'pending' | 'parsed' | 'failed',
-         consented_at, withdraw_token unique, withdrawn_at, created_at
-unlocks  id, book_id → books, recruiter_id → users, created_at, unique (book_id, recruiter_id)
+users         id (Cognito sub) PK, email unique, account_type 'school' | 'recruiter', school_domain null,
+              company null, job_title null, hiring jsonb null, onboarded_at null, created_at
+clubs         id, slug unique ("psu-hkn"), school_domain, name, tagline null, hue, payout_email,
+              owner_id → users, created_at
+books         id, club_id → clubs unique (one book per club), title, price_cents, created_at
+resumes       id, user_id → users unique (one per student), contact_name, pdf_key null,
+              grad_year int, majors text[], seeking text[], skills text[], profile jsonb, search_text text,
+              parse_status 'pending' | 'parsed' | 'failed', created_at, updated_at
+book_members  book_id → books, resume_id → resumes, status 'pending' | 'accepted' | 'rejected',
+              consented_at, requested_at, decided_at null, PK (book_id, resume_id)
+unlocks       id, book_id → books, recruiter_id → users, price_cents (what was paid), created_at,
+              unique (book_id, recruiter_id)
 ```
 
-Withdrawn resumes are excluded from every query, and withdrawing deletes the S3 object.
+Recruiters only ever see resumes with an `accepted` membership. `majors` and `skills` are stored
+lowercased for filtering; `profile` keeps the original casing for display. A school is identified by its
+primary email domain ("psu.edu").
 
 ## Pages
 
 | Route | Who | What |
 |-------|-----|------|
 | `/` | everyone | Landing with two CTAs: "List your club's book" and "Find candidates" |
-| `/onboarding` | new user | Pick officer or recruiter (recruiters enter a company) |
-| `/dashboard` | officer | Create club and book, copy student link, bulk upload, resume list + parse status, unlocks + earnings |
-| `/join/[bookId]` | student, no account | Name, email, PDF, consent checkbox → shows a private withdraw link |
-| `/withdraw/[token]` | student | One-click removal |
-| `/browse` | recruiter | Published books + cross-book search (grad year, major, seeking, skills, free text) |
-| `/books/[bookId]` | recruiter | Teaser cards; after unlock, names, emails, and PDF downloads |
+| `/signup`, `/login` | everyone | School or recruiter → school typeahead → themed `<Authenticator>` |
+| `/setup` | new account | School: create a club and/or add a resume and request books. Recruiter: company, title, hiring defaults |
+| `/dashboard` | officer | Copy join link, accept or reject join requests, members, unlocks + earnings |
+| `/join/[slug]` | school account | Request to join this club's book with your resume (consent checkbox) |
+| `/browse` | recruiter | Cross-book search with filters; a resume opens as a redacted teaser until unlocked |
 | `/pricing`, `/billing` | recruiter | Delivered by the `/monetize` PR |
 
 ## Flows
 
-**Upload** (server action): validate PDF ≤ 5 MB → put `resumes/{bookId}/{uuid}.pdf` → insert row as
-`pending` → `await parseResume()` (~5–10 s) → update row. Bulk upload calls the same action once per file,
-4 at a time. The officer ticks a box confirming the club's original form allowed sharing with employers.
+**Join** (server actions): the student uploads a PDF ≤ 5 MB → put `resumes/{userId}/{uuid}.pdf` →
+`await parseResume()` (~5–10 s) → the student reviews the profile, ticks consent, and picks books at their
+school → save the resume and add `pending` memberships. The officer accepts or rejects on `/dashboard`.
+Re-uploading replaces the one resume in every book.
 
-**Search:** plain SQL filters (`grad_year = any`, `majors && $1`, `seeking && $2`, `skills && $3`) plus
-`search_text ilike '%q%'`. Order by grad year, then newest. No ranking.
+**Search:** recruiters only, accepted memberships only. Any-of within school, grad year, seeking, major,
+and club; skills must all match (`skills @> $1`). Free text: every word must appear in `search_text`
+(trigram-indexed) or an accepted club's name. Order by grad year then newest, or newest. No ranking.
 
 **Unlock:** `canUnlock` → insert `unlocks` row → `recordUnlock` → page reveals contact info and downloads.
+
+**Withdraw:** leaving a book deletes the membership; deleting the resume deletes the S3 object, the row,
+and every membership.
 
 ## Gotchas
 
 - Amplify console rejects env vars starting with `AWS_`; use `APP_REGION`.
+- Amplify Hosting doesn't support Edge middleware. Pages check the session server-side through
+  `src/backend/auth` instead.
+- Cognito's default email sender is capped at 50 emails a day per AWS account, and the cap can't be raised.
+  Switch the pool to SES before real launch.
 - Amplify SSR only sees server env vars written at build time: in `amplify.yml`, append them to
   `.env.production` before `npm run build`.
 - Raise the server action body limit to `'5mb'` (`serverActions.bodySizeLimit` in `next.config.ts`) for
@@ -155,7 +204,7 @@ Env vars: `DATABASE_URL`, `APP_REGION`, `RESUME_BUCKET`, `BEDROCK_MODEL_ID`,
 | 12:00–12:30 | Agree on both contracts together; scaffold the repo | ↔ |
 | 12:30–1:30 | Next.js + auth + Drizzle schema, **deployed on Amplify** | `parseResume` working on the fake PDFs |
 | 1:30–2:30 | `/dashboard` + `/join` (**send student links to officers by 2:30**) | Run `/monetize` on the deployed app, review and merge the PR |
-| 2:30–4:00 | `/browse`, `/books/[id]`, search | `TeaserCard`, wire `lib/billing.ts`, test checkout end to end |
+| 2:30–4:00 | `/browse`, search | wire `src/backend/billing`, test checkout end to end |
 | 4:00–7:00 | Bug fixes, earnings view, landing page | **Sell full time** |
 | 7:00–8:00 | Code freeze 7:30. Demo run-through | Traction numbers. Send the feedback log, then do the survey in one sitting (~10 min; it can't be resumed) |
 
@@ -166,9 +215,9 @@ Collective, HackPSU, Nittany AI, Google Developers Club, CCSO, MICS, Hax Club, O
 
 **Demand (recruiters):** judges' companies (Luminal, VetRec, Unseen AI, Raya, Starborn, Cara), sponsors
 (AWS, MongoDB, Bloomerang, AGI Inc), and Builder's Collective's local businesses. Ask each to sign up,
-subscribe with a test card, and email a one-line commitment: "We'd pay $X/mo for this when it's live."
+buy a book with a test card, and email a one-line commitment: "We'd pay $X for this book when it's live."
 
-**Track live:** clubs onboarded, resumes uploaded, recruiters signed up, subscriptions, unlocks, commitments.
+**Track live:** clubs onboarded, resumes uploaded, recruiters signed up, book purchases, commitments.
 
 Officer message:
 > Building a tool at c0mpiled today that lets companies pay to unlock your club's resume book, and the club
@@ -178,7 +227,7 @@ Officer message:
 
 1. Clubs already sell resume books through Google Forms and password-protected PDFs ($250–$650 each).
 2. Officer creates a book and shares the link; a student uploads live and the teaser appears.
-3. Recruiter filters across clubs, subscribes through the App Monetization checkout, unlocks, downloads.
+3. Recruiter filters across clubs, buys a book through the App Monetization checkout, downloads.
 4. The club dashboard shows earnings.
 5. Traction: real clubs, real resumes, real recruiter signups and commitments.
 
